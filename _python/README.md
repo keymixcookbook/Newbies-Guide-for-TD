@@ -1,27 +1,60 @@
-# Python in a nutshell :chestnut:
+# PYTHON (in a nutshell :chestnut:)
 Useful things in python (*I am gonna assume you know the general logic of coding*)
 
-### Table of Contents
-- [<span style="color:#e6e6e6">Python Scripting Structure](#Python-Scripting-Structure)
-- [<span style="color:#e6e6e6">Variables](#Variables)
+###### > Table of Contents <
+- [The Bare-Bones](#The-Bare-Bones)
+- [Python Structure](#Python-Structure)
+- [Put up Conditions](#Conditions)
+- [Define Variables](#Variables)
+- [Nuke It (separate page)](#The-Mighty-Nuke)
+
+## The Bare-Bones
+```python
+
+# this is a comment, for labeling, one line only
+
+import module # import a external script, name without .py extension
+
+var = "assign" # Assign a variable
+integer = 1 # Integer Number
+float = 1.0 # Float Number, gotta have the decimals
+
+if var == "assign": # '==' is to check if variable, var, is "assign"
+  return True # this is a Boolean
+  print "This is True" # Print is to see the result
+else:
+  return False
+
+def A_Function():
+  # something happened here
+  return "this is a function"
+
+module.other_function() #to run a function inside the module imported
+```
 
 
-## Python Scripting Structure
+## Python Structure
 
 Python works in hierarchy
 
 >  - main_script.py
 >    - module_A.py
+>      - class_a()
 >      - function_a()
 
-Let's define `function_a()` in `module_A.py`
+*Above is also how the `/.nuke` folder file structure looks like.*
+
+Let's define `function_a()` in `module_A.py`, will leave `class_a()` for later on.
+
+In `module_A.py`
 
 ```python
+# define the function in module_A.py
 def function_a():
   return "something"
 ```
 
-As in the script `main_script.py`
+In `main_script.py`
 
 ```python
 # to import the module
@@ -71,4 +104,17 @@ function_a_renamed()
 >! Because we used "from...import...", we don't have to put the module name in front of the function to reference it
 
 
+## Conditions
+Ones they are often used: `if...else...`,`for...`, `try...except...`
+
 ## Variables
+You can assign a variable in 5 ways or levels:
+> - Environment
+> - Script/Module
+> - Class
+> - Function
+> - Conditions
+
+And they are also in a hierarchy - if a `variable` is defined in one level, it **can't** be used in the level **above**, but it **can** be used in the level **below**
+
+For this, we are mainly focus on 3 levels: **Script/Module**, **Function**, **Conditions**
