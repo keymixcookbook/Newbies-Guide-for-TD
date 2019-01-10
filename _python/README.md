@@ -10,25 +10,31 @@ Useful things in python (*I am gonna assume you know the general logic of coding
 
 ## The Bare-Bones
 ```python
-
 # this is a comment, for labeling, one line only
 
+# Modules
 import module # import a external script, name without .py extension
 
+# Variables
 var = "assign" # Assign a variable
 integer = 1 # Integer Number
 float = 1.0 # Float Number, gotta have the decimals
 
-if var == "assign": # '==' is to check if variable, var, is "assign"
+# Conditions
+if var == "assign": # '==' is to check if variable, var, is "assign", ':' is to end the statement
   return True # this is a Boolean
   print "This is True" # Print is to see the result
-else:
+elif var != "assign": # '!=' means if it is not...
   return False
+else:
+  print "gotta have the else"
 
+# Functions
 def A_Function():
   # something happened here
   return "this is a function"
 
+# To Use function in a module
 module.other_function() #to run a function inside the module imported
 ```
 
