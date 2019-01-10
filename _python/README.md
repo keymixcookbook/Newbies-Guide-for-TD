@@ -5,10 +5,8 @@ Useful things in python (*I am gonna assume you know the general logic of coding
 - [<span style="color:#e6e6e6">Python Scripting Structure](#Python-Scripting-Structure)
 - [<span style="color:#e6e6e6">Variables](#Variables)
 
----
----
 
-### Python Scripting Structure
+## Python Scripting Structure
 
 Python works in hierarchy
 
@@ -72,7 +70,5 @@ function_a_renamed()
 
 >! Because we used "from...import...", we don't have to put the module name in front of the function to reference it
 
----
----
 
 ## Variables
