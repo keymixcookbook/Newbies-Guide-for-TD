@@ -1,6 +1,6 @@
 # Nuke Modding Guide for Newbies
 
-More of a learning Repository for Nuke Python module
+More of a learning Repository for Nuke Python module, nuke modding fun
 
 ### Table of Content (Respository)
 
