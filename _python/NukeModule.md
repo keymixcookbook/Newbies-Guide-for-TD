@@ -7,5 +7,5 @@ Only includes the things that are often used, you can go [HERE](https://learn.fo
 - [Directories for python scripts](#Directories-for-python-scripts)
 - [Structure](#Structure)
 - [Nodes Tabs Knobs](#Nodes-Tabs-Knobs)
-- [Menu Items](#Menu Items)
-- [Simple Panels](#Simple Panels)
+- [Menu Items](#Menu-Items)
+- [Simple Panels](#Simple-Panels)

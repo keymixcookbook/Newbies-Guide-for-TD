@@ -2,7 +2,7 @@
 
 More of a learning Repository for Nuke Python module, nuke modding fun
 
-### Table of Content (Respository)
+### Table of Content (Repository)
 
 - [Modding with Python](./_python)
 - [~~Modding with Expression/TCL~~](./_tcl)
