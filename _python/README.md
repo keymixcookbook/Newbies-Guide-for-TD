@@ -1,26 +1,81 @@
 # PYTHON (in a nutshell :chestnut:)
-Useful things in python (*I am gonna assume you know the general logic of coding*)
+Useful things in python (*I am gonna assume you know the general logic of coding*). Only includes the things that are often used, you can go [Homepage](./README.md) to find the reference for more detailed documentation.
 
-###### > Table of Contents <
-- [The Bare-Bones](#The-Bare-Bones)
+This is python only, does not include the [Nuke module](NukeModule.md), and [supporting modules](SupportModule.md)(i.e. os(very useful), collection(can be useful) )
+
+## Table of Contents
+- [Operators](#Operators)
+- [Basic Syntax](#Basic-Syntax)
+- [Comments](#Comments)
+- [Variables Types](#Variable-Types)
+- [Value Convert](#Value-Convert)
+- [If Condition Statement](#If-Condition-Statement)
+- [Loops](#Loops)
+- [Comprehensions](#Comprehensions)
+- [Exception Statement](#Exception-Statement)
+- [Functions](#Functions)
+- [Modules](#Modules)
 - [Python Structure](#Python-Structure)
-- [Put up Conditions](#Conditions)
-- [Define Variables](#Variables)
-- [Nuke It (separate page)](#The-Mighty-Nuke)
 
-## The Bare-Bones
+###### Operators
+- Comparison
+  - `=` assign
+  - `==` is equal to
+  - `!=` is not equal to
+  - `>`,`<` bigger, smaller than
+  - `=>`, `=<` bigger/smaller and equal to
+- Math
+  - `+`, `-`, `*`, `/` plus, minus, multiply, divide
+  - `%`, `**` modulus, exponent
+- Logical
+  - `and` if a and b
+  - `or`  if a or b
+  - `not` if not(a and b)
+- Membership (*I know...that's what it is called*)
+  - `in`, `not in` if or not included
+  - `is`, `is not` if or not is exactly
+
+###### Basic Syntax
+- `""`,`''` String
+- `\n` Line break, to used in String
+- `;` multiple statement in a single line
+- `:` to define a **Suite**, used with `if`,`for`, `def`, etc.
+- `[]`, `()`, `{}` list, tuples, dictionary
+
+###### Comments
 ```python
 # this is a comment, for labeling, one line only
 
-# Modules
-import module # import a external script, name without .py extension
+'''
+This is a multi line comment
+can also be string in paragraph form
+'''
+```
 
-# Variables
-var = "assign" # Assign a variable
+###### Variable Types
+```python
+string = "This is a String"
 integer = 1 # Integer Number
 float = 1.0 # Float Number, gotta have the decimals
 
-# Conditions
+list = ['This', 1, ['list']] #list, can contain string, integer and float at the same time
+tuple = (1, 'tuple') #list, but can't manipulate afterwards
+dic = {'key': 'value', 'second': 2} #dictionary, with a Key and a Value
+
+# lists starts with Index 0, lists are assigned above
+print list[0] # Returns 'This'
+print tuple[1] # returns 'tuple'
+print dic['key'] # returns 'value'
+```
+
+###### Value Convert
+```python
+int() # String or Float -> Integer
+float() # String or Integer -> Float
+str() # Integer or Float -> String
+```
+###### If Condition Statement
+```python
 if var == "assign": # '==' is to check if variable, var, is "assign", ':' is to end the statement
   return True # this is a Boolean
   print "This is True" # Print is to see the result
@@ -28,99 +83,82 @@ elif var != "assign": # '!=' means if it is not...
   return False
 else:
   print "gotta have the else"
+```
 
-# Functions
-def A_Function():
+##### Loops
+```python
+# for loops
+for i in list:
+  return "something with looping through the list"
+
+# while loops
+while i<10:
+  return "while i is still smaller then 10"
+  print "do something"
+  i = i+1 #manipulate the value, or while loop never ends
+```
+
+###### Comprehensions
+```python
+list_new = [i for i in list_orig if 'condition' == True]
+
+for i in list_orig: # condition in the middle
+  if 'condition' == True: # condition at the end
+    list_new.append(i) #list item at the beginning
+```
+
+###### Exception Statement
+```python
+# try except statement; if error, it will skip
+try:
+  print "Do something here"
+except:
+  print "Something went wrong"
+  print "but code keeps running and skip the above action"
+
+# Code keeps running
+```
+
+###### Functions
+```python
+# A set of codes, run on demand
+def this_function():
   # something happened here
   return "this is a function"
 
-# To Use function in a module
-module.other_function() #to run a function inside the module imported
+def another_function(input_var, arg='keywards'):
+  if input_var == "used as a input for this function":
+    print "variable, arg, is predefined in the suite headline"
 ```
 
+###### Modules
+```python
+# Python script in a directory
 
-## Python Structure
+# import a external script, name without .py extension
+import module_a # Method 1
+module_a.function_a() # reference its function
+
+from module_b import * # Method 2
+function_b() # reference its function
+
+import module_c as c # Method 3
+c.function_c() # reference its function
+
+import package.module_d as d # Method 4
+d.function_d() # reference its function
+
+```
+
+###### Python Structure
 
 Python works in hierarchy
 
->  - main_script.py
->    - module_A.py
->      - class_a()
->      - function_a()
-
-*Above is also how the `/.nuke` folder file structure looks like.*
-
-Let's define `function_a()` in `module_A.py`, will leave `class_a()` for later on.
-
-In `module_A.py`
-
-```python
-# define the function in module_A.py
-def function_a():
-  return "something"
-```
-
-In `main_script.py`
-
-```python
-# to import the module
-import module_A
-
-# To Reference a function within the module
-module_A.function_a()
-
-```
-
-so to use the function: `module.function()` and modules are basically a set of python script file
-
-**OR**
-
-```python
-
-# to import the module with "from...import..."
-
-#--------------------------------------------------
-
-### Method 1 ###
-
-from module_A import *
-
-# To Reference the function
-function_a()
-
-#--------------------------------------------------
-
-### Method 2 ###
-
-import module_A as mod_A
-
-# To Reference the function
-mod_A.function_a()
-
-#--------------------------------------------------
-
-### Method 3 ###
-
-from module_A import function_a as function_a_renamed
-
-# To Reference the function
-function_a_renamed()
-```
-
->! Because we used "from...import...", we don't have to put the module name in front of the function to reference it
-
-
-## Conditions
-Ones they are often used: `if...else...`,`for...`, `try...except...`
-
-## Variables
-You can assign a variable in 5 ways or levels:
-> - Environment
-> - Script/Module
-> - Class
-> - Function
-> - Conditions
-
-And they are also in a hierarchy - if a `variable` is defined in one level, it **can't** be used in the level **above**, but it **can** be used in the level **below**
-
-For this, we are mainly focus on 3 levels: **Script/Module**, **Function**, **Conditions**
+>  - `main_script.py`
+>    - `./package`
+>     - `__init__.py`
+>     - `pkg_module.py`
+>    - `module_A.py`
+>      - `class_a()`
+>       - `class_method()`
+>      - `function_a()`
