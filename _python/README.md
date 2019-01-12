@@ -1,7 +1,7 @@
 # PYTHON (in a nutshell :chestnut:)
 Useful things in python (*I am gonna assume you know the general logic of coding*). Only includes the things that are often used, you can go [Homepage](./README.md) to find the reference for more detailed documentation.
 
-This is python only, does not include the [Nuke module](NukeModule.md), and [supporting modules](SupportModule.md)(i.e. os(very useful), collection(can be useful) )
+This is python only, does not include the [Nuke module](NukeModule.md), and [supporting modules](SupportModule.md) (i.e. **os**(very useful), **collection**(can be useful) )
 
 ## Table of Contents
 - [Operators](#Operators)
@@ -85,7 +85,7 @@ else:
   print "gotta have the else"
 ```
 
-##### Loops
+###### Loops
 ```python
 # for loops
 for i in list:
@@ -160,5 +160,5 @@ Python works in hierarchy
 >     - `pkg_module.py`
 >    - `module_A.py`
 >      - `class_a()`
->       - `class_method()`
+>         - `class_method()`
 >      - `function_a()`
