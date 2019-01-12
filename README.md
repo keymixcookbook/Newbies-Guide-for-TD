@@ -9,6 +9,7 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 - [~~Modding with Expression/TCL~~](./_tcl)
 - [~~Modding with PySide~~](###)
 - [~~Modding with Blink Script~~](###)
+- [~~Modding with PySide~~](###)
 
 ###### > Online References and Guides <
 - [Nuke Developer's Guide ('Quick' start)](https://learn.foundry.com/nuke/developers/80/pythondevguide/index.html)

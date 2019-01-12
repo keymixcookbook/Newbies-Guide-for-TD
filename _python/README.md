@@ -154,11 +154,11 @@ d.function_d() # reference its function
 
 Python works in hierarchy
 
->  - `main_script.py`
->    - `./package`
+> - `main_script.py`
+>   - `./package`
 >     - `__init__.py`
 >     - `pkg_module.py`
->    - `module_A.py`
->      - `ClassA()`
->         - `classMethod()`
->      - `function_a()`
+>   - `module_A.py`
+>     - `ClassA()`
+>       - `classMethod()`
+>     - `function_a()`
