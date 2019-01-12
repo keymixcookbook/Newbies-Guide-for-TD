@@ -159,6 +159,6 @@ Python works in hierarchy
 >     - `__init__.py`
 >     - `pkg_module.py`
 >    - `module_A.py`
->      - `class_a()`
->         - `class_method()`
+>      - `ClassA()`
+>         - `classMethod()`
 >      - `function_a()`
