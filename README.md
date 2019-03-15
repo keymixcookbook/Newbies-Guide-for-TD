@@ -6,7 +6,8 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 
 - [How to GitHub](https://guides.github.com/activities/hello-world/)
 - [Modding with Python](./_python)
-- [~~Modding with Expression/TCL~~](./_tcl)
+- [Modding with Expression/TCL](./_tcl)
+- [Shell Setup](./_shell)
 - [~~Modding with PySide~~](###)
 - [~~Modding with Blink Script~~](###)
 - [~~Modding with PySide~~](###)
