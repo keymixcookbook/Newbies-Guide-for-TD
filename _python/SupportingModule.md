@@ -11,7 +11,10 @@ Useful things in other supporting modules that comes with python (*I am gonna as
 ### collections
 Ideal for counting the duplicates of an item in an arry, and number of occerance - [Online Ref](https://docs.python.org/2/library/collections.html)
 
-`collection.Counter(ls)`
+```python
+import collections
+collections.Counter(ls)
+```
 
 ```python
 ls = ['a', 'a', 'b', 'b', 'c', 'c', 'c', 'd']
@@ -23,4 +26,24 @@ collections.Counter(ls)
 collections.Counter(ls).keys()
 ### ['a', 'b', 'c', 'd']
 
+```
+
+### math
+For Math operations (duh) - [Online Ref](https://docs.python.org/2/library/math.html)
+
+```python
+import math
+```
+
+```python
+num = 1.45
+
+math.floor(num) # round down
+### 1
+
+math.ceil(num) # round up
+### 2
+
+math.round(num) # round
+### 2
 ```
