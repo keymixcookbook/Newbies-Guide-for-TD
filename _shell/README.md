@@ -6,7 +6,7 @@ Shell basics for Linux
 `/usr/<username>/config/cshrc.csh`
 
 ### Snippets
-```sh
+```shell
 # Commands
 ls # List Directories
 cd # Change Directories
