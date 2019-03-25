@@ -14,6 +14,8 @@ This is python only, does not include the [Nuke module](NukeModule.md), and [sup
 - [Comprehensions](#Comprehensions)
 - [Exception Statement](#Exception-Statement)
 - [Functions](#Functions)
+- [Class](#Class)
+- [Constructor](#Constructor)
 - [Modules](#Modules)
 - [Python Structure](#Python-Structure)
 
