@@ -14,11 +14,21 @@ from PySide.QtGui import *
 # Define QApplication
 app = QApplication(parent=none)
 
-# Make Widgets
-widget = QLabel('Any QWidget Object here')
+# Make Widget Objects
+class AppObject(QLabel):
+	# Constructor
+	def __init__(self):
+		QLable.__init__(self, "Any QWidget Object here")
 
-# Run Application
-widget.show()
-app.exec_()
+		# Set initial values
+		self.setMinimumSize(QSize(600,400))
+		self.setAlignment(Qt.AlignCenter)
+		self.setWindowTitle("This QWidget Title")
 
+	# Run Application
+	def run(self):
+		self.show()
+		app.exec_()
+		
+AppObject().run()
 ```
