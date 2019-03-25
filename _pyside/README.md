@@ -1,6 +1,9 @@
 # PYSIDE (in a nutshell :chestnut:)
 Python on steriods
 
+###### PySide or PyQt
+same
+
 ###### The Basics
 - PySide has 2 main objects: `QtCore` & `QtGui`
 - `QWidget`: all visiable elements (**widget**) 
