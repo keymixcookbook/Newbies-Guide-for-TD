@@ -131,6 +131,19 @@ def another_function(input_var, arg='keywards'):
     print "variable, arg, is predefined in the suite headline"
 ```
 
+
+###### Class
+
+
+###### Constructor
+
+```python
+# Initiate the value of a Class when an object of Class is created
+
+def __init__(self):
+  self.method = 'something'
+```
+
 ###### Modules
 ```python
 # Python script in a directory
