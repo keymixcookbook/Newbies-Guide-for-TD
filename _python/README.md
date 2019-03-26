@@ -14,8 +14,8 @@ This is python only, does not include the [Nuke module](NukeModule.md), and [sup
 - [Comprehensions](#Comprehensions)
 - [Exception Statement](#Exception-Statement)
 - [Functions](#Functions)
-- [**Class**](#Class)
 - [Constructor](#Constructor)
+- [Class](#Class)
 - [Modules](#Modules)
 - [Python Structure](#Python-Structure)
 
@@ -36,6 +36,8 @@ This is python only, does not include the [Nuke module](NukeModule.md), and [sup
 - Membership (*I know...that's what it is called*)
   - `in`, `not in` if or not included
   - `is`, `is not` if or not is exactly
+  
+[:chestnut::](#Table-of-Contents)
 
 ###### Basic Syntax
 - `""`,`''` String
@@ -43,6 +45,9 @@ This is python only, does not include the [Nuke module](NukeModule.md), and [sup
 - `;` multiple statement in a single line
 - `:` to define a **Suite**, used with `if`,`for`, `def`, etc.
 - `[]`, `()`, `{}` list, tuples, dictionary
+
+[:chestnut::](#Table-of-Contents)
+
 
 ###### Comments
 ```python
@@ -53,6 +58,8 @@ This is a multi line comment
 can also be string in paragraph form
 '''
 ```
+[:chestnut::](#Table-of-Contents)
+
 
 ###### Variable Types
 ```python
@@ -69,6 +76,8 @@ print list[0] # Returns 'This'
 print tuple[1] # returns 'tuple'
 print dic['key'] # returns 'value'
 ```
+[:chestnut::](#Table-of-Contents)
+
 
 ###### Value Convert
 ```python
@@ -76,6 +85,8 @@ int() # String or Float -> Integer
 float() # String or Integer -> Float
 str() # Integer or Float -> String
 ```
+[:chestnut::](#Table-of-Contents)
+
 ###### If Condition Statement
 ```python
 if var == "assign": # '==' is to check if variable, var, is "assign", ':' is to end the statement
@@ -86,6 +97,8 @@ elif var != "assign": # '!=' means if it is not...
 else:
 	print "gotta have the else"
 ```
+[:chestnut::](#Table-of-Contents)
+
 
 ###### Loops
 ```python
@@ -99,6 +112,8 @@ while i<10:
 	print "do something"
 	i = i+1 #manipulate the value, or while loop never ends
 ```
+[:chestnut::](#Table-of-Contents)
+
 
 ###### Comprehensions
 ```python
@@ -108,6 +123,8 @@ for i in list_orig: # condition in the middle
 	if 'condition' == True: # condition at the end
 		list_new.append(i) #list item at the beginning
 ```
+[:chestnut::](#Table-of-Contents)
+
 
 ###### Exception Statement
 ```python
@@ -120,6 +137,8 @@ except:
 
 # Code keeps running
 ```
+[:chestnut::](#Table-of-Contents)
+
 
 ###### Functions
 ```python
@@ -132,6 +151,8 @@ def another_function(input_var, arg='keywards'):
 	if input_var == "used as a input for this function":
 		print "variable, arg, is predefined in the suite headline"
 ```
+[:chestnut::](#Table-of-Contents)
+
 
 
 ###### Constructor
@@ -142,6 +163,8 @@ def another_function(input_var, arg='keywards'):
 def __init__(self):
 	self.method = 'something'
 ```
+[:chestnut::](#Table-of-Contents)
+
 
 
 ###### Class
@@ -166,6 +189,7 @@ class ChildClass(ThisClass):
 ```
 
 `self` - A reference to current instance of the `Class`
+[:chestnut::](#Table-of-Contents)
 
 
 
@@ -187,6 +211,8 @@ import package.module_d as d # Method 4
 d.function_d() # reference its function
 
 ```
+[:chestnut::](#Table-of-Contents)
+
 
 ###### Python Structure
 
@@ -200,3 +226,4 @@ Python works in hierarchy
 >     - `ClassA()`
 >       - `classMethod()`
 >     - `function_a()`
+[:chestnut::](#Table-of-Contents)
