@@ -159,7 +159,10 @@ class ThisClass:
 # Reference instance value
 ThisClass().param
 ThisClass().ClassMethod()
-    
+
+# Define Child Class
+class ChildClass(ThisClass):
+	
 ```
 
 `self` - A reference to current instance of the `Class`
