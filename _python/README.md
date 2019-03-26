@@ -14,7 +14,7 @@ This is python only, does not include the [Nuke module](NukeModule.md), and [sup
 - [Comprehensions](#Comprehensions)
 - [Exception Statement](#Exception-Statement)
 - [Functions](#Functions)
-- [Class](#Class)
+- [**Class**](#Class)
 - [Constructor](#Constructor)
 - [Modules](#Modules)
 - [Python Structure](#Python-Structure)
@@ -134,7 +134,18 @@ def another_function(input_var, arg='keywards'):
 ```
 
 
+###### Constructor
+
+```python
+# Initiate the value of a Class when an object of Class is created
+
+def __init__(self):
+	self.method = 'something'
+```
+
+
 ###### Class
+The Holy Grail of Python
 
 ```python
 # Define a Class
@@ -154,14 +165,6 @@ ThisClass().ClassMethod()
 `self` - A reference to current instance of the `Class`
 
 
-###### Constructor
-
-```python
-# Initiate the value of a Class when an object of Class is created
-
-def __init__(self):
-	self.method = 'something'
-```
 
 ###### Modules
 ```python
