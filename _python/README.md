@@ -79,25 +79,25 @@ str() # Integer or Float -> String
 ###### If Condition Statement
 ```python
 if var == "assign": # '==' is to check if variable, var, is "assign", ':' is to end the statement
-  return True # this is a Boolean
-  print "This is True" # Print is to see the result
+	return True # this is a Boolean
+	print "This is True" # Print is to see the result
 elif var != "assign": # '!=' means if it is not...
-  return False
+	return False
 else:
-  print "gotta have the else"
+	print "gotta have the else"
 ```
 
 ###### Loops
 ```python
 # for loops
 for i in list:
-  return "something with looping through the list"
+	return "something with looping through the list"
 
 # while loops
 while i<10:
-  return "while i is still smaller then 10"
-  print "do something"
-  i = i+1 #manipulate the value, or while loop never ends
+	return "while i is still smaller then 10"
+	print "do something"
+	i = i+1 #manipulate the value, or while loop never ends
 ```
 
 ###### Comprehensions
@@ -105,18 +105,18 @@ while i<10:
 list_new = [i for i in list_orig if 'condition' == True]
 
 for i in list_orig: # condition in the middle
-  if 'condition' == True: # condition at the end
-    list_new.append(i) #list item at the beginning
+	if 'condition' == True: # condition at the end
+		list_new.append(i) #list item at the beginning
 ```
 
 ###### Exception Statement
 ```python
 # try except statement; if error, it will skip
 try:
-  print "Do something here"
+	print "Do something here"
 except:
-  print "Something went wrong"
-  print "but code keeps running and skip the above action"
+	print "Something went wrong"
+	print "but code keeps running and skip the above action"
 
 # Code keeps running
 ```
@@ -125,12 +125,12 @@ except:
 ```python
 # A set of codes, run on demand
 def this_function():
-  # something happened here
-  return "this is a function"
+	# something happened here
+	return "this is a function"
 
 def another_function(input_var, arg='keywards'):
-  if input_var == "used as a input for this function":
-    print "variable, arg, is predefined in the suite headline"
+	if input_var == "used as a input for this function":
+		print "variable, arg, is predefined in the suite headline"
 ```
 
 
@@ -140,7 +140,7 @@ def another_function(input_var, arg='keywards'):
 # Define a Class
 class ThisClass:
 	def __init__(self):
-  		self.param = 'parameters'
+		self.param = 'parameters'
 	
 	def ClassMethod(self):
 		var = "Function in a Class is a Method"
@@ -160,7 +160,7 @@ ThisClass().ClassMethod()
 # Initiate the value of a Class when an object of Class is created
 
 def __init__(self):
-  self.method = 'something'
+	self.method = 'something'
 ```
 
 ###### Modules
