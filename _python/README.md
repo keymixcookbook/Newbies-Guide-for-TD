@@ -136,6 +136,23 @@ def another_function(input_var, arg='keywards'):
 
 ###### Class
 
+```python
+# Define a Class
+class ThisClass:
+	def __init__(self):
+  		self.param = 'parameters'
+	
+	def ClassMethod(self):
+		var = "Function in a Class is a Method"
+
+# Reference instance value
+ThisClass().param
+ThisClass().ClassMethod()
+    
+```
+
+`self` - A reference to current instance of the `Class`
+
 
 ###### Constructor
 
