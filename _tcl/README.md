@@ -1,7 +1,7 @@
 # TCL in a nutshell :chestnut:
 Useful things in TCL, also used by Nuke Expressions
 
-# Snippets
+# Syntax
 
 ### Labelling
 
@@ -76,3 +76,9 @@ fBm(x, y, z, octaves, lacunarity, gain) // full range values
 turbulence(x, y, z, octaves, lucanarity, gain) // only abs values
 noise(x, y, z)
 ```
+
+# Snippets
+
+UV with overscan
+`(((((x+parent.overscan)/(width+parent.overscan*2))*((width)+parent.overscan*2))-parent.overscan)/(width))-(0.5/width)`
+
