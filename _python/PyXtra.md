@@ -1,5 +1,38 @@
 # Additional Python codes
 
+### __name__ & __main__
+
+```python
+
+if __name__ == '__main__':
+	# module being directly ran
+else
+	# module not being directly ran, but ran as an import
+
+```
+
+> if run directly, variable `__name__` will be `__main__`;
+> if run imported, variable `__name__` will be the **module name**.
+
+`import_module.py`
+```python
+
+def main():
+	print __name__
+print main()
+
+>>>__main__
+
+```
+
+`main_module.py`
+```Python
+
+import import_module
+
+>>> 'import_module'
+```
+
 ### Ternary Operators
 ```Python
 # var
