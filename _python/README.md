@@ -18,6 +18,7 @@ This is python only, does not include the [Nuke module](NukeModule.md), and [sup
 - [Class](#Class)
 - [Modules](#Modules)
 - [Python Structure](#Python-Structure)
+- [Other ways of scripting in Python](PyXtra.md)
 
 ###### Operators
 - Comparison
@@ -36,7 +37,7 @@ This is python only, does not include the [Nuke module](NukeModule.md), and [sup
 - Membership (*I know...that's what it is called*)
   - `in`, `not in` if or not included
   - `is`, `is not` if or not is exactly
-  
+
 [:chestnut::](#Table-of-Contents)
 
 ###### Basic Syntax
@@ -175,7 +176,7 @@ The Holy Grail of Python
 class ThisClass:
 	def __init__(self):
 		self.param = 'parameters'
-	
+
 	def ClassMethod(self):
 		var = "Function in a Class is a Method"
 
@@ -185,7 +186,7 @@ ThisClass().ClassMethod()
 
 # Define Child Class
 class ChildClass(ThisClass):
-	
+
 ```
 
 `self` - A reference to current instance of the `Class`
