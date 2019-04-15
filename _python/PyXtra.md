@@ -26,7 +26,7 @@ print x
 ```
 
 ### Loop with multiple lists
-```pythonw
+```python
 # enumerate(list, start_number)
 ls = ['potato', 'cabbage', 'burrito']
 
