@@ -9,3 +9,20 @@ Only includes the things that are often used, you can go [HERE](https://learn.fo
 - [Nodes Tabs Knobs](#Nodes-Tabs-Knobs)
 - [Menu Items](#Menu-Items)
 - [Simple Panels](#Simple-Panels)
+
+### Directories for python scripts
+
+### Structure
+
+### Nodes Tabs Knobs
+
+###### Input and Outputs
+```python
+node.dependences()
+node.dependent()
+
+```
+
+# Menu Items
+
+# Simple Panels
