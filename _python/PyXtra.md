@@ -1,36 +1,29 @@
 # Additional Python codes
 
-### __name__ & __main__
+
+### List Manipulation
 
 ```python
+# Add
+ls.append(item)
+ls[key] = value
+ls.extend([item1, item2])
 
-if __name__ == '__main__':
-	# module being directly ran
-else
-	# module not being directly ran, but ran as an import
+# Remove
+ls.remove(item) # Can't be assigned as a new variable directly
 
-```
+# Sort
+sorted(ls)
 
-> if run directly, variable `__name__` will be `__main__`;
-> if run imported, variable `__name__` will be the **module name**.
+# List to Strings
+', '.join(ls)
 
-`import_module.py`
-```python
+# Zip
+ls_a = ['a','b','c']
+ls_b = [1, 2, 3]
+zip(ls_a, ls_b)
 
-def main():
-	print __name__
-print main()
-
->>>__main__
-
-```
-
-`main_module.py`
-```Python
-
-import import_module
-
->>> 'import_module'
+>>> [['a', 1], ['b', 2], ['c', 3]] 
 ```
 
 ### Ternary Operators
@@ -96,4 +89,36 @@ print c
 >>>2
 >>>[3, 4, 5]
 
+```
+
+### name & main
+
+```python
+
+if __name__ == '__main__':
+	# module being directly ran
+else
+	# module not being directly ran, but ran as an import
+
+```
+
+- if run directly, variable `__name__` will be `__main__`;
+- if run imported, variable `__name__` will be the **module name**.
+
+###### Example
+`main_module.py` contains `import_module.py`
+
+`import_module.py`
+```python
+def main():
+	print __name__
+print main()
+
+>>>__main__ # When run standalone
+```
+`main_module.py`
+```Python
+import import_module
+
+>>> 'import_module' # When run inside main_module
 ```

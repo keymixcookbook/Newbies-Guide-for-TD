@@ -9,6 +9,7 @@ Only includes the things that are often used, you can go [HERE](https://learn.fo
 - [Nodes Tabs Knobs](#Nodes-Tabs-Knobs)
 - [Menu Items](#Menu-Items)
 - [Simple Panels](#Simple-Panels)
+- [Callbacks](#Callback)
 
 ### Directories for python scripts
 
@@ -16,13 +17,57 @@ Only includes the things that are often used, you can go [HERE](https://learn.fo
 
 ### Nodes Tabs Knobs
 
-###### Input and Outputs
+###### Nodes
 ```python
-node.dependences()
-node.dependent()
+
+nuke.createNode('Grade', inpanel=False)
+nuke.nodes.Grade(knob=knobvalue, inputs=[node])
+
+node.setInput(0, node)
+
+# Referencing Nodes
+node.dependencies(nuke.INPUTS | nuke.EXPRESSIONS | nuke.HIDDEN_INPUTS) # Reference Nodes from inputs
+node.dependent() # Reference Nodes from outputs
+
+# Layers/Channels
+nuke.Layer('layerName', ['layerName.red', 'layerName.green', 'layerName.blue'])
+
+nuke.layers(node) # return list of layer names
+```
+
+###### Knobs
+```python
+# Adding Knobs
+knob = nuke.PyScript_Knob('name','label','value')
+knob.clearFlag(nuke.STARTLINE)
+knob.setFlag(nuke.STARTLINE)
+node.addKnob(knob)
+
+# Expression/Animation
+knob.clearAnimated()
+knob.isAnimated() # Boolean
+knob.setExpression('$gui')
+knob.hasExpression() # Boolean
+```
+
+###### Tabs
+```python
+
 
 ```
 
 # Menu Items
+```python
+kuMu = nuke.menu('Nuke').addMenu('KU')
+kuMu.addCommand('menuLocation', 'functionName', 'alt+c', icon='/img.png', shortcutContext=2)
+# shortcutContext: 0=window, 1=Application, 2=DAG
+```
 
 # Simple Panels
+
+# Callbacks
+```python
+
+nuke.addKnobChanged(functionName, nodeClass='PostageStamp')
+
+```
