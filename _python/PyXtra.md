@@ -24,6 +24,12 @@ ls_b = [1, 2, 3]
 zip(ls_a, ls_b)
 
 >>> [['a', 1], ['b', 2], ['c', 3]]
+
+# One line function
+filter(function, ls)
+filter(lambda x: x+1, [1,2,3])
+
+>>>2,3,6
 ```
 
 ### Ternary Operators

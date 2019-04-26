@@ -5,7 +5,7 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 ### Table of Content (Repository)
 
 - [How to GitHub](https://guides.github.com/activities/hello-world/)
-- [Modding with Python](./_python)
+- [Modding with Python](./_python)([NukeModule](./_python/NukeModule.md) | [SupportingModule](./_python/SupportingModule.md) | [PyXtra](./_python/PyXtra.md))
 - [Modding with Expression/TCL](./_tcl)
 - [Shell Setup](./_shell)
 - [Modding with PySide](./_pyside)
