@@ -38,7 +38,7 @@ This is python only, does not include the [Nuke module](NukeModule.md), and [sup
   - `in`, `not in` if or not included
   - `is`, `is not` if or not is exactly
 
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 ###### Basic Syntax
 - `""`,`''` String
@@ -47,7 +47,7 @@ This is python only, does not include the [Nuke module](NukeModule.md), and [sup
 - `:` to define a **Suite**, used with `if`,`for`, `def`, etc.
 - `[]`, `()`, `{}` list, tuples, dictionary
 
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 
 ###### Comments
@@ -59,7 +59,7 @@ This is a multi line comment
 can also be string in paragraph form
 '''
 ```
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 
 ###### Variable Types
@@ -77,7 +77,7 @@ print list[0] # Returns 'This'
 print tuple[1] # returns 'tuple'
 print dic['key'] # returns 'value'
 ```
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 
 ###### Value Convert
@@ -86,7 +86,7 @@ int() # String or Float -> Integer
 float() # String or Integer -> Float
 str() # Integer or Float -> String
 ```
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 ###### If Condition Statement
 ```python
@@ -98,7 +98,7 @@ elif var != "assign": # '!=' means if it is not...
 else:
 	print "gotta have the else"
 ```
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 
 ###### Loops
@@ -113,7 +113,7 @@ while i<10:
 	print "do something"
 	i = i+1 #manipulate the value, or while loop never ends
 ```
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 
 ###### Comprehensions
@@ -124,7 +124,7 @@ for i in list_orig: # condition in the middle
 	if 'condition' == True: # condition at the end
 		list_new.append(i) #list item at the beginning
 ```
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 
 ###### Exception Statement
@@ -138,7 +138,7 @@ except:
 
 # Code keeps running
 ```
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 
 ###### Functions
@@ -152,7 +152,7 @@ def another_function(input_var, arg='keywards'):
 	if input_var == "used as a input for this function":
 		print "variable, arg, is predefined in the suite headline"
 ```
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 
 
@@ -164,7 +164,7 @@ def another_function(input_var, arg='keywards'):
 def __init__(self):
 	self.method = 'something'
 ```
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 
 
@@ -184,13 +184,74 @@ class ThisClass:
 ThisClass().param
 ThisClass().ClassMethod()
 
-# Define Child Class
-class ChildClass(ThisClass):
+# Example
+class ExampleClass:
+    def __init__(self, name, number):
+        self.name = name
+        self.number = number
+
+    def exampleMethod(self):
+        print "%s: %s" % (self.name, self.number)
+
+myClass = ExampleClass('Potato', 1)
+print myClass
+
+>>> "Potato: 1"
+
+myClass.number = 3 # manipulate parameter value
+del myClass.number # delete parameter
 
 ```
 
-`self` - A reference to current instance of the `Class`
-[:chestnut::](#Table-of-Contents)
+- `self` - A reference to current instance of the `Class`
+    - it **must be** the **FIRST parameter** of the `function` in the class
+    - does't has to be named `'self'`, as long as it's the **first parameter**
+
+
+###### Class Inheritance
+**Child Class** inherits properties from **Parent Class**
+
+```python
+class ChildClass(ParentClass):
+    pass
+
+class ChildClass(ExampleClass):
+    def __init__(self, name, number, newParam): # Overwrites ParentClass property
+        ExampleClass.__init__(self, name, number) # Bring back ParentClass properties
+        self.newParam = newParam
+myChild = ChildClass('Potato', 1, 'King Potato')
+print "%s: %s is %s" (myChild.name, myChild.number, myChild.newParam)
+
+>>> "Potato: 1 is King Potato"
+```
+
+###### Class Inheritance - super()
+to ignore this class' `__init__(self)` and inherits properties from Parent Class
+
+> "...In a class hierarchy with single inheritance, super can be used to refer to parent classes without naming them explicitly..."
+> -- [Python 2.0 Doc](https://docs.python.org/2/library/functions.html#super)
+
+
+```Python
+super(currentClass, self).__init__()
+
+class ParentClass(object):
+    def __init__(self, parent):
+        pass
+    def get_name():
+        print "This is from Parent Class"
+
+class ChildClass(ParentClass):
+    def __init__(self): # Overwrites QWidget properties
+        super(ChildClass, self).__init__() # Ignore the overwrite
+
+c = ChildClass()
+print c.get_name()
+
+>>> "This is from Parent Class"
+```
+
+[:chestnut:](#Table-of-Contents)
 
 
 
@@ -212,7 +273,7 @@ import package.module_d as d # Method 4
 d.function_d() # reference its function
 
 ```
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
 
 
 ###### Python Structure
@@ -227,4 +288,4 @@ Python works in hierarchy
 >     - `ClassA()`
 >       - `classMethod()`
 >     - `function_a()`
-[:chestnut::](#Table-of-Contents)
+[:chestnut:](#Table-of-Contents)
