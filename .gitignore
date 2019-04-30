@@ -111,3 +111,4 @@ venv.bak/
 .mypy_cache/
 
 __local_test__.py
+*.ai
