@@ -24,8 +24,8 @@ from PySide.QtGui import *
 # Make Widget Objects
 class Panel(QWidget):
 	# Constructor
-    def __init__(self):
-        super(Panel, self).__init__()
+	def __init__(self):
+		super(Panel, self).__init__()
 
 		# Define widget object
 		label = QLabel('Label Text')
