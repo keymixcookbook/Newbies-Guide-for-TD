@@ -112,3 +112,4 @@ venv.bak/
 
 __local_test__.py
 *.ai
+_pyside/_img/_edit
