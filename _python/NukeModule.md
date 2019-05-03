@@ -80,12 +80,20 @@ knob = nuke.PyScript_Knob('name','label','value')
 knob.clearFlag(nuke.STARTLINE)
 knob.setFlag(nuke.STARTLINE)
 node.addKnob(knob)
+knob.setFlag(0x00008000) # Another way of setting flags, expecting integer list from Nukepidia
 
 # Expression/Animation
 knob.clearAnimated()
 knob.isAnimated() # Boolean
 knob.setExpression('$gui')
 knob.hasExpression() # Boolean
+
+# Autolabel
+customLabel = "nuke.thisNode().name()+'\\n'+nuke.thisNode()['knobname'].value()" #'\\n' for new line
+customLabel_ifs = "nuke.thisNode().name() + (' big!' if nuke.thisNode()['size'].value()>100 else ' small')" # With a if statement
+# (<True Action> if <True Condition> else <Else Action>)
+
+nuke.selectedNode()['autolabel'].setValue(customLabel)
 ```
 
 ###### Tabs
@@ -109,6 +117,12 @@ kuMu.addCommand('menuLocation', 'functionName', 'alt+c', icon='/img.png', shortc
 nuke.addKnobChanged(functionName, nodeClass='PostageStamp')
 
 ```
+
+# Pipeline Integration
+
+### Startup
+script to execute on startup
+`nuke.addOnCreate(function, nodeClass='Root')`
 
 # Other
 ```python
