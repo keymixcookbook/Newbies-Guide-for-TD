@@ -5,7 +5,7 @@ Shell basics for Linux
 
 `/usr/<username>/config/cshrc.csh`
 
-### Snippets
+### Command-line Snippets
 ```shell
 # Commands
 ls # List Directories
@@ -27,4 +27,16 @@ alias comp `cd /jobs/$JOB/$SHOT/nuke/comp/scene/$USER/`
 # Enviroment
 setenv ENV_NAME value
 printenv ENV_NAME
+```
+
+### Shell Script Snippets
+```Shell
+# Command-line arguments, input variables
+$[1-9]
+
+# Set Enviroment Variables
+export KU_STUDIO_ENV=$1
+
+# Print statement
+echo "job in to $KU_STUDIO_ENV"
 ```
