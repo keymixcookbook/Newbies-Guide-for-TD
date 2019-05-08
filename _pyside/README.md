@@ -54,7 +54,7 @@ app.exec_()
 ### Useful/Basic Widgets
 Building blocks for PySide, just like bricks of Lego
 
-[`Qlabel`](#Qlabel) [`QLineEdit`](#`QLineEdit`) [`QPushButton`](#`QPushButton`) [`QCheckBox`](#`QCheckBox`) [`QComboBox`](#`QComboBox`) [`QListWidget`](#`QListWidget`) [`QTabWidget`](#`QTabWidget`)
+[`Qlabel`](#Qlabel) [`QLineEdit`](#QLineEdit) [`QPushButton`](#QPushButton) [`QCheckBox`](#QCheckBox) [`QComboBox`](#QComboBox) [QListWidget](#QListWidget) [`QTabWidget`](#QTabWidget)
 
 [`QTableWidget`](#`QTableWidget`)
 
