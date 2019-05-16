@@ -55,6 +55,9 @@ print x
 
 >>> 1
 
+# method 4
+'statement' if condition else 'statement'
+
 ```
 
 ### Loop with multiple lists
