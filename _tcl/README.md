@@ -79,6 +79,6 @@ noise(x, y, z)
 
 # Snippets
 
-UV with overscan
-`(((((x+parent.overscan)/(width+parent.overscan*2))*((width)+parent.overscan*2))-parent.overscan)/(width))-(0.5/width)`
-
+###### UV with overscan
+r: `(((((x+overscan)/(width+overscan*2))*(width+overscan*2))-overscan)/width)-(0.5/width)`
+g: `(((((y+overscan)/(height+overscan*2))*(height+overscan*2))-overscan)/height)-(0.5/height)`
