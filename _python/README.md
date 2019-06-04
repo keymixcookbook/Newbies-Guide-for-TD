@@ -18,7 +18,7 @@ This is python only, does not include the [Nuke module](NukeModule.md), and [sup
 - [Class](#Class)
 - [Modules](#Modules)
 - [Python Structure](#Python-Structure)
-- [Other ways of scripting in Python](PyXtra.md)
+- [Python Snippets](Snippets.md)
 
 ###### Operators
 - Comparison
