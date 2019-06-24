@@ -24,3 +24,4 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 ###### > Other Resources <
 
 - [Manage Gizmo Knobs](https://learn.foundry.com/nuke/8.0/content/user_guide/configuring_nuke/creating_sourcing_gizmos.html)
+- [Blinkscripts 101 - gabrielroytuts](https://sites.google.com/site/gabrielroytuts/nuke/blinkscript)
