@@ -84,3 +84,7 @@ noise(x, y, z)
 (((((x+overscan)/(width+overscan*2))*(width+overscan*2))-overscan)/width)-(0.5/width)
 (((((y+overscan)/(height+overscan*2))*(height+overscan*2))-overscan)/height)-(0.5/height)
 ```
+###### Boolean with inputs
+```javascript
+![ exists parent.input[value input1.number] ]
+```
