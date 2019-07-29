@@ -129,4 +129,7 @@ script to execute on startup
 # Color Value Convert
 int('%02x%02x%02x%02x' % (r,g,b,a), 16) # RGB -> Nuke; r,g,b,a: 0~255
 int('%sFF' % ('2D2D2D'),16) # HEX -> Nuke
+
+# Default custom knob default value
+nuke.selectedNode()['knob'].setDefaultValue([1.0]) # Value must be a sequence/arry
 ```
