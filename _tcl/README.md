@@ -88,3 +88,9 @@ noise(x, y, z)
 ```javascript
 ![ exists parent.input[value input1.number] ]
 ```
+
+###### Randomize with controls
+```javascript
+((random(seed,(frame+phase)*freq))*val_max+offset)*fade
+```
+predefined knobs: seed, phase, freq, val_max, offset, fade
