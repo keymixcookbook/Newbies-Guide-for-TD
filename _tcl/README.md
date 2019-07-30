@@ -86,7 +86,7 @@ noise(x, y, z)
 ```
 ###### Boolean with inputs
 ```javascript
-![ exists parent.input[value input1.number] ]
+![ exists parent.input[value nodename.number] ]
 ```
 
 ###### Randomize with controls
