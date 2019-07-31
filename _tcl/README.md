@@ -90,7 +90,8 @@ noise(x, y, z)
 ```
 
 ###### Randomize with controls
+predefined knobs: seed, phase, freq, val_max, offset, fade
 ```javascript
 ((random(seed,(frame+phase)*freq))*val_max+offset)*fade
 ```
-predefined knobs: seed, phase, freq, val_max, offset, fade
+sample: [`fade.nk`](https://github.com/tianlunjiang/NukeModdingGuide/blob/master/_tcl/src/fade.nk)
