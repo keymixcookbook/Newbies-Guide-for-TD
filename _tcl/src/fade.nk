@@ -1,0 +1,23 @@
+set cut_paste_input [stack 0]
+version 10.0 v4
+push $cut_paste_input
+Multiply {
+ channels rgba
+ value {{((random(seed,(frame+frameoffset)*freq))*val_max+amp_shift)*fade}}
+ name fade
+ label "\[value value]"
+ selected true
+ xpos 2999
+ ypos -973
+ addUserKnob {20 tb_user l control}
+ addUserKnob {7 fade}
+ fade 1
+ addUserKnob {26 ""}
+ addUserKnob {3 seed}
+ seed 999
+ addUserKnob {7 freq R 0 10}
+ addUserKnob {7 val_max l max R 0 2}
+ val_max 1
+ addUserKnob {7 amp_shift l "amp shift" R -1 1}
+ addUserKnob {3 frameoffset}
+}
