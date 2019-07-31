@@ -10,6 +10,7 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 - [Shell Setup](./_shell)
 - [Modding with PySide](./_pyside)
 - [~~Modding with Blink Script~~](###)
+- [Nuke Common error and solutions](https://github.com/tianlunjiang/NukeModdingGuide/blob/master/CommonError.md)
 
 ###### > Online References and Guides <
 - [Nuke Developer's Guide ('Quick' start)](https://learn.foundry.com/nuke/developers/80/pythondevguide/index.html)
