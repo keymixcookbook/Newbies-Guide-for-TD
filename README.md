@@ -16,7 +16,7 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 - [Python 101 (Legible Learning Site)](https://python101.pythonlibrary.org/index.html)
 
 ###### > Module APIs <
-- **Nuke** (functions used in Nuke): [API](https://learn.foundry.com/nuke/developers/70/pythonreference/)[DEV Guide](https://learn.foundry.com/nuke/developers/63/ndkdevguide/index.html)
+- **Nuke** (functions used in Nuke): [API](https://learn.foundry.com/nuke/developers/70/pythonreference/) | [DEV Guide](https://learn.foundry.com/nuke/developers/63/ndkdevguide/index.html)
 - **OS** (for accessing system files): [os.path](https://docs.python.org/2.7/library/os.path.html#module-os.path), [os](https://docs.python.org/2.7/library/os.html)
 - **Blink Script** (to use with Blinkscript Node): [Blink Kernels](https://learn.foundry.com/nuke/developers/11.2/BlinkKernels/index.html)
 
