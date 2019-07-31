@@ -40,13 +40,14 @@ nuke.pluginAddPath() # Add Plugin Path
 ```python
 
 # Create Nodes
-nuke.createNode('Grade', inpanel=False)
+nuke.createNode('<node class>', inpanel=False)
+nuke.createNode("<node class>", "<knob name> <knob value> <knob name> <knob value>")
 nuke.nodes.Grade(knob=knobvalue, inputs=[node])
 
 # Accessing Nodes
 nuke.selectedNode() # One selected node
 nuke.selectedNodes() # Multiple selected nodes
-nuke.toNode('nodeName') # one node by its name
+nuke.toNode('<nodeName>') # one node by its name
 
 # Set Inputs
 node.setInput(0, node)
