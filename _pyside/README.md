@@ -1,4 +1,4 @@
-|# PYSIDE in a nutshell :chestnut:
+# PYSIDE in a nutshell :chestnut:
 Python on steriods
 
 - [The Basics](#The-Basics)
@@ -6,6 +6,8 @@ Python on steriods
 - [Layouts](#Layouts) ( [Types of Layout](#Types-of-Layout) | [Layout Stack](#Layout-Stack) | [Layout Groups](#Layout-Groups) )
 - [Signal](#Signal)
 
+### Other Resources
+- [Basic Widgets and its methods](https://www.tutorialspoint.com/pyqt/pyqt_basic_widgets.htm)
 ---
 
 ### PySide or PyQt
@@ -49,6 +51,10 @@ app = QApplication(sys.argv)
 panel = Panel()
 panel.show()
 app.exec_()
+
+# If Run within Nuke
+panel = Panel()
+panel.show()
 ```
 
 ### Useful/Basic Widgets
