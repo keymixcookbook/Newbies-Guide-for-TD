@@ -89,7 +89,7 @@ knob.isAnimated() # Boolean
 knob.setExpression('$gui')
 knob.hasExpression() # Boolean
 
-# Autolabel
+# Autolabel - this replace the built-in autolabel for the notes and can not parse tcl expressions
 customLabel = "nuke.thisNode().name()+'\\n'+nuke.thisNode()['knobname'].value()" #'\\n' for new line
 customLabel_ifs = "nuke.thisNode().name() + (' big!' if nuke.thisNode()['size'].value()>100 else ' small')" # With a if statement
 # (<True Action> if <True Condition> else <Else Action>)
@@ -115,7 +115,7 @@ kuMu.addCommand('menuLocation', 'functionName', 'alt+c', icon='/img.png', shortc
 # Callbacks
 ```python
 # KnobChanged
-nuke.addKnobChanged(functionName, nodeClass='PostageStamp')
+nuke.addKnobChanged(functionName, nodeClass='PostageStamp') # functionName use without quotes
 
 ```
 
