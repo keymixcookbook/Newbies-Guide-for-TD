@@ -6,7 +6,7 @@ Only includes the things that are often used, you can go [HERE](https://learn.fo
 ## Table of Contents
 - [Directories for python scripts](#Directories-for-python-scripts)
 - [Structure](#Structure)
-- [Nodes Tabs Knobs](#Nodes-Tabs-Knobs)
+- [Nodes Tabs Knobs](#Nodes-Tabs-Knobs) ([list of knob types](#List-of-Knob-Types-with-Python-API))
 - [Menu Items](#Menu-Items)
 - [Simple Panels](#Simple-Panels)
 - [Callbacks](#Callback)
@@ -96,6 +96,55 @@ customLabel_ifs = "nuke.thisNode().name() + (' big!' if nuke.thisNode()['size'].
 
 nuke.selectedNode()['autolabel'].setValue(customLabel)
 ```
+
+###### List of Knob Types with Python API
+
+|Knob Type | Arguments
+|:---------|:---------
+| AColor_Knob | 'name', 'label'
+| Arry_Knob | 'name', 'label'
+| Axis_Knob | 'name', 'label'
+| BBox_Knob | 'name', 'label'
+| Bitmask_Knob | 'name', 'label'
+| Boolean_Knob | 'name', 'label'
+| Box3_Knob | 'name', 'label'
+| Channel_Knob | 'name', 'label'
+| CascadingEnumeration_Knob | 'name', 'label', [list, list/sublist]
+| ChannelMask_Knob | 'name', 'label'
+| ColorChip_Knob | 'name', 'label'
+| Color_Knob | 'name', 'label'
+| Double_Knob | 'name', 'label'
+| Enumeration_Knob | 'name', 'label', [list]
+| EvalString_Knob | 'name', 'label', 'string'
+| Eyedropper_Knob
+| File_Knob
+| String_Knob
+| Scale_Knob
+| SceneView_Knob
+| IArray_Knob
+| Int_Knob
+| Keyer_Knob
+| Font_Knob
+| Format_Knob
+| GeoSelect_Knob
+| Histogram_Knob
+| Link_Knob
+| LookupCurves_Knob
+| MultiView_Knob
+| Obsolete_Knob
+| Password_Knob
+| Pulldown_Knob
+| PyCustom_Knob
+| PyScript_Knob
+| Range_Knob
+| Tab_Knob
+| Text_Knob
+| Transform2d_Knob
+| ViewView_Knob
+| UV_Knob
+| WH_Knob
+| XYZ_Knob
+| XY_Knob
 
 ###### Tabs
 ```python
