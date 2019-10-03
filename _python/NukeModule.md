@@ -99,8 +99,8 @@ nuke.selectedNode()['autolabel'].setValue(customLabel)
 
 ###### List of Knob Types with Python API
 
-|Knob Type | Arguments | Human readable / Annotations
-|:---------|:---------
+|Knob Type (Class Object) | Arguments | Human readable / Annotations
+|:---------|:--------- |:----------------------------
 | AColor_Knob | 'name', 'label' | RGB+Alpha
 | Arry_Knob | 'name', 'label' | 
 | Axis_Knob | 'name', 'label' |
