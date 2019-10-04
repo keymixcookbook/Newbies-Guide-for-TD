@@ -30,7 +30,7 @@ nuke.pluginAddPath() # Add Plugin Path
 ### Structure
 - `nuke`
 	- `Node.Knob`
-	- `Group.Root`
+	- `Root.Group`
 	- `Panel`
 - `nukescripts`
 
@@ -102,49 +102,49 @@ nuke.selectedNode()['autolabel'].setValue(customLabel)
 |Knob Type (Class Object) | Arguments | Human readable / Annotations
 |:---------|:--------- |:----------------------------
 | AColor_Knob | 'name', 'label' | RGB+Alpha
-| Arry_Knob | 'name', 'label' | 
+| Arry_Knob | 'name', 'label' |
 | Axis_Knob | 'name', 'label' |
 | BBox_Knob | 'name', 'label' | x,y,r/w,t/h
 | Bitmask_Knob | 'name', 'label' | will crash your nuke
 | Boolean_Knob | 'name', 'label' | checkbox
-| Box3_Knob | 'name', 'label' | 
+| Box3_Knob | 'name', 'label' |
 | Channel_Knob | 'name', 'label' |
 | CascadingEnumeration_Knob | 'name', 'label', [list, list/sublist] | dropdown menu
-| ChannelMask_Knob | 'name', 'label' | 
-| ColorChip_Knob | 'name', 'label' | 
+| ChannelMask_Knob | 'name', 'label' |
+| ColorChip_Knob | 'name', 'label' |
 | Color_Knob | 'name', 'label' | RGB
 | Double_Knob | 'name', 'label' | floating slider
 | Enumeration_Knob | 'name', 'label', [list] | dropdown menu
 | EvalString_Knob | 'name', 'label', 'string' | not sure the use of it
-| Eyedropper_Knob
-| File_Knob
-| String_Knob
-| Scale_Knob
-| SceneView_Knob
-| IArray_Knob
-| Int_Knob
-| Keyer_Knob
-| Font_Knob
-| Format_Knob
-| GeoSelect_Knob
-| Histogram_Knob
-| Link_Knob
-| LookupCurves_Knob
-| MultiView_Knob
-| Obsolete_Knob
-| Password_Knob
-| Pulldown_Knob
-| PyCustom_Knob
-| PyScript_Knob
-| Range_Knob
-| Tab_Knob
+| Eyedropper_Knob | 'name', 'label' |
+| File_Knob | 'name', 'label'
+| String_Knob | 'name', 'label' | Text input
+| Scale_Knob | 'name', 'label'
+| SceneView_Knob | 'name', 'label'
+| IArray_Knob | 'name', 'label'
+| Int_Knob | 'name', 'label'
+| Keyer_Knob | 'name', 'label'
+| Font_Knob | 'name', 'label'
+| Format_Knob | 'name', 'label'
+| GeoSelect_Knob | 'name', 'label'
+| Histogram_Knob | 'name', 'label'
+| Link_Knob | 'name', 'label'
+| LookupCurves_Knob | 'name', 'label' | use addCurve('curveName') to add a new curve
+| MultiView_Knob | 'name', 'label'
+| Obsolete_Knob | 'name', 'label' | don't know why it's here
+| Password_Knob | | 'name', 'label'
+| Pulldown_Knob | 'name', 'label', {'key': 'python value'} | parse string into python command
+| PyCustom_Knob | 'name', 'label', cmd | for pyqt application inside a knob UI
+| PyScript_Knob | 'name', 'label', cmd | Python button
+| Range_Knob | 'name', 'label'
+| Tab_Knob | 'name', 'label'
 | Text_Knob | 'name', 'label' | Title text
-| Transform2d_Knob
-| ViewView_Knob
-| UV_Knob
+| Transform2d_Knob | 'name', 'label'
+| ViewView_Knob | 'name', 'label'
+| UV_Knob | 'name', 'label'
 | WH_Knob | 'name', 'label' | silmiler to Transfrom's scale knob
-| XYZ_Knob
-| XY_Knob
+| XYZ_Knob | 'name', 'label'
+| XY_Knob | 'name', 'label'
 
 ###### Tabs
 ```python
