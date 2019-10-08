@@ -101,43 +101,43 @@ nuke.selectedNode()['autolabel'].setValue(customLabel)
 
 |Knob Type (Class Object) | Arguments | Human readable / Annotations
 |:---------|:--------- |:----------------------------
-| AColor_Knob | 'name', 'label' | RGB+Alpha
-| Array_Knob | 'name', 'label',int | Matrix like length defined by int
-| Axis_Knob | 'name', 'label' |
-| BBox_Knob | 'name', 'label' | x,y,r/w,t/h
-| Bitmask_Knob | 'name', 'label' | will crash your nuke
-| Boolean_Knob | 'name', 'label' | checkbox
-| Box3_Knob | 'name', 'label' |
-| Channel_Knob | 'name', 'label' |
+| AColor_Knob 		| 'name', 'label' | RGB+Alpha
+| Array_Knob 		| 'name', 'label',int | Matrix like length defined by int
+| Axis_Knob 		| 'name', 'label' |
+| BBox_Knob 		| 'name', 'label' | x,y,r/w,t/h
+| Bitmask_Knob 		| 'name', 'label' | will crash your nuke
+| Boolean_Knob 		| 'name', 'label' | checkbox
+| Box3_Knob 		| 'name', 'label' | x,y,n,r,t,f (n: near, f: far)
+| Channel_Knob 		| 'name', 'label' | 
 | CascadingEnumeration_Knob | 'name', 'label', [list, list/sublist] | dropdown menu
-| ChannelMask_Knob | 'name', 'label' |
-| ColorChip_Knob | 'name', 'label' |
+| ChannelMask_Knob | 'name', 'label' | 
+| ColorChip_Knob | 'name', 'label' | Floating color wheel
 | Color_Knob | 'name', 'label' | RGB
 | Double_Knob | 'name', 'label' | floating slider
 | Enumeration_Knob | 'name', 'label', [list] | dropdown menu
 | EvalString_Knob | 'name', 'label', 'string' | not sure the use of it
-| Eyedropper_Knob | 'name', 'label' |
+| Eyedropper_Knob | 'name', 'label' | 
 | File_Knob | 'name', 'label'
 | Font_Knob | 'name', 'label'
 | Format_Knob | 'name', 'label'
 | GeoSelect_Knob | 'name', 'label'
 | Histogram_Knob | 'name', 'label'
-| IArray_Knob | 'name', 'label'
+| IArray_Knob | 'name', 'label', [int,int] | Matrix array, int [row,column] 
 | Int_Knob | 'name', 'label'
 | Keyer_Knob | 'name', 'label'
 | Obsolete_Knob | 'name', 'label' | don't know why it's here
-| Password_Knob | | 'name', 'label'
+| Password_Knob | 'name', 'label'
 | Pulldown_Knob | 'name', 'label', {'key': 'python value'} | parse string into python command
 | PyCustom_Knob | 'name', 'label', cmd | for pyqt application inside a knob UI
 | PyScript_Knob | 'name', 'label', cmd | Python button
-| Range_Knob | 'name', 'label'
+| Range_Knob | 'name', 'label', [float,float,float,...] | Similar to that of Histogram slider
 | String_Knob | 'name', 'label' | Text input
 | Scale_Knob | 'name', 'label'
 | SceneView_Knob | 'name', 'label'
 | Tab_Knob | 'name', 'label'
-| Text_Knob | 'name', 'label' | Title text
+| Text_Knob | 'name', 'label' | Title text with CSS
 | Transform2d_Knob | 'name', 'label'
-| Link_Knob | 'name', 'label'
+| Link_Knob | 'name', 'label' | use `makeLink(nodename, 'knob')` to link between knobs
 | LookupCurves_Knob | 'name', 'label' | use addCurve('curveName') to add a new curve
 | MultiView_Knob | 'name', 'label'
 | ViewView_Knob | 'name', 'label'
@@ -218,7 +218,35 @@ kuMu.addCommand('menuLocation', 'functionName', 'alt+c', icon='/img.png', shortc
 # shortcutContext: 0=window, 1=Application, 2=DAG
 ```
 
-# Simple Panels
+# Panels
+
+```python
+p = nuke.Panel('Simple Panel')
+
+p.addClipnameSearch('clip path', '/tmp')
+p.addFilenameSearch('file path', '/tmp')
+p.addTextFontPulldown('font browser', '/myFonts/')
+p.addRGBColorChip('some pretty color', '')
+p.addExpressionInput('enter an expression', '4*25')
+p.addBooleanCheckBox('yes or no?', True)
+p.addEnumerationPulldown('my choices', 'A B C')
+p.addScriptCommand('tcl or python code', '')
+p.addSingleLineInput('just one line', 'not much space')
+p.addMultilineTextInput('multiple lines of user input text', 'lineA\nlineB')
+p.addNotepad('write something', 'some very long text could go in here. For now this is just some random default value')
+p.addPasswordInput('password', 'donttellanyone')
+p.addButton('push here')
+p.addButton('or here')
+p.addButton('or even here')
+
+
+pp = nukescripts.PythonPanel('Python Panel')
+
+knob = nuke.Double_Knob('knobtype','knoblabel')
+pp.addKnob(knob)
+pp.show() # Floating and dockable
+pp.addToPane() # Docked on create
+```
 
 # Callbacks
 ```python
