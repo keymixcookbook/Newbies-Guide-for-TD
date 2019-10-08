@@ -102,7 +102,7 @@ nuke.selectedNode()['autolabel'].setValue(customLabel)
 |Knob Type (Class Object) | Arguments | Human readable / Annotations
 |:---------|:--------- |:----------------------------
 | AColor_Knob | 'name', 'label' | RGB+Alpha
-| Arry_Knob | 'name', 'label' |
+| Array_Knob | 'name', 'label',int | Matrix like length defined by int
 | Axis_Knob | 'name', 'label' |
 | BBox_Knob | 'name', 'label' | x,y,r/w,t/h
 | Bitmask_Knob | 'name', 'label' | will crash your nuke
@@ -118,33 +118,37 @@ nuke.selectedNode()['autolabel'].setValue(customLabel)
 | EvalString_Knob | 'name', 'label', 'string' | not sure the use of it
 | Eyedropper_Knob | 'name', 'label' |
 | File_Knob | 'name', 'label'
-| String_Knob | 'name', 'label' | Text input
-| Scale_Knob | 'name', 'label'
-| SceneView_Knob | 'name', 'label'
-| IArray_Knob | 'name', 'label'
-| Int_Knob | 'name', 'label'
-| Keyer_Knob | 'name', 'label'
 | Font_Knob | 'name', 'label'
 | Format_Knob | 'name', 'label'
 | GeoSelect_Knob | 'name', 'label'
 | Histogram_Knob | 'name', 'label'
-| Link_Knob | 'name', 'label'
-| LookupCurves_Knob | 'name', 'label' | use addCurve('curveName') to add a new curve
-| MultiView_Knob | 'name', 'label'
+| IArray_Knob | 'name', 'label'
+| Int_Knob | 'name', 'label'
+| Keyer_Knob | 'name', 'label'
 | Obsolete_Knob | 'name', 'label' | don't know why it's here
 | Password_Knob | | 'name', 'label'
 | Pulldown_Knob | 'name', 'label', {'key': 'python value'} | parse string into python command
 | PyCustom_Knob | 'name', 'label', cmd | for pyqt application inside a knob UI
 | PyScript_Knob | 'name', 'label', cmd | Python button
 | Range_Knob | 'name', 'label'
+| String_Knob | 'name', 'label' | Text input
+| Scale_Knob | 'name', 'label'
+| SceneView_Knob | 'name', 'label'
 | Tab_Knob | 'name', 'label'
 | Text_Knob | 'name', 'label' | Title text
 | Transform2d_Knob | 'name', 'label'
+| Link_Knob | 'name', 'label'
+| LookupCurves_Knob | 'name', 'label' | use addCurve('curveName') to add a new curve
+| MultiView_Knob | 'name', 'label'
 | ViewView_Knob | 'name', 'label'
 | UV_Knob | 'name', 'label'
 | WH_Knob | 'name', 'label' | silmiler to Transfrom's scale knob
 | XYZ_Knob | 'name', 'label'
 | XY_Knob | 'name', 'label'
+
+
+###### PyCustom Knob
+[pyside widgets inside a nuke gizmo](http://tylerart.com/sketchbook/22/12/2015/pyside-widgets-inside-a-nuke-gizmo)
 
 ###### Tabs
 ```python
