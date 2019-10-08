@@ -150,6 +150,61 @@ nuke.selectedNode()['autolabel'].setValue(customLabel)
 ###### PyCustom Knob
 [pyside widgets inside a nuke gizmo](http://tylerart.com/sketchbook/22/12/2015/pyside-widgets-inside-a-nuke-gizmo)
 
+define widget as a Class, inheret from `nukescripts.PythonPanel` or `QWidget` and 
+**Define `makeUI(self)` inside the Class Wraper**
+
+Example:
+```python
+from PySide import QtGui, QtCore
+import nuke
+
+class MyWidget(QtGui.QWidget):
+
+    def __init__(self, node):
+        super(self.__class__, self).__init__()
+
+        self.node = node
+
+        layout = QtGui.QHBoxLayout()
+        layout.setAlignment(QtCore.Qt.AlignTop)
+        self.setLayout(layout)
+
+        btn1 = QtGui.QPushButton('Node Name')
+        btn1.clicked.connect(self.btn1Clicked)
+
+        btn2 = QtGui.QPushButton('Print Stuff')
+        btn2.clicked.connect(self.btn2Clicked)
+
+        dial = QtGui.QDial()
+        dial.valueChanged.connect(self.dialValueChanged)
+
+        layout.addWidget(btn1)
+        layout.addWidget(btn2)
+        layout.addWidget(dial)
+
+
+    def btn1Clicked(self):
+        print self.node.name()
+
+    def btn2Clicked(self):
+        print 'Hi, I\'m a button.'
+
+    def dialValueChanged(self):
+        print 'Value was just changed!'
+
+    def makeUI(self):
+        return self
+
+    def updateValue(self):
+        pass
+
+
+if __name__ == '__main__':
+    node = nuke.selectedNode()
+    knob = nuke.PyCustom_Knob( "MyWidget", "", "MyWidget(nuke.thisNode())" ) 
+    node.addKnob(knob)
+```
+
 ###### Tabs
 ```python
 
