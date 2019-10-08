@@ -8,7 +8,7 @@ Only includes the things that are often used, you can go [HERE](https://learn.fo
 - [Structure](#Structure)
 - [Nodes Tabs Knobs](#Nodes-Tabs-Knobs) ([list of knob types](#List-of-Knob-Types-with-Python-API))
 - [Menu Items](#Menu-Items)
-- [Simple Panels](#Simple-Panels)
+- [Simple Panels](#Panels)
 - [Callbacks](#Callback)
 - [Other](#Other)
 
@@ -73,6 +73,7 @@ node.setYpos() # integer
 
 nuke.zoom(2, [x,y]) # Focus DAG to [x,y]
 ```
+[&#9776;](#Table-of-Contents)
 
 ###### Knobs
 ```python
@@ -96,6 +97,7 @@ customLabel_ifs = "nuke.thisNode().name() + (' big!' if nuke.thisNode()['size'].
 
 nuke.selectedNode()['autolabel'].setValue(customLabel)
 ```
+[&#9776;](#Table-of-Contents)
 
 ###### List of Knob Types with Python API
 
@@ -204,12 +206,14 @@ if __name__ == '__main__':
     knob = nuke.PyCustom_Knob( "MyWidget", "", "MyWidget(nuke.thisNode())" ) 
     node.addKnob(knob)
 ```
+[&#9776;](#Table-of-Contents)
 
 ###### Tabs
 ```python
 
 
 ```
+[&#9776;](#Table-of-Contents)
 
 # Menu Items
 ```python
@@ -217,6 +221,7 @@ kuMu = nuke.menu('Nuke').addMenu('KU')
 kuMu.addCommand('menuLocation', 'functionName', 'alt+c', icon='/img.png', shortcutContext=2)
 # shortcutContext: 0=window, 1=Application, 2=DAG
 ```
+[&#9776;](#Table-of-Contents)
 
 # Panels
 
@@ -247,6 +252,7 @@ pp.addKnob(knob)
 pp.show() # Floating and dockable
 pp.addToPane() # Docked on create
 ```
+[&#9776;](#Table-of-Contents)
 
 # Callbacks
 ```python
@@ -254,6 +260,7 @@ pp.addToPane() # Docked on create
 nuke.addKnobChanged(functionName, nodeClass='PostageStamp') # functionName use without quotes
 
 ```
+[&#9776;](#Table-of-Contents)
 
 # Pipeline Integration
 
