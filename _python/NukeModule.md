@@ -9,7 +9,8 @@ Only includes the things that are often used, you can go [HERE](https://learn.fo
 - [Nodes Tabs Knobs](#Nodes-Tabs-Knobs) ([list of knob types](#List-of-Knob-Types-with-Python-API))
 - [Menu Items](#Menu-Items)
 - [Simple Panels](#Panels)
-- [Callbacks](#Callback)
+- [Callbacks](#Callbacks)
+- [Rotoshapes](#Rotoshapes)
 - [Other](#Other)
 
 ### Directories for python scripts
@@ -221,6 +222,11 @@ kuMu = nuke.menu('Nuke').addMenu('KU')
 kuMu.addCommand('menuLocation', 'functionName', 'alt+c', icon='/img.png', shortcutContext=2)
 # shortcutContext: 0=window, 1=Application, 2=DAG
 ```
+Other Manus
+- `nuke.menu('Animation')`: right click menu for Animation icon
+- `nuke.menu('Properties')`: right-click menu for the Property panel
+
+
 [&#9776;](#Table-of-Contents)
 
 # Panels
@@ -260,6 +266,30 @@ pp.addToPane() # Docked on create
 nuke.addKnobChanged(functionName, nodeClass='PostageStamp') # functionName use without quotes
 
 ```
+[&#9776;](#Table-of-Contents)
+
+
+# Rotoshapes
+Everything rotoshapes, very different, very annoying
+
+There are 3 types of elements in Rotoshape/Roto node: 
+- `Layer`: Groups/Layers, exclude Root (that returns a `NoneType`, use `rootLayer`)
+- `Stroke`: Paint strokes, Dodges
+- `Shape`: Anything Spline - Bezier, BSpline, Ecllips, Recotangle...
+
+`rootLayer`: Contains all above elements in the node, iterable; *when shape inside a layer, returns the layer object*
+
+```python
+n = nuke.toNode('Roto')
+k = n['curves'] # Roto node rotoshape curve object
+
+k.getSelected() # return: Iterable, Selected Rotoshapes as list
+k.toElement('Rotoshape') # return: object, object refered by its name
+k.toElement('Layer/Rotoshape') # return: object, shape inside a layer
+k.getTransform() # return: object, AnimCTransform (whatever that is)
+
+```
+
 [&#9776;](#Table-of-Contents)
 
 # Pipeline Integration
