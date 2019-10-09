@@ -15,6 +15,7 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 ###### > Online References and Guides <
 - [Nuke Developer's Guide ('Quick' start)](https://learn.foundry.com/nuke/developers/80/pythondevguide/index.html)
 - [Python 101 (Legible Learning Site)](https://python101.pythonlibrary.org/index.html)
+- [Google Python Class](https://developers.google.com/edu/python)
 
 ###### > Module APIs <
 - **Nuke** (functions used in Nuke): [API](https://learn.foundry.com/nuke/developers/70/pythonreference/) | [NDK](https://learn.foundry.com/nuke/developers/63/ndkdevguide/index.html)
