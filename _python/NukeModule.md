@@ -290,6 +290,24 @@ k.getTransform() # return: object, AnimCTransform (whatever that is)
 
 ```
 
+### Expression link Transform of a Rotoshape curve
+sometimes it will be faster just to right-click or control-drag on animation parameter
+
+[`link_tools.py`(sample script)](https://gist.github.com/jedypod/759871a41a35482704af) | [`_curvelib.AnimCTransform` methods](https://learn.foundry.com/nuke/developers/70/pythonreference/_curvelib.AnimCTransform-class.html)
+
+Basic Event Sequence:
+1. Define `_curvelib.AnimCurve()` object
+2. Assign a *string value* to `<AnimCurve Object>.expressionString = 'Expression'`
+3. Set `<AnimCurve Object>.useExpression = True`
+4. Find *Transform Attribute object* for selected Rotoshape curve `<Curve object>.getTransform()`
+5. Set Expressions (`Translation`, `Rotation`, `Scale`, `PivotPoint`)
+	- `<Attribute object>.setTranslationAnimCurve(index, <AnimCurve object>)` - 0: x, 1: y
+	- `<Attribute object>.setRotationAnimCurve(2, <AnimCurve object>)` - [why index is `2`](https://www.mail-archive.com/nuke-python@support.thefoundry.co.uk/msg02295.html)
+	- `<Attribute object>.setScaleAnimCurve(index, <AnimCurve object>)` - 0: x, 1: y
+	- `<Attribute object>.setPivotPointAnimCurve(index, <AnimCurve object>)` - 0: x, 1: y
+
+
+
 [&#9776;](#Table-of-Contents)
 
 # Pipeline Integration
