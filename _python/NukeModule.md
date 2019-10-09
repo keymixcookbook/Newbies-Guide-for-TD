@@ -8,7 +8,7 @@ Only includes the things that are often used, you can go [HERE](https://learn.fo
 - [Structure](#Structure)
 - [Nodes Tabs Knobs](#Nodes-Tabs-Knobs) ([list of knob types](#List-of-Knob-Types-with-Python-API))
 - [Menu Items](#Menu-Items)
-- [Simple Panels](#Panels)
+- [Panels](#Panels)
 - [Callbacks](#Callbacks)
 - [Rotoshapes](#Rotoshapes)
 - [Other](#Other)
@@ -277,7 +277,7 @@ There are 3 types of elements in Rotoshape/Roto node:
 - `Stroke`: Paint strokes, Dodges
 - `Shape`: Anything Spline - Bezier, BSpline, Ecllips, Recotangle...
 
-`rootLayer`: Contains all above elements in the node, iterable; *when shape inside a layer, returns the layer object*
+`rootLayer`: Contains all above elements in the node, *iterable*; *when shape inside a layer, returns the layer object*
 
 ```python
 n = nuke.toNode('Roto')
@@ -287,6 +287,7 @@ k.getSelected() # return: Iterable, Selected Rotoshapes as list
 k.toElement('Rotoshape') # return: object, object refered by its name
 k.toElement('Layer/Rotoshape') # return: object, shape inside a layer
 k.getTransform() # return: object, AnimCTransform (whatever that is)
+elem = [c for c in k.rootLayer] # return: every elements inside the Roto node
 
 ```
 
