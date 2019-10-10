@@ -277,8 +277,7 @@ There are 3 types of elements in Rotoshape/Roto node:
 - `Layer`: Groups/Layers, exclude Root (that returns a `NoneType`, use `rootLayer`)
 - `Stroke`: Paint strokes, Dodges
 - `Shape`: Anything Spline - Bezier, BSpline, Ecllips, Recotangle...
-
-`rootLayer`: Contains all above elements in the node, *iterable*; *when shape inside a layer, returns the layer object*
+- `rootLayer`: Contains all above elements in the node, *iterable*; *when shape inside a layer, returns the layer object*
 
 ```python
 n = nuke.toNode('Roto')
