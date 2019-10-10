@@ -104,56 +104,56 @@ nuke.selectedNode()['autolabel'].setValue(customLabel)
 
 |Knob Type (Class Object) | Arguments | Human readable / Annotations
 |:---------|:--------- |:----------------------------
-| AColor_Knob 		| 'name', 'label' | RGB+Alpha
-| Array_Knob 		| 'name', 'label',int | Matrix like length defined by int
-| Axis_Knob 		| 'name', 'label' |
-| BBox_Knob 		| 'name', 'label' | x,y,r/w,t/h
-| Bitmask_Knob 		| 'name', 'label' | will crash your nuke
-| Boolean_Knob 		| 'name', 'label' | checkbox
-| Box3_Knob 		| 'name', 'label' | x,y,n,r,t,f (n: near, f: far)
-| Channel_Knob 		| 'name', 'label' | 
-| CascadingEnumeration_Knob | 'name', 'label', [list, list/sublist] | dropdown menu
-| ChannelMask_Knob | 'name', 'label' | 
-| ColorChip_Knob | 'name', 'label' | Floating color wheel
-| Color_Knob | 'name', 'label' | RGB
-| Double_Knob | 'name', 'label' | floating slider
-| Enumeration_Knob | 'name', 'label', [list] | dropdown menu
-| EvalString_Knob | 'name', 'label', 'string' | not sure the use of it
-| Eyedropper_Knob | 'name', 'label' | 
-| File_Knob | 'name', 'label'
-| Font_Knob | 'name', 'label'
-| Format_Knob | 'name', 'label'
-| GeoSelect_Knob | 'name', 'label'
-| Histogram_Knob | 'name', 'label'
-| IArray_Knob | 'name', 'label', [int,int] | Matrix array, int [row,column] 
-| Int_Knob | 'name', 'label'
-| Keyer_Knob | 'name', 'label'
-| Obsolete_Knob | 'name', 'label' | don't know why it's here
-| Password_Knob | 'name', 'label'
-| Pulldown_Knob | 'name', 'label', {'key': 'python value'} | parse string into python command
-| PyCustom_Knob | 'name', 'label', cmd | for pyqt application inside a knob UI
-| PyScript_Knob | 'name', 'label', cmd | Python button
-| Range_Knob | 'name', 'label', [float,float,float,...] | Similar to that of Histogram slider
-| String_Knob | 'name', 'label' | Text input
-| Scale_Knob | 'name', 'label'
-| SceneView_Knob | 'name', 'label'
-| Tab_Knob | 'name', 'label'
-| Text_Knob | 'name', 'label' | Title text with CSS
-| Transform2d_Knob | 'name', 'label'
-| Link_Knob | 'name', 'label' | use `makeLink(nodename, 'knob')` to link between knobs
-| LookupCurves_Knob | 'name', 'label' | use addCurve('curveName') to add a new curve
-| MultiView_Knob | 'name', 'label'
-| ViewView_Knob | 'name', 'label'
-| UV_Knob | 'name', 'label'
-| WH_Knob | 'name', 'label' | silmiler to Transfrom's scale knob
-| XYZ_Knob | 'name', 'label'
-| XY_Knob | 'name', 'label'
+| AColor_Knob 					| 'name', 'label' | RGB+Alpha
+| Array_Knob 					| 'name', 'label', int | Matrix like length defined by int
+| Axis_Knob 					| 'name', 'label'
+| BBox_Knob 					| 'name', 'label' | x,y,r/w,t/h
+| Bitmask_Knob 					| 'name', 'label' | will crash your nuke
+| Boolean_Knob 					| 'name', 'label' | checkbox
+| Box3_Knob 					| 'name', 'label' | x,y,n,r,t,f (n: near, f: far)
+| Channel_Knob 					| 'name', 'label'
+| CascadingEnumeration_Knob 	| 'name', 'label', [list, list/sublist] | dropdown menu
+| ChannelMask_Knob 				| 'name', 'label' |
+| ColorChip_Knob 				| 'name', 'label' | Floating color wheel
+| Color_Knob 					| 'name', 'label' | RGB
+| Double_Knob 					| 'name', 'label' | floating slider
+| Enumeration_Knob 				| 'name', 'label', [list] | dropdown menu
+| EvalString_Knob 				| 'name', 'label', 'string' | not sure the use of it
+| Eyedropper_Knob 				| 'name', 'label'
+| File_Knob 					| 'name', 'label'
+| Font_Knob 					| 'name', 'label'
+| Format_Knob 					| 'name', 'label'
+| GeoSelect_Knob 				| 'name', 'label'
+| Histogram_Knob 				| 'name', 'label'
+| IArray_Knob 					| 'name', 'label', [int,int] | Matrix array, int [row,column]
+| Int_Knob 						| 'name', 'label'
+| Keyer_Knob 					| 'name', 'label'
+| Obsolete_Knob 				| 'name', 'label' | don't know why it's here
+| Password_Knob 				| 'name', 'label'
+| Pulldown_Knob 				| 'name', 'label', {'key': 'python value'} | parse string into python command
+| PyCustom_Knob 				| 'name', 'label', cmd | for pyqt application inside a knob UI
+| PyScript_Knob 				| 'name', 'label', cmd | Python button
+| Range_Knob 					| 'name', 'label', [float,float,float,...] | Similar to that of Histogram slider
+| String_Knob 					| 'name', 'label' | Text input
+| Scale_Knob 					| 'name', 'label'
+| SceneView_Knob 				| 'name', 'label'
+| Tab_Knob 						| 'name', 'label'
+| Text_Knob 					| 'name', 'label' | Title text with CSS
+| Transform2d_Knob 				| 'name', 'label'
+| Link_Knob 					| 'name', 'label' | use `makeLink(nodename, 'knob')` to link between knobs
+| LookupCurves_Knob 			| 'name', 'label' | use addCurve('curveName') to add a new curve
+| MultiView_Knob 				| 'name', 'label'
+| ViewView_Knob 				| 'name', 'label'
+| UV_Knob 						| 'name', 'label'
+| WH_Knob 						| 'name', 'label' | simlier to Transfrom's scale knob
+| XYZ_Knob 						| 'name', 'label'
+| XY_Knob 						| 'name', 'label'
 
 
 ###### PyCustom Knob
 [pyside widgets inside a nuke gizmo](http://tylerart.com/sketchbook/22/12/2015/pyside-widgets-inside-a-nuke-gizmo)
 
-define widget as a Class, inheret from `nukescripts.PythonPanel` or `QWidget` and 
+define widget as a Class, inheret from `nukescripts.PythonPanel` or `QWidget` and
 **Define `makeUI(self)` inside the Class Wraper**
 
 Example:
@@ -204,7 +204,7 @@ class MyWidget(QtGui.QWidget):
 
 if __name__ == '__main__':
     node = nuke.selectedNode()
-    knob = nuke.PyCustom_Knob( "MyWidget", "", "MyWidget(nuke.thisNode())" ) 
+    knob = nuke.PyCustom_Knob( "MyWidget", "", "MyWidget(nuke.thisNode())" )
     node.addKnob(knob)
 ```
 [&#9776;](#Table-of-Contents)
@@ -246,9 +246,10 @@ p.addSingleLineInput('just one line', 'not much space')
 p.addMultilineTextInput('multiple lines of user input text', 'lineA\nlineB')
 p.addNotepad('write something', 'some very long text could go in here. For now this is just some random default value')
 p.addPasswordInput('password', 'donttellanyone')
-p.addButton('push here')
-p.addButton('or here')
-p.addButton('or even here')
+p.addButton('push here') # return: 0
+p.addButton('or here') # return: 1
+p.addButton('or even here') # return: 2
+p.show()
 
 
 pp = nukescripts.PythonPanel('Python Panel')
@@ -272,7 +273,7 @@ nuke.addKnobChanged(functionName, nodeClass='PostageStamp') # functionName use w
 # Rotoshapes
 Everything rotoshapes, very different, very annoying
 
-There are 3 types of elements in Rotoshape/Roto node: 
+There are 3 types of elements in Rotoshape/Roto node:
 - `Layer`: Groups/Layers, exclude Root (that returns a `NoneType`, use `rootLayer`)
 - `Stroke`: Paint strokes, Dodges
 - `Shape`: Anything Spline - Bezier, BSpline, Ecllips, Recotangle...
