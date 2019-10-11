@@ -95,3 +95,4 @@ predefined knobs: seed, phase, freq, val_max, offset, fade
 ((random(seed,(frame+phase)*freq))*val_max+offset)*fade
 ```
 sample: [`fade.nk`](https://github.com/tianlunjiang/NukeModdingGuide/blob/master/_tcl/src/fade.nk)
+Different types of waves: [Nuke Wave Expressions](https://www.cameroncarson.com/nuke-wave-expressions)
