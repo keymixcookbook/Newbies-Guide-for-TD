@@ -30,3 +30,5 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 - [HTML in Nuke - Ben McEwan](https://benmcewan.com/blog/2019/08/12/html-in-nuke/)
 - [Intro to Blinkscript SIGGARPH Presentation](https://www.youtube.com/watch?v=p3Lv7ThKbUk)
 - [The Mailing Archieve - nuke-python fourm](https://www.mail-archive.com/nuke-python@support.thefoundry.co.uk/)
+- [The Art of Command line](https://github.com/jlevy/the-art-of-command-line)
+- [smartLib tools](https://www.cragl.com/tool.php?tool=connect)
