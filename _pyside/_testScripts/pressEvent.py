@@ -2,10 +2,8 @@ from PySide.QtGui import *
 from PySide.QtCore import *
 
 class core_SetLabel(QDialog):
-    def __init__(self):
+    def __init__(self,prevLabel):
         super(core_SetLabel,self).__init__()
-
-        prevLabel = nuke.selectedNode()['label'].getValue()
 
         self.lineInput = QLineEdit()
         self.lineInput.setText(prevLabel)
@@ -31,13 +29,18 @@ class core_SetLabel(QDialog):
         
         self.close()
         
-    def open(self):
-        sel = nuke.selectedNodes()
-        if len(sel)>0:    
-            self.show()
-        else:
-            print "No node selected"
+ #   def open(self):
+#        sel = nuke.selectedNodes()
+#        if len(sel)>0:    
+#            self.show()
+#        else:
+#            print "No node selected"
+#
 
-
-p = core_SetLabel()
-p.open()     
+if len(nuke.selectedNodes())>0:
+    prevLabel = nuke.selectedNode()['label'].getValue()    
+    
+    p = core_SetLabel(prevLabel)
+    p.show()
+else:
+    print "No node selected la"
