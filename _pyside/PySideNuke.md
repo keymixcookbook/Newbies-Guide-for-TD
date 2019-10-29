@@ -87,3 +87,48 @@ class NukeTestWindow(QtGui.QWidget):
 nukescripts.panels.registerWidgetAsPanel('NukeTestWindow', 'Test table panel', 'uk.co.thefoundry.NukeTestWindow')
 
 ```
+
+
+### Reoccering panels
+it took me a while to figure this shit out, thanks to [TurboNode5000 by Matt Roe](http://www.nukepedia.com/python/nodegraph/turbonode)
+
+for reoccering pyside widgets with a single instance and dynamic inputs
+Excecuing Seq:
+1. Initiate class: nuke launch, `__init__(self)` is defined
+2. Initiate class: inside `__init__(self)`, setting layouts and widgets with **empty input values** 
+3. Initiate class: **`self.default()`** is run to set default values and get input values
+4. Calling instance: `instance.run()`
+5. Calling instance: `self.default()` is run to set values dynamically
+6. Calling instance: `self.show()` to show widgets
+
+
+```python
+import PySide.QtGui as QtGui
+import nuke
+
+
+class Panel(QtGui.QWidget):
+    def __init__(self):
+        super(Panel, self).__init__()
+        
+        self.line = QtGui.QLabel()
+        self.layout = QtGui.QVBoxLayout()
+        self.layout.addWidget(self.line)
+        self.setLayout(self.layout)
+        self.resize(100,50)
+        
+        # Reset Default value when instancing the class
+        self.default()
+
+    # setting defalt value when run
+    def default(self):
+        self.line.setText(nuke.selectedNode().name())
+    
+    # sequence of events when relaunch
+    def run(self):
+        self.default()
+        self.show()
+        
+            
+p = Panel()
+```
