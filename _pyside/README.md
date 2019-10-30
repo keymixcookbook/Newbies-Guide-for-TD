@@ -2,7 +2,7 @@
 Python on steriods
 
 - [The Basics](#The-Basics)
-- [Useful/Basic Widgets](#Useful/Basic-Widgets)
+- [Useful/Basic Widgets](#Useful-/-Basic-Widgets)
 - [Layouts](#Layouts) ( [Types of Layout](#Types-of-Layout) | [Layout Stack](#Layout-Stack) | [Layout Groups](#Layout-Groups) )
 - [Signal](#Signal)
 
