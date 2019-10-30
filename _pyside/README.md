@@ -2,7 +2,7 @@
 Python on steriods
 
 - [The Basics](#The-Basics)
-- [Useful/Basic Widgets](#Useful-/-Basic-Widgets)
+- [Useful/Basic Widgets](#Basic-Widgets)
 - [Layouts](#Layouts) ( [Types of Layout](#Types-of-Layout) | [Layout Stack](#Layout-Stack) | [Layout Groups](#Layout-Groups) )
 - [Signal](#Signal)
 
@@ -57,7 +57,7 @@ panel = Panel()
 panel.show()
 ```
 
-### Useful/Basic Widgets
+### Basic Widgets
 Building blocks for PySide, just like bricks of Lego
 
 [`Qlabel`](#Qlabel) [`QLineEdit`](#QLineEdit) [`QPushButton`](#QPushButton) [`QCheckBox`](#QCheckBox) [`QComboBox`](#QComboBox) [`QListWidget`](#QListWidget) [`QTabWidget`](#QTabWidget)
@@ -320,7 +320,8 @@ def signal_changed(self):
 
 ### Event
 When user interact with the Widget Object, pressed a key or hover the cursor
-`mousePressEvent(self, event)``keyPressEvent(self, event)``enterEvent(self, event)``leaveEvent(self, event)`
+
+`mousePressEvent(self, event)` `keyPressEvent(self, event)` `enterEvent(self, event)` `leaveEvent(self, event)`
 
 ```python
 class Panel(QWidget):
