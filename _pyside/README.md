@@ -1,6 +1,7 @@
 # PYSIDE in a nutshell :chestnut:
 Python on steriods
 
+###### Table of Contents
 - [The Basics](#The-Basics)
 - [Useful/Basic Widgets](#Basic-Widgets)
 - [Layouts](#Layouts) ( [Types of Layout](#Types-of-Layout) | [Layout Stack](#Layout-Stack) | [Layout Groups](#Layout-Groups) )
@@ -57,6 +58,9 @@ panel = Panel()
 panel.show()
 ```
 
+[&#9776;](#Table-of-Contents)
+
+
 ### Basic Widgets
 Building blocks for PySide, just like bricks of Lego
 
@@ -68,6 +72,9 @@ Building blocks for PySide, just like bricks of Lego
 ```python
 label = QLabel('Label')
 ```
+
+[&#9776;](#Basic-Widgets)
+
 ###### `QLineEdit`
 ```python
 line = QLineEdit("Initial Value") # Define Widget
@@ -83,6 +90,9 @@ line_suggestion = ['Potato', 'Cabbage', 'Burrito']
 completer = QCompleter(line_suggestion)
 line.setCompleter(completer)
 ```
+
+[&#9776;](#Basic-Widgets)
+
 ###### `QPushButton`
 ```python
 push = QPushButton('push')
@@ -93,6 +103,9 @@ push.setShortcut('u')
 push.setToolTip("This is a tooltip when hover")
 push.setCheckable(True) # State of the QPushButton
 ```
+
+[&#9776;](#Basic-Widgets)
+
 ###### `QCheckBox`
 ```python
 checkbox = QCheckBox('Checkbox')
@@ -100,6 +113,9 @@ checkbox = QCheckBox('Checkbox')
 checkbox.setChecked(True)
 checkbox.isChecked() # Return if checked or not, Boolean
 ```
+
+[&#9776;](#Basic-Widgets)
+
 ###### `QComboBox`
 ```python
 combo = QComboBox()
@@ -111,6 +127,8 @@ combo.currentIndex() # return: current index
 combo.findText('Potato') # return: index of the text
 combo.setCurrentIndex(0) # set default text with input index
 ```
+
+[&#9776;](#Basic-Widgets)
 
 ###### `QListWidget`
 ```python
@@ -127,6 +145,8 @@ list_widget.setAlternatingRowColors(True)
 list_widget.setSelectionMode(QAbstractItemView.ExtendedSelection) # Enable Multiple Selections
 
 ```
+
+[&#9776;](#Basic-Widgets)
 
 ###### `QTabWidget`
 
@@ -164,6 +184,8 @@ master_layout = QHBoxLayout()
 master_layout.addWidget(table)
 self.setLayout(master_layout)
 ```
+
+[&#9776;](#Basic-Widgets)
 
 ###### `QTableWidget`
 - Every item in the cell has to be an **Object**
@@ -231,6 +253,9 @@ class MasterPanel(QWidget):
         table_layout.addWidget(table)
         self.setLayout(table_layout)
 ```
+[&#9776;](#Basic-Widgets)
+
+[&#9776;](#Table-of-Contents)
 
 ### Layouts
 Every Widget object needs a layout
@@ -281,6 +306,8 @@ group_layout = QHBoxLayout()
 group.setLayout(group_layout)
 ```
 
+[&#9776;](#Table-of-Contents)
+
 ### Signal
 When the **value** of a widget is changed
 `QWidget().signalMehtod.connect(self.methodToExecute)`
@@ -317,6 +344,7 @@ def signal_changed(self):
 	sender = self.sender() # return: widget object
 ```
 
+[&#9776;](#Table-of-Contents)
 
 ### Event
 When user interact with the Widget Object, pressed a key or hover the cursor

@@ -184,6 +184,8 @@ class ThisClass:
 ThisClass().param
 ThisClass().ClassMethod()
 
+ThisInstance = ThisClass() # Create an instance of a class
+
 # Example
 class ExampleClass:
     def __init__(self, name, number):
@@ -206,6 +208,26 @@ del myClass.number # delete parameter
 - `self` - A reference to current instance of the `Class`
     - it **must be** the **FIRST parameter** of the `function` in the class
     - does't has to be named `'self'`, as long as it's the **first parameter**
+
+
+###### Class Variables
+
+```python
+class Variable:
+
+    var_static = 'Class Level Variable - static variable'
+
+    def __init__(self):
+        var_class = 'Class Level Variable'
+        self.var_instance = 'Class-Instance Level Variable'
+
+        self.thisMethod() # Execute a method
+
+    def thisMethod(self):
+        var_local = 'method variable'
+        self.var_instance == 'from Class-Instance Level'
+        Variable.var_static == 'from Class level'
+```
 
 
 ###### Class Inheritance
