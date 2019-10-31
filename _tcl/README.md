@@ -21,6 +21,9 @@ Useful things in TCL, also used by Nuke Expressions
 
 // topnode
 [value [topnode].name]
+
+// knob value with decimal limit
+[format "%.2f" [value knobname]]
 ```
 
 ###### File Path
