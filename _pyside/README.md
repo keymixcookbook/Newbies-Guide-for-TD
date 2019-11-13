@@ -1,11 +1,13 @@
 # PYSIDE in a nutshell :chestnut:
-Python on steriods
+Python on steroids
 
 ###### Table of Contents
 - [The Basics](#The-Basics)
 - [Useful/Basic Widgets](#Basic-Widgets)
 - [Layouts](#Layouts) ( [Types of Layout](#Types-of-Layout) | [Layout Stack](#Layout-Stack) | [Layout Groups](#Layout-Groups) )
-- [Signal](#Signal)
+- [Signal](#Signal) and [Event](#Event)
+- [Snippets](./pysideSnippets)
+- [Useful Resources](#Resources)
 
 ### Other Resources
 - [Basic Widgets and its methods](https://www.tutorialspoint.com/pyqt/pyqt_basic_widgets.htm)
@@ -65,12 +67,12 @@ panel.show()
 Building blocks for PySide, just like bricks of Lego
 
 [`Qlabel`](#Qlabel) [`QLineEdit`](#QLineEdit) [`QPushButton`](#QPushButton) [`QCheckBox`](#QCheckBox) [`QComboBox`](#QComboBox) [`QListWidget`](#QListWidget) [`QTabWidget`](#QTabWidget)
-
 [`QTableWidget`](#`QTableWidget`)
 
 ###### `QLabel`
 ```python
 label = QLabel('Label')
+label = QLabel('<h1>HTML tag<br>Support</h1>')
 ```
 
 [&#9776;](#Basic-Widgets)
@@ -189,7 +191,8 @@ self.setLayout(master_layout)
 
 ###### `QTableWidget`
 - Every item in the cell has to be an **Object**
-- `QtableWidgetItem(str)` for Strings; `QTableWidget.setCellWidget(row, column, widget)` for Widget Objects in a cell
+	- `QtableWidgetItem(str)` for Strings;
+	- `QTableWidget.setCellWidget(row, column, widget)` for Widget Objects in a cell
 
 ```python
 
@@ -331,7 +334,8 @@ class Panel(QWidget):
 	    count = len(text)
 	    self.line_output.setText(str(count))
 ```
-- `self` before `self.line_input = QLineEdit()` is necessary when defining a custom method
+- `self` before `self.line_input = QLineEdit()` is necessary when defining a instance-level variable
+- `self` as a function argument `line_edit_count(self)` is necessary when defining a method
 
 ###### `sender()`
 To identify which widget is changed
@@ -349,7 +353,9 @@ def signal_changed(self):
 ### Event
 When user interact with the Widget Object, pressed a key or hover the cursor
 
-`mousePressEvent(self, event)` `keyPressEvent(self, event)` `enterEvent(self, event)` `leaveEvent(self, event)`
+`mousePressEvent(self, event)`, `keyPressEvent(self, event)`, `enterEvent(self, event)`, `leaveEvent(self, event)`
+
+> `.connect()` overwrites the event for this widget object
 
 ```python
 class Panel(QWidget):
@@ -391,3 +397,9 @@ class MouseHover(QLineEdit):
 - Need to overwrite and redefine the Event method, and **keep** the `event` parameter
 - For when mouse hover a Widget Object, the original widget is overwritten and **Events** are redefined
 	- hence a **new class** is defined with a new Widget Object
+
+
+### Resources
+- [PySide2 API](https://doc.qt.io/qtforpython/)
+- [Qt Examples](https://doc.qt.io/qtforpython/tutorials/index.html)
+- [Signal and Slots](https://techbase.kde.org/Development/Tutorials/Python_introduction_to_signals_and_slots)
