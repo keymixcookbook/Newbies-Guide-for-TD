@@ -15,3 +15,13 @@ Solution:
 - in `menu.py` add line `os.setenv('QT_COMPRESS_TABLET_EVENTS')='1'`
 - **OR** in cshell/terminal, `setenv QT_COMPRESS_TABLET_EVENTS 1`
 - restart nuke
+
+
+### Hide Status Bar in Nuke 11
+```python
+from Qt import QtWidgets
+
+for n in QtWidgets.QApplication.allWidgets():
+    if isinstance(n, QtWidgets.QStatusBar):
+        print n.hide()
+```
