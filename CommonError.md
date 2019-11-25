@@ -21,7 +21,10 @@ Solution:
 ```python
 from Qt import QtWidgets
 
-for n in QtWidgets.QApplication.allWidgets():
-    if isinstance(n, QtWidgets.QStatusBar):
-        print n.hide()
+try:
+    for n in QtWidgets.QApplication.allWidgets():
+        if isinstance(n, QtWidgets.QStatusBar):
+            n.hide()
+except:
+    print "not in nuke 11"
 ```
