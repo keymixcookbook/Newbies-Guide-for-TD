@@ -32,3 +32,4 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 - [The Mailing Archieve - nuke-python fourm](https://www.mail-archive.com/nuke-python@support.thefoundry.co.uk/)
 - [The Art of Command line](https://github.com/jlevy/the-art-of-command-line)
 - [smartLib tools](https://www.cragl.com/tool.php?tool=connect)
+- [TCL + Html](https://www.gatimedia.co.uk/expressions)
