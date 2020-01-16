@@ -33,3 +33,4 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 - [The Art of Command line](https://github.com/jlevy/the-art-of-command-line)
 - [smartLib tools](https://www.cragl.com/tool.php?tool=connect)
 - [TCL + Html](https://www.gatimedia.co.uk/expressions)
+- [Nuke Python R&D](https://satheeshnuketutorials.blogspot.com/)
