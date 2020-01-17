@@ -189,4 +189,22 @@ def rgb2hsv(r, g, b):
         s = df/mx
     v = mx
     return h, s, v #h: 0~360; s,v: 0~1
+    
+
+# Source: https://stackoverflow.com/questions/34472375/linear-to-srgb-conversion
+def srgb2lin(s):
+    '''1D color conversion where 's' as sRGB sample value'''
+    if s <= 0.0404482362771082:
+        lin = s / 12.92
+    else:
+        lin = pow(((s + 0.055) / 1.055), 2.4)
+    return lin
+
+def lin2srgb(lin):
+    '''1D color conversion where 'lin' as linear sample value'''
+    if lin > 0.0031308:
+        s = 1.055 * (pow(lin, (1.0 / 2.4))) - 0.055
+    else:
+        s = 12.92 * lin
+    return s
 ```
