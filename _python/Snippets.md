@@ -189,7 +189,7 @@ def rgb2hsv(r, g, b):
         s = df/mx
     v = mx
     return h, s, v #h: 0~360; s,v: 0~1
-    
+
 
 # Source: https://stackoverflow.com/questions/34472375/linear-to-srgb-conversion
 def srgb2lin(s):
@@ -207,4 +207,22 @@ def lin2srgb(lin):
     else:
         s = 12.92 * lin
     return s
+```
+
+# Restart Nuke with Command
+
+```Python
+# Source: https://community.foundry.com/discuss/topic/135555/
+
+# Restart
+def restartNuke():
+    nuke.scriptNew('')
+    nuke.modified(False)
+    nuke.scriptExit()
+
+# Reload
+import myModule
+# make changes to the module
+myModule = reload(myModule)
+
 ```
