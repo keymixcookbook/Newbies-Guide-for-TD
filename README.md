@@ -34,3 +34,4 @@ More of a learning Repository for Nuke Python module, nuke modding fun
 - [smartLib tools](https://www.cragl.com/tool.php?tool=connect)
 - [TCL + Html](https://www.gatimedia.co.uk/expressions)
 - [Nuke Python R&D](https://satheeshnuketutorials.blogspot.com/)
+- [Nuke NDK example walkthrough - Max van Leeuwen](https://maxvanleeuwen.com/project/nuke-ndk/)
