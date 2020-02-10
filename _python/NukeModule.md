@@ -297,7 +297,7 @@ sometimes it will be faster just to right-click or control-drag on animation par
 [`link_tools.py`(sample script)](https://gist.github.com/jedypod/759871a41a35482704af) | [`_curvelib.AnimCTransform` methods](https://learn.foundry.com/nuke/developers/70/pythonreference/_curvelib.AnimCTransform-class.html)
 
 Basic Event Sequence:
-1. Define `_curvelib.AnimCurve()` object
+1. Define `_curvelib.AnimCurve()` object (per knob and axis)
 2. Assign a *string value* to `<AnimCurve Object>.expressionString = 'Expression'`
 3. Set `<AnimCurve Object>.useExpression = True`
 4. Find *Transform Attribute object* for selected Rotoshape curve `<Curve object>.getTransform()`
