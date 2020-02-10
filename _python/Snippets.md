@@ -29,8 +29,38 @@ zip(ls_a, ls_b)
 filter(function, ls)
 filter(lambda x: x+1, [1,2,3])
 
->>>2,3,6
+>>> 2,3,6
+
+# Remove Duplicates
+ls = ["a", "b", "a", "c", "c"]
+ls = list(dict.fromkeys(ls))
+
+>>> ["a", "b", "c"] 
 ```
+
+
+### String Manipulation
+```python
+str = 'Transform_MatchMove4' 
+
+# Removing tailing numbers
+str.rstrip('0123456789') # Right strip
+str.lstrip('0123456789') # Left strip
+str.strip('0123456789') # Both side strip
+
+>>> 'Transform_MatchMove'
+
+# Checking starting string
+str.startswith('Transform')
+
+>>> True
+
+# Spliting String
+str.split('_')
+
+>>> ['Transform', 'MatchMove4']
+```
+
 
 ### Ternary Operators
 ```Python
@@ -209,7 +239,7 @@ def lin2srgb(lin):
     return s
 ```
 
-# Restart Nuke with Command
+### Restart Nuke with Command
 
 ```Python
 # Source: https://community.foundry.com/discuss/topic/135555/
