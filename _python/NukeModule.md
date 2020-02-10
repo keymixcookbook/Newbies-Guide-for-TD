@@ -74,6 +74,24 @@ node.setYpos() # integer
 
 nuke.zoom(2, [x,y]) # Focus DAG to [x,y]
 ```
+
+###### Group Nodes
+```python
+# Accessing nodes within a group
+# Method 1
+with groupNode:
+	# functions
+
+# Method 2
+group_node.begin()
+# functions
+group_node.end()
+
+# Method 3
+nuke.toNode('groupNode.insideNode')
+```
+
+
 [&#9776;](#Table-of-Contents)
 
 ###### Knobs
