@@ -132,3 +132,15 @@ class Panel(QtGui.QWidget):
             
 p = Panel()
 ```
+### Access PyQt Widget in Script Editor
+good for debugging your functions methods outside of a widget
+```python
+YourWidget = None
+YourWidget_child = None
+for n in QtWidgets.QApplication.allWidgets():
+    if isinstance(n, YourWidget_Class):
+        YourWidget = n
+for n in YourWidget.children():
+    if isinstance(n, YourWidget_child_Class):
+        YourWidget_child = n
+```
