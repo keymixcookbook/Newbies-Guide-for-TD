@@ -63,7 +63,7 @@ int main() {
 ```
 
 
-####### User inputs and exit programs
+###### User inputs and exit programs
 `cin` ask for user inputs, but taking `space` as `enter`
 
 `getline(cin, var)` takes everthing until `enter` is hit
@@ -133,7 +133,7 @@ my_array[1] = 1;
 ```
 
 **Character Array**
-a string of characters that ends with '\0', a null character
+a string of characters that ends with `'\0'`, a null character
 ```c++
 char a[] = "potato";
 char b[6] = "potato"; // character array with length of 6, number of letters + a null character
