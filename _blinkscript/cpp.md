@@ -190,12 +190,15 @@ dereference ptrN: 100
 ```
 
 ### Cpp specific Operators
+common operators, [full operators](https://www.geeksforgeeks.org/operators-c-c/)
 - `=`: assignment
 - `<<`: insertion stream out
 - `>>`: extraction stream in
 - `::`: scope (name used within a portion of source code, library of keywords?)
 - `&&`: logic 'and'
 - `||`: logic 'or'
+- `?`, `:`: one line conditional, same as tcl, `<condition> ? <true_condition> : <false_condition>`
+- `sizeof()`: Determine size in bytes on this implementation (dunno why this is an operator)
 
 
 ### Conditional and Loops
