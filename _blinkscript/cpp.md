@@ -202,5 +202,95 @@ common operators, [full operators](https://www.geeksforgeeks.org/operators-c-c/)
 
 
 ### Conditional and Loops
+The `if`s:
+```c++
+if (int n==1){
+  //do something
+}else{ // must include else statement
+  //else something
+  return 0; // else can't be empty
+}
+
+if (int n==1){
+  //do something
+}else if (n!=1){
+  //else if something
+}else{
+  //else something
+}
+```
+
+The `for`s:
+```c++
+for (int i=0; i<n; i++){ // Need to initialize i
+  //something to loop
+}
+```
+The `do while`s:
+```c++
+int input;
+do{
+  //something to do
+}while(input<0); // while input<0 repeat previous do functions
+```
+
+The Pyramid example:
+
+```c++
+int perLine(int r, int n, int d){
+  // same as python's string repeating function
+
+  //r: cur row number
+  //n: number of blocks
+  //d: direction
+  if (d==-1){
+    for (int i=1; i<=n; i++){
+      if(i<=(n-r)){
+          printf(" ");
+      }else{
+          printf("#");
+      }
+    }
+  }else if(d==1){
+    for (int i=1; i<=n; i++){
+      if(i<=r){
+        printf("#");
+      }else{
+        printf(" ");
+      }
+    }
+  }else{
+    return 0;
+  }
+  return 0;
+}
+
+int main(){
+  int blocks;
+
+  do{
+    blocks = get_int("Height: ");
+  }while(blocks<0);
+
+  for (int r=1; r<=blocks; r++){
+    perLine(r, blocks,-1);
+    printf("  ");
+    perLine(r, blocks,1);
+    printf("\n");
+  }
+}
+
+```
+return result:
+```
+       #  #       
+      ##  ##       
+     ###  ###     
+    ####  ####    
+   #####  #####   
+  ######  ######  
+ #######  #######
+########  ########
+```
 ### Functions
 ### Console errors
