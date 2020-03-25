@@ -46,19 +46,19 @@ using namespace std;
 
 int main() {
 
-    //declares num as a variable that can hold a floating point number
-    float num;
+	//declares num as a variable that can hold a floating point number
+	float num;
 
-    // Displays this text to the console
-    cout << "Give me a number: ";
+	// Displays this text to the console
+	cout << "Give me a number: ";
 
-    // Takes the user's input and stores it in num
-    cin >> num;
+	// Takes the user's input and stores it in num
+	cin >> num;
 
-    // Displays to the console
-    cout << "This is your number doubled: " << num*2;
+	// Displays to the console
+	cout << "This is your number doubled: " << num*2;
 
-    return 0;
+	return 0;
 }
 ```
 
@@ -69,15 +69,15 @@ int main() {
 `getline(cin, var)` takes everthing until `enter` is hit
 ```c++
 int main(){
-    string y; // declare variable
-    cout << "Type of the potato"; // console string
-    getline(cin, y); // ask for input, same line as previous
-    cout << "creating" << y; // combine string with input value
-    cout << " Potato." << endl; // add to end of previous line, same line
-    cout << "Press enter to exit..." << endl; // console string
-    getline(cin, y); // allow exit with enter key pressed
+	string y; // declare variable
+	cout << "Type of the potato"; // console string
+	getline(cin, y); // ask for input, same line as previous
+	cout << "creating" << y; // combine string with input value
+	cout << " Potato." << endl; // add to end of previous line, same line
+	cout << "Press enter to exit..." << endl; // console string
+	getline(cin, y); // allow exit with enter key pressed
 
-    return 0;
+	return 0;
 }
 ```
 
@@ -97,8 +97,13 @@ Require declaring data type before each variable, built-in data types are:
 - `decimal`: floating point (28-29 digits, 128 bit) `1.1234567e12`
 - `bool`: boolean (lower case) `true`
 - `char`: character (one letter) `'p'`
-    - `char*`: character (string) `"potato"`
+	- `char*`: character (string) `"potato"`
 - `auto`: set data type after `=` assignment
+
+
+- `void`: a type, but not a datatype. returns no value
+	- Function can have a `void` which don't return a value
+	- `int myFunction(void){}` declare a function with no parameter
 
 ###### Data Size
 `sizeof(<type>)` - max value/length of a datatype
@@ -110,9 +115,9 @@ Require declaring data type before each variable, built-in data types are:
 ###### Signed / Unsigned Values
 Min and Max values a variable can possibly hold from a given point
 - `signed`: return positive and negative values (bi-directional)
-    - counting from smallest to this value
+	- counting from smallest to this value
 - `unsigned`: return *only* positive values (directional)
-    - counting from this value to the biggest
+	- counting from this value to the biggest
 
 ###### Arrays
 similar to python's `list`, but different (cpp has `list` too)
@@ -171,15 +176,15 @@ using namespace std;
 
 // demonstrates what happens when you dereference a pointer
 int main( ) {
-    int varN = 100;
-    int *ptrN = &varN; //*
-    // ptrN points to varN address
+	int varN = 100;
+	int *ptrN = &varN; //*
+	// ptrN points to varN address
 
-    cout << "varN value: " << varN << endl;
-    cout << "varN location: " << ptrN << endl;
-    cout << "dereference ptrN: " << *ptrN << endl; //*
+	cout << "varN value: " << varN << endl;
+	cout << "varN location: " << ptrN << endl;
+	cout << "dereference ptrN: " << *ptrN << endl; //*
 
-    return 0;
+	return 0;
 }
 ```
 return:
@@ -205,88 +210,120 @@ common operators, [full operators](https://www.geeksforgeeks.org/operators-c-c/)
 The `if`s:
 ```c++
 if (int n==1){
-  //do something
+	//do something
 }else{ // must include else statement
-  //else something
-  return 0; // else can't be empty
+	//else something
+	return 0; // else can't be empty
 }
 
 if (int n==1){
-  //do something
+	//do something
 }else if (n!=1){
-  //else if something
+	//else if something
 }else{
-  //else something
+	//else something
 }
+
+int x = (condition) ? 5 : 6; // if condition true 5 else 6
 ```
 
 The `for`s:
+used for number of repetition is *clear and pre-defined*
 ```c++
 for (int i=0; i<n; i++){ // Need to initialize i
-  //something to loop
+	//something to loop
 }
 ```
-The `do while`s:
+The `while`s:
+good for number of repetition is *unclear and un-defined* until it meets the condition
 ```c++
 int input;
+
+while (input<0){
+	//something to do 'after' condition is true
+	//or will repeat infinitely
+}
+
+
 do{
-  //something to do
+	//something to do 'before' condition is true
 }while(input<0); // while input<0 repeat previous do functions
+```
+
+The `switch`s:
+```c++
+int x = GetInt(); //get the number
+switch(x){
+	case 1: // if x is 1 do the following
+		printf("one");
+		break; // break the loops
+	case 2:
+		printf("two");
+		break;
+	case 3:
+		printf("three");
+		break;
+	case 4:
+		printf("four");
+		// will still print out "four" if no break
+	default: // Will always execute no matter the case
+		printf("End")
+}
 ```
 
 The Pyramid example:
 
 ```c++
 int perLine(int r, int n, int d){
-  // same as python's string repeating function
+	// same as python's string repeating function
 
-  //r: cur row number
-  //n: number of blocks
-  //d: direction
-  if (d==-1){
-    for (int i=1; i<=n; i++){
-      if(i<=(n-r)){
-          printf(" ");
-      }else{
-          printf("#");
-      }
-    }
-  }else if(d==1){
-    for (int i=1; i<=n; i++){
-      if(i<=r){
-        printf("#");
-      }else{
-        printf(" ");
-      }
-    }
-  }else{
-    return 0;
-  }
-  return 0;
-}
+	//r: cur row number
+	//n: number of blocks
+	//d: direction
+	if (d==-1){
+		for (int i=1; i<=n; i++){
+			if(i<=(n-r)){
+			  printf(" ");
+			}else{
+			  printf("#");
+		  	}
+		}
+	}else if(d==1){
+		for (int i=1; i<=n; i++){
+		  	if(i<=r){
+				printf("#");
+		  	}else{
+				printf(" ");
+		  	}
+		}
+	}else{
+		return 0;
+	}
+		return 0;
+	}
 
 int main(){
-  int blocks;
+	int blocks;
 
-  do{
-    blocks = get_int("Height: ");
-  }while(blocks<0);
+	do{
+		blocks = get_int("Height: ");
+	}while(blocks<0);
 
-  for (int r=1; r<=blocks; r++){
-    perLine(r, blocks,-1);
-    printf("  ");
-    perLine(r, blocks,1);
-    printf("\n");
-  }
+	for (int r=1; r<=blocks; r++){
+		perLine(r, blocks,-1);
+		printf("  ");
+		perLine(r, blocks,1);
+		printf("\n");
+	}
 }
 
 ```
 return result:
 ```
-       #  #       
-      ##  ##       
-     ###  ###     
-    ####  ####    
+	   #  #       
+	  ##  ##       
+	 ###  ###     
+	####  ####    
    #####  #####   
   ######  ######  
  #######  #######
