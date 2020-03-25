@@ -271,6 +271,10 @@ switch(x){
 }
 ```
 
+Control Statement:
+- `break`: breaks and stops the loop
+- `continue`: skip and continue remaining loop
+
 The Pyramid example:
 
 ```c++
