@@ -1,7 +1,9 @@
 # C++ for Python programmers
-cout << main reference << [cpp4python](https://runestone.academy/runestone/books/published/cpp4python/index.html) << endl;
 
-cout << cpp Basic Tutorials << [T Payne](https://www.youtube.com/playlist?list=PL82YdDfxhWsCyZLsg_kXhH8sy5ixQNras) << endl;
+Resources
+1. cout << main reference << [cpp4python](https://runestone.academy/runestone/books/published/cpp4python/index.html) << endl;
+2. cout << cpp Basic Tutorials << [T Payne](https://www.youtube.com/playlist?list=PL82YdDfxhWsCyZLsg_kXhH8sy5ixQNras) << endl;
+3. cout << Basics of Computer Science << [CS50](https://cs50.harvard.edu/) << endl;
 
 
 ### The Syntaxes
@@ -9,6 +11,19 @@ cout << cpp Basic Tutorials << [T Payne](https://www.youtube.com/playlist?list=P
 - `<>`: libraries
 - `;`: use to end a line
 - `{}`: start and end a function
+
+
+### Cpp specific Operators
+common operators, [full operators](https://www.geeksforgeeks.org/operators-c-c/)
+- `=`: assignment
+- `<<`: insertion stream out
+- `>>`: extraction stream in
+- `::`: scope (name used within a portion of source code, library of keywords?)
+- `&&`: logic 'and'
+- `||`: logic 'or'
+- `?`, `:`: one line conditional, same as tcl, `<condition> ? <true_condition> : <false_condition>`
+- `sizeof()`: Determine size in bytes on this implementation (dunno why this is an operator)
+
 
 ### Import libraries
 libraries are `header` and to be imported with `#include`
@@ -27,7 +42,6 @@ a collection of classes and functions which are written in the core language
 #include <iterators>
 ...
 ```
-### Main functions
 
 ### Comments
 `\\`: single line; `/*  */`: multi line
@@ -104,6 +118,9 @@ Require declaring data type before each variable, built-in data types are:
 - `void`: a type, but not a datatype. returns no value
 	- Function can have a `void` which don't return a value
 	- `int myFunction(void){}` declare a function with no parameter
+- `const <type> <varName>`: to declare a constant value that will not be changed
+- `(<type>) <variable>`: convert variable to a post-defined type inside '()'
+	- `(float) intVariable`
 
 ###### Data Size
 `sizeof(<type>)` - max value/length of a datatype
@@ -122,6 +139,8 @@ Min and Max values a variable can possibly hold from a given point
 ###### Arrays
 similar to python's `list`, but different (cpp has `list` too)
 
+3 components to declare an array`<type> <name>[<size>]`
+
 > individual variables next to each other in the memory
 
 **Array Declaration**
@@ -136,15 +155,65 @@ int array_2d[2][3] // 2 dimensional array with 2x'row', 3x'columns'
 my_array[0] = 0;
 my_array[1] = 1;
 ```
+**Reassigning Arrays**
+
+you **can not** assign one array to another array directly, ie. ~~`int lsA[4] = int lsB[4]`~~
+
+however, you can **loop** one array and assign items to another
+```c++
+int from[4] = {1,2,3,4};
+int to[4];
+
+for (i=0, i<=from.size(), i++){
+	from[i] = to[i];
+}
+```
+
+**Passed by Reference**
+most variables in C are passed by value, function receives it as a **copy**,
+
+but `array` are passed by **reference**, it does not copy.
+
+```c++
+void set_array(int array[4]);
+void set_int(int x);
+
+int main(void){
+	int a = 10;
+	int b[4] = {0, 1, 2 ,3};
+
+	set_int(a);
+	set_array(b);
+	printf("%d %d\n", a, b[0])
+}
+
+void set_int(int x) {
+	x = 22;						// Copy input to int x
+}
+void set_array(int array[4]){
+	array[0] = 22;				// Reference input with array[0]
+}
+
+```
+how above `main()`is ran
+1. Define `int a = 10`
+2. Define `array b[4] = {0, 1, 2 ,3}`
+3. Call `set_int` > inputs `a`, value: `10`
+	3.1 > copy to `x` > returns its copy `x`, value `22`
+4. Call `set_array` > inputs `array b`, value b[4]{0,1,2,3}
+	4.1 > referencing `b` > reassign `b` with `array`, value from `0` to `22`
+5. prints output `10 22\n` or initially declared `a`, referenced and reassigned `b`
+
 
 **Character Array**
-a string of characters that ends with `'\0'`, a null character
+a string of characters that ends with `'\0'`, a null character, or "8 zero bits"
 ```c++
 char a[] = "potato";
 char b[6] = "potato"; // character array with length of 6, number of letters + a null character
 char c[]{'a', 'b', '\0'}; //'\0' being the null character to end the string
 char c[]{'a', 'b', '\0', 'c'} // 'c' won't be displayed, null listed before
 ```
+
 
 ###### String
 list of characters with more function
@@ -155,11 +224,22 @@ string burrito = "burrito";
 
 potato.swap(burrito); // swap "potato" with "burrito"
 potato.size(); // python: len(potato)
+strlen(potato) // also for length of the string
 potato.find('p'); // index of letter 'p'
 potato[1]; // letter with string index of 1
 
 combine = potato + burrito; // combine strings
 ```
+
+How is it stored in the memory
+```c
+string names[4];
+names[0] = "EMMA";
+names[1] = "RODRIGO";
+names[2] = "BRIAN";
+names[3] = "DAVID";
+```
+![string_array_CS50](https://cs50.harvard.edu/x/2020/notes/2/memory_with_string_array.png)
 
 
 ###### Pointer and address-of
@@ -194,17 +274,6 @@ varN location: 0x7fff3f8f2f2c
 dereference ptrN: 100
 ```
 
-### Cpp specific Operators
-common operators, [full operators](https://www.geeksforgeeks.org/operators-c-c/)
-- `=`: assignment
-- `<<`: insertion stream out
-- `>>`: extraction stream in
-- `::`: scope (name used within a portion of source code, library of keywords?)
-- `&&`: logic 'and'
-- `||`: logic 'or'
-- `?`, `:`: one line conditional, same as tcl, `<condition> ? <true_condition> : <false_condition>`
-- `sizeof()`: Determine size in bytes on this implementation (dunno why this is an operator)
-
 
 ### Conditional and Loops
 The `if`s:
@@ -232,6 +301,19 @@ used for number of repetition is *clear and pre-defined*
 ```c++
 for (int i=0; i<n; i++){ // Need to initialize i
 	//something to loop
+}
+```
+alternative `for`s
+```c++
+string s = "potato"
+
+for (int i=0, n=5; i<strlen(s); i++){
+	// define variables inside the 'for' statement
+}
+
+for (int i=0; s[i]!='\0'; i++){
+	// break loop when 's[i]' isn't '\0'
+	// similar to 'while' loop with condition 's[i]!='\0''
 }
 ```
 The `while`s:
@@ -271,67 +353,113 @@ switch(x){
 }
 ```
 
-Control Statement:
+###### Control Statement
 - `break`: breaks and stops the loop
 - `continue`: skip and continue remaining loop
 
-The Pyramid example:
+###### Examples
+1. [The Pyramid](ThePyramidExample.c) (loop printing characters)
+2. [Capitalize](Capitalize.c) (loop and Ascii values for characters)
 
-```c++
-int perLine(int r, int n, int d){
-	// same as python's string repeating function
 
-	//r: cur row number
-	//n: number of blocks
-	//d: direction
-	if (d==-1){
-		for (int i=1; i<=n; i++){
-			if(i<=(n-r)){
-			  printf(" ");
-			}else{
-			  printf("#");
-		  	}
-		}
-	}else if(d==1){
-		for (int i=1; i<=n; i++){
-		  	if(i<=r){
-				printf("#");
-		  	}else{
-				printf(" ");
-		  	}
-		}
-	}else{
-		return 0;
-	}
-		return 0;
-	}
+### Command-line
+when running `C` or `C++` files in a command-line
 
-int main(){
-	int blocks;
+`argc`: argument count | `argv`: argument value
+```c
+//file: cmdline.c
+int main(int argc, string argv[]){
+    if (argc == 2){
+        printf("hello %s\n", argv[1]);
+    }else{
+        printf("hello there!\n");
+    }
+}
+```
 
-	do{
-		blocks = get_int("Height: ");
-	}while(blocks<0);
+when run above code in terminal
+```
+host:~ username$ ./cmdline potato
+hello potato!
+```
+*`./cmdline` and `potato` count as **2** command-line arguments, where `potato` is `argv[1]`*
 
-	for (int r=1; r<=blocks; r++){
-		perLine(r, blocks,-1);
-		printf("  ");
-		perLine(r, blocks,1);
-		printf("\n");
-	}
+### Functions
+functions are declared with 3 components: `<return-type> <name>(<argument-list>)`, ie. `float funcPotatoes(void){}`
+
+###### Order of Declaration
+functions used within a function has be declared **before** being called.
+
+There are **2 ways** of doing this, both starts with **declaring** the function.
+
+`Declare` > `Define` > `Call`
+```c
+// Declare first
+int subFunction(int potato){
+	// Function stuff
 }
 
+// Call afterwards
+int main(void){
+	subFunction(potato)
+}
 ```
-return result:
+`Declare` > `Call` > `Define`
+```c
+// Declare name and arguments
+int subFunction(int potato);
+
+// Call the function
+int main(void){
+	subFunction(potato)
+}
+
+// Define the function, return type and name has to be the same
+int subFunction{
+	// Function stuff
+}
 ```
-	   #  #       
-	  ##  ##       
-	 ###  ###     
-	####  ####    
-   #####  #####   
-  ######  ######  
- #######  #######
-########  ########
+###### The `main()` function
+every `C` or `C++` program needs a `int main(arg){}`, and everything inside will be run when execute
+
+```c
+#include <stdio.h>
+
+int main(void){
+	// everything in the program
+	// when the script is run
+}
 ```
-### Functions
+
+###### Exit Code
+the `return` value of a function is called **exit code**
+
+`int main()` function has a default exit code of `0`, indicates nothing went wrong, but they are customizable.
+
+```c
+//ispotato.c
+#include <stdio.h>
+
+int main(int argc, string argv[]){
+    if (argc < 2 || argv[1]!="potato"){
+        printf("not a potato\n");
+        return 1;
+    }
+	printf("potato it is!");
+	return 0;
+}
+```
+run above in terminal
+
+exit code: `1`
+```
+host:~ username$ ./ispotato burrito
+not a potato
+```
+exit code: `0`
+```
+host:~ username$ ./ispotato potato
+potato it is!
+```
+*function breaks after `return` is ran*
 ### Console errors
