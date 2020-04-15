@@ -198,10 +198,10 @@ void set_array(int array[4]){
 how above `main()`is ran
 1. Define `int a = 10`
 2. Define `array b[4] = {0, 1, 2 ,3}`
-3. Call `set_int` > inputs `a`, value: `10`
-	3.1 > copy to `x` > returns its copy `x`, value `22`
-4. Call `set_array` > inputs `array b`, value b[4]{0,1,2,3}
-	4.1 > referencing `b` > reassign `b` with `array`, value from `0` to `22`
+3. Call `set_int(a)` > inputs `a`, value: `10`...
+	- copy to `x` > returns its copy `x`, value `22`
+4. Call `set_array(b)` > inputs `array b`, value b[4]{0,1,2,3}...
+	- referencing `b` > reassign `b` with `array`, value from `0` to `22`
 5. prints output `10 22\n` or initially declared `a`, referenced and reassigned `b`
 
 
@@ -275,6 +275,24 @@ dereference ptrN: 100
 ```
 
 
+###### Structs
+define custom data types with `typedef struct`, for multiple data types
+```C++
+typedef struct{
+	// Define variable type and name
+	string name;
+	string number;
+}
+person; // name of the struct
+
+// To use struct
+person people[4]; //Declare variable with datatype person
+
+people[0].name = "potato"
+people[0].number = 666666
+```
+
+
 ### Conditional and Loops
 The `if`s:
 ```c++
@@ -293,7 +311,18 @@ if (int n==1){
 	//else something
 }
 
+```
+alternative `if`s
+```c
+// You can use if..else.. without the {}, since it considers as same line
+if (int n==1)
+	//do soemthing
+else
+	// do other things
+
+// You can make it a one-liner
 int x = (condition) ? 5 : 6; // if condition true 5 else 6
+
 ```
 
 The `for`s:
@@ -406,7 +435,7 @@ int main(void){
 ```
 `Declare` > `Call` > `Define`
 ```c
-// Declare name and arguments
+// Declare name and arguments or Function Prototypes
 int subFunction(int potato);
 
 // Call the function
@@ -462,4 +491,68 @@ host:~ username$ ./ispotato potato
 potato it is!
 ```
 *function breaks after `return` is ran*
-### Console errors
+
+
+### Sorting
+algorithm to sort an array of values
+
+- **Bubble** sort: looking into current item's neighbor
+- **Selection** sort: looking into the smallest item, swap with the nth item
+- **Merge** sort: sort left and right half separately then merge
+
+[Merge Sort Example](./MergeSort.c)
+
+[CS50 - Sorting Visualization](https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html)
+
+
+### Recursion
+a function that calls itself
+
+**2 basic components in a recursion function**
+- Base Case: terminate the recursive process
+- Recursive Case: where the recursion will actually occur
+
+it follows the basic principle of factorial numbers `n!`:
+```
+1! = 1
+2! = 2 * 1
+3! = 3 * 2 * 1
+...
+n! = n * (n-1)! // Recursion
+```
+now put factorial into a C function:
+```c
+int fact(int n){
+
+	// Base Case
+	if (n == 1)
+		return 1;
+	else
+	// Recursive function
+		return n* fact(n-1)
+}
+```
+as you can see it's also similar to `while` loops:
+
+```c
+int factWhile(int n){
+
+	int product = 1; // sets Base case counter
+
+	while (n > 0){  // Base case condition
+		// Recirsive function
+		product *= n; //**
+		n --;
+	}
+	return product;
+}
+```
+
+
+### Python the C++ Way
+
+###### String vs String Compare
+- python: `'potato' == 'potato'`, returns: `True` or `False`
+- C++: `strcmp("potato", "potato")`, returns: `0` if true or `1` if false
+
+######
