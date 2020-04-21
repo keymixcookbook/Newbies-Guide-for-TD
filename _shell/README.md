@@ -1,15 +1,39 @@
 # Shell in a nutshell :chestnut:
-Shell basics for Linux
+Shell basics
 
-### Config (Linux)
+### Config (Linux, C Shell)
 
 `/usr/<username>/config/cshrc.csh`
 
-### Config (Bash/Mac)
+### Config (Mac, BASH Shell)
 
 `/Users/<username>/.bash_profile`
 
-### Command-line Snippets
+```shell
+alias nuke='/Applications/Nuke11.3v6/Nuke11.3v6/Contents/MacOS/Nuke11.3v6'
+alias job='source  <path.sh>' # run a shell script using command-line
+```
+
+### Config (BASH in Windows)
+Why use shell in windows? cuz bash-ishly cool XD
+
+[How to setup `Bash` shell in windows 10](https://www.howtogeek.com/265900/everything-you-can-do-with-windows-10s-new-bash-shell/)
+
+`/home/<username>/.bashrc` or `.bash_aliases`
+
+`C` Drive location: `/mnt/c/`
+
+```Shell
+alias nuke='/mnt/c/Program\ Files/Nuke11.3v6/nuke11.3.exe'
+alias nuke='/mnt/c/Program\ Files/Autodesk/Maya2019/bin/maya.exe'
+```
+
+
+### Config (Windows Command Prompt, cmd)
+
+nuke command-line: `doskey nuke="C:\Program Files\Nuke11.3v6\Nuke11.3.exe"`
+
+### Command-line Snippets (UNIX shells)
 ```shell
 # Directory Commands
 ls # List directories
@@ -62,3 +86,13 @@ export KU_STUDIO_ENV=$1
 # Print statement
 echo "job in to $KU_STUDIO_ENV"
 ```
+
+### Using `vim` for editing in shell
+
+`vim <file>`
+
+Commands
+- `i`: insert/edit file
+- `ESC`: exist editing mode
+- `:wq`: write and quit
+- `:q`: quit without wirte
