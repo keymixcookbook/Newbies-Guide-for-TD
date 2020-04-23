@@ -28,6 +28,26 @@ alias nuke='/mnt/c/Program\ Files/Nuke11.3v6/nuke11.3.exe'
 alias nuke='/mnt/c/Program\ Files/Autodesk/Maya2019/bin/maya.exe'
 ```
 
+###### Access a network drive in BASH for Windows
+[windows subsystem for linux release note](https://docs.microsoft.com/en-us/archive/blogs/wsl/file-system-improvements-to-the-windows-subsystem-for-linux)
+
+1. create an alias folder: `sudo mkdir /mnt/<AliasFolder>`
+2. mounting the drive: `sudo mount -t drvfs '\\<NetworkDriveName>\<NetworkSharedFolder>' /mnt/<AliasFolder>`
+
+###### Execute a BASH script in BASH for Windows
+if you are using command-line arguements with bash sctipts, there will be a `\r` at the end of each line, due to its windows character.
+
+to solve this problem, is to use `dos2unix` command
+
+1. install `dos2unix` on Bash for windows
+```shell
+sudo apt-get update
+sudo apt-get install dos2unix
+```
+2. using `dos2unix` to convert the Bash script:
+```shell
+dos2unix <file>.sh
+```
 
 ### Config (Windows Command Prompt, cmd)
 
@@ -62,7 +82,7 @@ sudo # Supersuer
 -f # Forcefully to
 -r # Recursively to
 
-# making alias
+# making alias (C Shell)
 alias <aliasname> '<command>'
 
 # Variables
@@ -72,6 +92,9 @@ alias comp `cd /jobs/$JOB/$SHOT/nuke/comp/scene/$USER/`
 # Enviroment
 setenv ENV_NAME value
 printenv ENV_NAME
+
+# Shell Prompt (Default)
+PS1="\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
 ```
 
 ### Bash Shell Script Snippets
