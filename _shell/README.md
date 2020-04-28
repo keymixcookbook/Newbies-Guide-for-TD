@@ -14,40 +14,11 @@ alias nuke='/Applications/Nuke11.3v6/Nuke11.3v6/Contents/MacOS/Nuke11.3v6'
 alias job='source  <path.sh>' # run a shell script using command-line
 ```
 
-### Config (BASH in Windows)
+### Config (BASH in Windows or WSL)
 Why use shell in windows? cuz bash-ishly cool XD
 
-[How to setup `Bash` shell in windows 10](https://www.howtogeek.com/265900/everything-you-can-do-with-windows-10s-new-bash-shell/)
+and I think it deservse its own [page](./WSL.md)
 
-`/home/<username>/.bashrc` or `.bash_aliases`
-
-`C` Drive location: `/mnt/c/`
-
-```Shell
-alias nuke='/mnt/c/Program\ Files/Nuke11.3v6/nuke11.3.exe'
-alias nuke='/mnt/c/Program\ Files/Autodesk/Maya2019/bin/maya.exe'
-```
-
-###### Access a network drive in BASH for Windows
-[windows subsystem for linux release note](https://docs.microsoft.com/en-us/archive/blogs/wsl/file-system-improvements-to-the-windows-subsystem-for-linux)
-
-1. create an alias folder: `sudo mkdir /mnt/<AliasFolder>`
-2. mounting the drive: `sudo mount -t drvfs '\\<NetworkDriveName>\<NetworkSharedFolder>' /mnt/<AliasFolder>`
-
-###### Execute a BASH script in BASH for Windows
-if you are using command-line arguements with bash sctipts, there will be a `\r` at the end of each line, due to its windows character.
-
-to solve this problem, is to use `dos2unix` command
-
-1. install `dos2unix` on Bash for windows
-```shell
-sudo apt-get update
-sudo apt-get install dos2unix
-```
-2. using `dos2unix` to convert the Bash script:
-```shell
-dos2unix <file>.sh
-```
 
 ### Config (Windows Command Prompt, cmd)
 
