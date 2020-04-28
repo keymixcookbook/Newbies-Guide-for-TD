@@ -5,10 +5,10 @@ it's cool for windows 10 to have WSL, but it has a few things that needs workaro
 
 ### Overview:
 
-1. [Setup up WSL](#1.-Setup-WSL-in-Windows-10)
-2. [Executing a Bash script & command launch applications](#2.-Execute-a-Bash-scrip)
-3. [Environment Variables for your pipeline](#3.-Sharing-Environment-Variables) (I will do Nuke pipeline for this guide)
-4. [`job` in or `go` to your show and shot](4.-job-in-or-go-to-your-show-and-shot)
+1. [Setup up WSL](#1-Setup-WSL-in-Windows-10)
+2. [Executing a Bash script & command launch applications](#2-Execute-a-Bash-scrip)
+3. [Environment Variables for your pipeline](#3-Sharing-Environment-Variables) (I will do Nuke pipeline for this guide)
+4. [`job` in or `go` to your show and shot](#4-job-in-or-go-to-your-show-and-shot)
 5. Load show/shot tools in nuke (wip)
 
 
@@ -46,7 +46,7 @@ if you are using command-line arguments with bash scripts, there will be a `\r` 
 
 something like this:
 
-![](./_img/shellcharReturn.png)
+![](./_img/shellCharReturn.png)
 
 
 to solve this problem, is to use `dos2unix` command
