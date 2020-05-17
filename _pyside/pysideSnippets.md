@@ -45,7 +45,58 @@ class MultipleShowing:
 
 - `setAlignment(QtCore.Qt.AlignRight)` - Set alignment
 
+**Get rid of the margins surrounding custom Panels**
 [Remove Nuke PythonPanel Margins](https://stackoverflow.com/questions/43224402/how-to-create-custom-panel-without-framing-via-python-in-nuke)
+```python
+
+import nuke
+import PySide.QtCore as QtCore
+import PySide.QtGui as QtGui
+from nukescripts import panels
+
+def set_widget_margins_to_zero(widget_object):
+
+    if widget_object:
+        target_widgets = set()
+        target_widgets.add(widget_object.parentWidget().parentWidget())
+        target_widgets.add(widget_object.parentWidget().parentWidget().parentWidget().parentWidget())
+
+        for widget_layout in target_widgets:
+            try:
+                widget_layout.layout().setContentsMargins(0, 0, 0, 0)
+            except:
+                pass
+
+class Example_Window(QtGui.QWidget):
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+        layout = QtGui.QVBoxLayout()
+        label = QtGui.QLabel('Margins be-gone!')
+        label.setStyleSheet('QLabel{background: #eeffcc}')
+
+        layout.setContentsMargins(0,0,0,0)
+        layout.addWidget(label)
+        self.setLayout(layout)
+
+        expandingPolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding,
+                                            QtGui.QSizePolicy.Expanding)
+        label.setSizePolicy(expandingPolicy)
+        self.setSizePolicy(expandingPolicy)
+
+    def event(self, event):
+        if event.type() == QtCore.QEvent.Type.Show:
+
+            try:
+                set_widget_margins_to_zero(self)
+            except:
+                pass
+
+        return QtGui.QWidget.event(self, event)
+
+panels.registerWidgetAsPanel('Example_Window', 'Example Widget',
+                             'mwbp.Example_Widget')
+
+```
 ###### Window Flags
 
 ###### Spacing
