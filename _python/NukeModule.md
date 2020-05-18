@@ -138,7 +138,7 @@ nuke.selectedNode()['autolabel'].setValue(customLabel)
 | Enumeration_Knob 				| 'name', 'label', [list] | dropdown menu
 | EvalString_Knob 				| 'name', 'label', 'string' | not sure the use of it
 | Eyedropper_Knob 				| 'name', 'label'
-| File_Knob 					| 'name', 'label'
+| File_Knob 					| 'name', 'label' 'url string'
 | Font_Knob 					| 'name', 'label'
 | Format_Knob 					| 'name', 'label'
 | GeoSelect_Knob 				| 'name', 'label'
