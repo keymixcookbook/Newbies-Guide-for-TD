@@ -2,9 +2,11 @@
 Useful things in other supporting modules that comes with python (*I am gonna assume you know the general logic of coding*).
 
 ## Table of Contents
-- [`os` Module](#os)
-- [`shutil` Module](#shutil)
-- [`collections` Module](#collections)
+- [`os` Module](#os) - for operating system API
+- [`shutil` Module](#shutil) - os file manipulation mostly for copying, moving and deleting files and directories
+- [`collections` Module](#collections) - list manipulation
+- [`math` Module](#math) - math operations
+- [`re` Module](#re) - regular expression
 
 ---
 
@@ -99,7 +101,7 @@ collections.Counter(ls).keys()
 ```
 
 ### math
-For Math operations (duh) - [Online Ref](https://docs.python.org/2/library/math.html)
+For Math operations (duh) - [Online Ref](https://docs.python.org/2.7/library/math.html)
 
 ```python
 import math
@@ -117,3 +119,58 @@ math.ceil(num) # round up
 math.round(num) # round
 >>> 2
 ```
+
+
+### re
+For string search/replace/matching... with pattern syntax- [Online Ref](https://docs.python.org/2.7/library/re.html)
+
+`re` modules usually comes with 4 components: `pattern`, `str`, `flags`, `MatchObject`
+
+
+**Useful Methods**
+
+method|return|description
+:---|:---|:---
+`re.match(pattern, str, flag=0)`				| `<MatchObject>` 	| finds beginning of the string
+`re.search(pattern, str, flag=0)` 				| `<MatchObject>` 	| finds all of the string
+`re.sub(pattern, replStr, str, max=0)` 			| `str`				| substitute `str` with `replStr` base on `pattern`
+`re.split(pattern, str, maxsplit=0, flag=0)` 	| `[str, str]` 		| substitute `str` with `replStr` base on `pattern`
+`re.findall(pattern, str)` 	| `[str, str]` 		| find all occerance of `str`
+`re.compile(pattern)` | `<reObject>` | compile `pattern` in an object
+
+
+**MatchObject methods**
+
+method|return|return type
+:---|:---|:---
+`<MatchObject>.group()`| matched string | 'str'
+`<MatchObject>.start()`| matched string's index, start position | `int`
+`<MatchObject>.end()`  | matched string's index, end position | `int`
+`<MatchObject>.span()` | matched string's index, range | `(int, int)`
+
+`None` returned if no match
+
+**pattern** *(partial)*
+
+pattern|match|example
+:---|:---|:---
+`^`		| beginning of **line** 			| `'^potato'`
+`$`		| end of **line** 					| `'potato$'`
+`.`		| anything, *except newline* 		| `'po.o'`
+`[...]`	| a set of characters 				| `[0-9]`
+`[^..]`	| except the set of characters		| `[^0-9]`
+`a|b`	| a or b 							| `po| p`
+`\w`	| word character					|
+`\W`	| non-word character				|
+`\s`	| whitespace						|
+`\S`	| non-whitespace					|
+`\d`	| digits							|
+`\D`	| non-digits						|
+`\A`	| beginning of **string**			|
+`\Z`	| end of **string**					|
+`\b`	| begining or end of **word**		| `r'\bP'`
+`\B`	| not begining or end of **word**	| `r'o\b'`
+`\n`	| newline, tabs, etc				|
+`{#}`	| exactly `#` of repetition			|
+`{#,}`	| `#` or more repetition			|
+`{#,#}`	| `#`~`#` repetitions				|
