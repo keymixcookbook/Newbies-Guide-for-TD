@@ -7,7 +7,7 @@
 # Add
 ls.append(item)
 ls[key] = value
-ls.extend([item1, item2])
+ls.extend([item1, item2]) # Return a list
 
 # Remove
 ls.remove(item) # Can't be assigned as a new variable directly
@@ -35,15 +35,15 @@ filter(lambda x: x+1, [1,2,3])
 ls = ["a", "b", "a", "c", "c"]
 ls = list(dict.fromkeys(ls))
 
->>> ["a", "b", "c"] 
+>>> ["a", "b", "c"]
 ```
 
 
 ### String Manipulation
 ```python
-str = 'Transform_MatchMove4' 
+str = 'Transform_MatchMove4'
 
-# Removing tailing numbers
+# Removing letter/numbers
 str.rstrip('0123456789') # Right strip
 str.lstrip('0123456789') # Left strip
 str.strip('0123456789') # Both side strip
@@ -59,6 +59,10 @@ str.startswith('Transform')
 str.split('_')
 
 >>> ['Transform', 'MatchMove4']
+
+# String Replacement
+str = str.replace('Transform', 'NoOp')
+>>> 'NoOp_Matchmove4'
 ```
 
 
