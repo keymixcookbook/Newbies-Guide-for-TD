@@ -7,6 +7,7 @@ Python on steroids
 - [Layouts](#Layouts) ( [Types of Layout](#Types-of-Layout) | [Layout Stack](#Layout-Stack) | [Layout Groups](#Layout-Groups) )
 - [Signal](#Signal) and [Event](#Event)
 - [Snippets](./pysideSnippets)
+- [Import UI as a separate file](./uiImporting)
 - [Useful Resources](#Resources)
 
 ### Other Resources
