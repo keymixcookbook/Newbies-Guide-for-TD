@@ -105,6 +105,7 @@ push.setIcon(QIcon("/location"))
 push.setShortcut('u')
 push.setToolTip("This is a tooltip when hover")
 push.setCheckable(True) # State of the QPushButton
+push.setStyleSheet("Text-align:left") # Align text
 ```
 
 [&#9776;](#Basic-Widgets)
@@ -192,7 +193,7 @@ self.setLayout(master_layout)
 
 ###### `QTableWidget`
 - Every item in the cell has to be an **Object**
-	- `QtableWidgetItem(str)` for Strings;
+	- `QtableWidgetItem(row, column, str)` for Strings;
 	- `QTableWidget.setCellWidget(row, column, widget)` for Widget Objects in a cell
 
 ```python
@@ -207,7 +208,8 @@ class Table(QTableWidget):
         # Set Attributes of the table
         self.setRowCount(len(data.keys()))
         self.setColumnCount(4)
-        self.horizontalHeader().setStretchLastSection(True)
+        self.horizontalHeader().setStretchLastSection(True) # Stretch last column or section
+		self.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch) # Stretch first column
         self.setEditTriggers(QAbstractItemView.NoEditTriggers) # Set Cell not editable
         self.setSelectionBehavior(QAbstractItemView.SelectRows) # Set Selection for the entire row
 
