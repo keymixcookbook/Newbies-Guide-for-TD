@@ -7,6 +7,7 @@ Useful things in other supporting modules that comes with python (*I am gonna as
 - [`collections` Module](#collections) - list manipulation
 - [`math` Module](#math) - math operations
 - [`re` Module](#re) - regular expression
+- [`json` Module](#json) - javascript object notation data storage
 
 ---
 
@@ -76,7 +77,12 @@ with `os` module, with copying and removing files and directories - [Online Ref]
 
 ```python
 import shutil
+
+# Copying files
 shutil.copy2('/src/file_copy.ext', '/dst/file_paste.ext')
+
+# Copying directories
+shutil.copytree('/src/dir/', '/dst/dir/')
 
 ```
 
@@ -174,3 +180,29 @@ pattern|match|example
 `{#}`	| exactly `#` of repetition			|
 `{#,}`	| `#` or more repetition			|
 `{#,#}`	| `#`~`#` repetitions				|
+
+
+
+### json
+javascript object notation for saving data as a file
+
+```PYTHON
+import json
+```
+
+there are 2 main methods for `json` module
+- `json.dumps(data, indent=<int>)`
+- `json.loads()`
+
+
+```python
+# Writing or dumping json files
+with open('data_file.json', 'w') as f:
+    json_data = json.dumps(data, indent=2)
+    f.write(json_data)
+
+# Loading json files
+with open('data_file.json', 'r') as f:
+    json_data = json.load(f)
+
+```
