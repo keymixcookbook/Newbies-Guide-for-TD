@@ -1,7 +1,7 @@
 # PYTHON (in a nutshell :chestnut:)
 Useful things in python (*I am gonna assume you know the general logic of coding*). Only includes the things that are often used, you can go [Homepage](./README.md) to find the reference for more detailed documentation.
 
-This is python only, does not include the [Nuke module](NukeModule.md), and [supporting modules](SupportModule.md) (i.e. **os**(very useful), **collection**(can be useful) )
+This is python only, does not include the [Nuke module](NukeModule.md), and [supporting modules](SupportingModule.md) (i.e. **os**(very useful), **collection**(can be useful) )
 
 ## Table of Contents
 - [Operators](#Operators)
