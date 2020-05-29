@@ -39,14 +39,20 @@ from Qt import QtWidgets, QtCore, QtGui
 import sys
 
 # import ui module
-from ui import Ui_Class as ui
+from ui import Ui_Class
 
 class main_Class(QtWidgets.QWidget):
     def __init__(self):
         super(main_Class, self).__init__()
 
-        # calling setupUi method
-        ui.setupUi(self)
+        # instance ui object
+        self.ui=Ui_Class()
+
+        # Call setupUi()
+        self.ui.setupUi(self)
+
+        # Return an value from ui
+        getValue = self.ui.lineedits.text()
 
         # finish importing ui and do otherthings
         ...
