@@ -90,3 +90,47 @@ Commands
 - `ESC`: exist editing mode
 - `:wq`: write and quit
 - `:q`: quit without wirte
+
+
+### BATCH basics
+Windows command prompt runs of `Batch`, and the syntax are differet than unix shell
+
+**Syntax**
+- `::` or `Rem`: comments
+- `@`: apply command to itself, ie. `@echo off`: to turn off display of commands
+- `%VARIABLE%`: in script variables
+- `%<1-9>`: command-line argument variables
+- `>`: redirect output, ie. `dir in > out`
+- `/<a-z>`: switch to define variable type
+
+**Commands** (common ones)
+- `dir`: list contents of a directory
+- `set`: sets variables
+- `echo`: prints in shell
+- `cls`: clear shell
+- `start`: start a program
+- `md`: make directory
+- `path`: display or sets %PATH% variable
+- `rem`: comments
+- `doskey`: sets aliases or macros
+- `pause`: pause shell from auto-close after successfully execute script
+
+**Saving aliases** (saving aliases in windows system)
+
+1. create a `.bat` file with aliases commands, ie. `aliases.bat`
+2. in cmd, run `regedit` and go to:
+    - before windows 10: `HKEY_CURRENT_USER\Software\Microsoft\Command Processor`
+    - in windows 10: `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Command Processor`
+3. add `String Value` entry, with name `AutoRun`
+4. set its value to **full path** of `aliases.bat`
+
+[online ref](https://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt)
+
+**Conditional Statements**
+```shell
+if <condition> (
+    <true commands>
+    )else(
+    <false commands>
+        )
+```
