@@ -126,11 +126,20 @@ Windows command prompt runs of `Batch`, and the syntax are differet than unix sh
 
 [online ref](https://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt)
 
+**using command-line argv with doskey aliases** (tricky one)
+
+you have to tell the alias how many argument this doskey macro will have, [doskey documentation](https://ss64.com/nt/doskey.html)
+
+- in `aliases.bat`
+    - `doskey aliases="file.bat" $1 $2 $3...`
+- in `file.bat`
+    - `$[1-9]` = `%[1-9]`
+
 **Conditional Statements**
 ```shell
 if <condition> (
     <true commands>
-    )else(
+    ) else (
     <false commands>
-        )
+    )
 ```
