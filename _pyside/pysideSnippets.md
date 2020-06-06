@@ -8,8 +8,6 @@
 - [Add Remove Widgets](#Add-Remove-Widgets)
 - [Event Handler](#Event-Handler)
 - [Show Window/Instance](#Showing)
-- [Nuke with Qt](#Nuke)
-
 
 #### Initialize
 Multiple showing of the same instance
@@ -99,9 +97,12 @@ panels.registerWidgetAsPanel('Example_Window', 'Example Widget',
 ```
 ###### Window Flags
 
+- `QtCore.Qt.WindowCloseButtonHint`: only show close button
+- `QtCore.Qt.MSWindowsFixedSizeDialogHint`: window not resizeable
+
+[&#9776;](#Table-of-Contents)
+
 ###### Spacing
-
-
 
 [&#9776;](#Table-of-Contents)
 
@@ -122,6 +123,11 @@ panels.registerWidgetAsPanel('Example_Window', 'Example Widget',
 
 - `setFrameStyle(QFrame.Box | QFrame.Raised)` - set border along widgets
 
+**Expand size of a widget in a cell in QGridLayout**
+```Python
+_sizepolicy = QtWidgets.QSizePolicy.Expanding
+self.widget.setSizePolicy(_sizepolicy,_sizepolicy)
+```
 
 [&#9776;](#Table-of-Contents)
 
@@ -161,10 +167,17 @@ def run(self):
  - also: `result()`
 
 
-
 [&#9776;](#Table-of-Contents)
 
 
-#### Nuke
+
+
+#### Add Divider Line
+
+```python
+separador = QtWidgets.QFrame()
+separador.setFrameShape(QtWidgets.QFrame.HLine)
+separador.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+```
 
 [&#9776;](#Table-of-Contents)
