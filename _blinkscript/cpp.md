@@ -387,8 +387,8 @@ switch(x){
 - `continue`: skip and continue remaining loop
 
 ###### Examples
-1. [The Pyramid](ThePyramidExample.c) (loop printing characters)
-2. [Capitalize](Capitalize.c) (loop and Ascii values for characters)
+1. [The Pyramid](_example/ThePyramidExample.c) (loop printing characters)
+2. [Capitalize](_example/Capitalize.c) (loop and Ascii values for characters)
 
 
 ### Command-line
@@ -500,7 +500,7 @@ algorithm to sort an array of values
 - **Selection** sort: looking into the smallest item, swap with the nth item
 - **Merge** sort: sort left and right half separately then merge
 
-[Merge Sort Example](./MergeSort.c)
+[Merge Sort Example](_example/MergeSort.c)
 
 [CS50 - Sorting Visualization](https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html)
 
