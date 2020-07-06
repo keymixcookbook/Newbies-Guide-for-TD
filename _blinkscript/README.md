@@ -8,11 +8,12 @@ C++ modded with Nuke NDK
 ### Blinkscript Basics
 for what I understand, Foundary's Blinkscript (or Blink Kernel, ["WTF is a Kernel"](https://en.wikipedia.org/wiki/Kernel_(operating_system)#/media/File:Kernel_Layout.svg)) is a mix of C++ and GLSL (or you can argue GLSL is base off C++, so Blinkscript is a child of C++)
 
-The following is a consolidation of Blink Tutorials I found online: [here](https://learn.foundry.com/nuke/developers/90/BlinkKernels/InvertKernel.html) and [here](https://sites.google.com/site/gabrielroytuts/nuke/blinkscript/intro) and [here](http://www.guillemramisadesoto.com/tutorials#/blink-101/) and [here](http://www.xaviermartinvfx.com/x_aton/)
+The following is a consolidation of Blink Tutorials I found online: [here](https://learn.foundry.com/nuke/developers/90/BlinkKernels/InvertKernel.html) and [here](https://sites.google.com/site/gabrielroytuts/nuke/blinkscript/intro) and [here](http://www.guillemramisadesoto.com/tutorials#/blink-101/) and [here](http://www.xaviermartinvfx.com/x_aton/) in an orgnized manner, I hope
 
 ###### Necessary Components
-The necessary functions to setup for Blinkscript to run (more details below)
-1. Declare a Kernel: `kernel BlinkName: ImageComputationKernel<eSomethingWise>{}`
+The necessary parts to setup for Blinkscript to run, with following orders (and more details for each parts below)
+1. Any declaration of global functions (optional)
+1. Declare a Kernel Granularity: `kernel BlinkName: ImageComputationKernel<eSomethingWise>{}`
 1. Image Specification, define src and dst: `Image<eRead> src`, `Image<eWrite> dst`
 1. Define parameters and/or variables: `param:` and `void define(){ defineParam() }`
 1. Initialize: `void init(){}`
@@ -52,9 +53,9 @@ kernel InvertKernel : ImageComputationKernel<eComponentWise>
 ##### Kernel Type
 - `ImageComputationKernel`: takes zero or more images input and ouput one or more images
     - access order random
-- `ImageRollingKernel`: where there is a data dependency between the output at different points in the output space
+- `ImageRollingKernel`(not common): where there is a data dependency between the output at different points in the output space
     - access order either horizontally or vertically
-- `ImageReductionKernal`: reduce an image down to a value/set of values
+- `ImageReductionKernal` (not common): reduce an image down to a value/set of values
 
 ##### Kernel Granularity
 There are 2 types of Blinkscript Kernel, which sets what kind of data you can access.
@@ -72,13 +73,15 @@ Define the input and ouput image, and what can you access from each.
     - `<eWrite>`: write-only access
 - AccessPattern
     - `<eAccessPoint>`: will only be accessed at current position in output space
-    - `<eAccessRange1D>`: 1 dimensional position to current iteration space
-    - `<eAccessRange1D>`: 2 dimensional position to current iteration space
+    - `<eAccessRange1D>`: 1 axis, 1 dimensional position to current iteration space
+    - `<eAccessRange2D>`: 2 axis, 2 dimensional position to current iteration space
     - `<eAccessRandom>`: any pixel in the iteration space
 - EdgeMethod
     - `<eEdgeClamped>`: repeat edge pixels of the input image
     - `<eEdgeConstant>`: 0 value returned outside image bounds
     - `<eEdgeNone>`: values undefined outside of the image bounds, most efficient way if out bounds not require access
+
+> How you setup the AccessPattern, determines what you have to define in init(), more in the Reserved Methods section
 
 
 ##### Variables
@@ -88,31 +91,67 @@ there are 2 types of variable ('types' here I don't mean data types, but more on
 
 **Datatypes** (awfully similar to GLSL)
 - `bool`: good ol' friend true/false
-
-
 - `int`: single intiger value
 - `int2`: 2 dimensional integer
 - `int3`: 3 dimensional integer
 - `int4`: 4 dimensional integer
 - `int multi_int[4]` : array of intiger values
-
-
 - `float`: single float value
     - `1.0f`, the tailing `f` is a tricky one, cuz sometimes you need it, sometimes you don't...what the `f`, man
 - `float2`: 2 dimensional float
 - `float3`: 3 dimensional float
-- `float4`: 4 dimensional float (also can be used as color knob for `r`, `g`, `b`, `a`)
+- `float4`: 4 dimensional float (also can be used as color knob for `r`, `g`, `b`, `a` or `x`, `y`, `z`, `w`, or `0`, `1`, `2`, `3`)
 - `float multi_float[n]`: n dimensional float
-
-
 - `float3x3`: 3x3 matrices
 - `float4x4`: 4x4 matrices
 
 **Reserved Variables**
-environment variables pre-defined by nuke
+variables pre-defined by nuke (for this, I use `src` for sources images for clearity)
 
+- `PI`: pi
 - `eX`/`eY`: axis of the image
-- `bounds`: image bounds or `recti`/`rectf`
+- used with `void process()`
+    - `int2 pos`: the x `pos.x` and y `pos.y` coordinates of their position in the iteration space
+    - `int3 pos`: same as `int2 pos`, but with pos.z as Component
+- `src.kMin`, `src.kMax`: minimum and maximum possible value for any component
+- `src.kWhitePoint`: boundary value between white and super-white, usually set to `1`
+- `src.kComps`: number of components of src
+- `src.kClamps`: bool, if src should be clamps or not
+- `src.bounds`: image bounds
     - `bound.width()`, `bound.height()`
     - `bound.x1()`, `bound.y1()`: bottom left corner
     - `bound.x2()`, `bound.y2()`: top right corner
+- `ValueType(src)`: data type of src, ie `float`, `int` (yes i know, it looks like a function, but it's considered as a variable, C++ madness, low-level computing is weird)
+- `SampleType(src)`: similar to `ValueType()`, but it shows the length/number of components, ie `float3`
+
+**Reserved Methods**
+- `define()`: define parameters
+    - `defineParam(paramName, "externalParamName", defaultValue)`: actual define parameters (if value is float, needs tailing `f`)
+- `init()`: setting up access to images and initialising local variables
+    - setup ranged image access
+    - `setAxis(eX)`: set axis for `<eAccessRange1D>` and `<eAccessRange2D>`
+    - `setRange(int rangeMin, int rangeMax)`: set range from min value to max (if 2D, set both axis)
+    - `setRange(int xMin, int yMin, int xMax, int yMax)`: set range min to max for **2 axises only**
+    - `<eAccessPoint>` and `<eAccessRandom>` does not need to `setRange()`
+- `process()`: main function for Blinkscript
+- `src()`: source access
+    - `src()`: `<eAccessPoint>` access, no argument is needed
+    - `src(int offset)`: `<eAccessRange1D>` access, interation space + `offset`
+    - `src(int xOffset, int yOffset)`: `<eAccessRange2D>` access, interation space + `xOffset, yOffset`
+    - `src(int x, int y)`: `<eAccessRandom>` access, src at `x,y` coordinate
+    - for `<eComponentWise>`: it can access per component
+    - for `<ePixelWise>`: `src(..., int c)`: to specifiy a component `c` as intiger
+    - Reutrn type:
+        - if `<eComponentWise>`: same as `src.ValueType`
+        - if `<ePixelWise>`: `int c` given: `src.ValueType` or vector with all component type
+- Math Functions: almost same as GLSL ([list of GLSL functions](https://www.khronos.org/registry/OpenGL-Refpages/gl4/index.php))
+    - `bilinear(Image src, float x, float y, int c)` where `int c` is optional
+    - `sin()`,`cos()`, `tan()`, `asin()`, `acos()`, `atan()`, `atan2()`
+    - `exp()`, `log()`, `log2()`, `log10()`
+    - `floor()`, `ceil()`, `round()`, `pow()`, `sqrt()`, `rsqrt()`, `abs()`, `fabs()`, `fmod()`, `modf()`, `sign()`, `min()`, `max()`, `clamp()`, `rcp()`
+    - `atomicAdd()`, `atomicInc()`
+    - `median(scalar data[], int size)`: median value of `data[]` with given `size`
+    - `rect(scalar x1, scalar y1, scalar x2, scalar y2)`: Construct a rectangle from `(x1,y1)` to `(x2,y2)`
+    - `rect.grow(scalar x, scalar y)`: grow bounds by `x` and `y`
+    - `rect.inside(scalar x, scalar y)`, `rect.inside(vec v)`: bool, whether `(x,y)` or `v` inside `rect`
+    - `rect.width()`, `rect.height()`: `vec` or `scalar`, width and height
