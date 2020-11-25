@@ -62,3 +62,22 @@ in `menu.py`
 import W_dontUseNativeMenuBar
 W_dontUseNativeMenuBar.init()
 ```
+
+### Exit codes
+
+#### 137
+
+- OS: `Linux`
+- Cause: render blade ran out of memory
+- Discription: render blade errors and there is no clear indication of where it errors, but at the end of the log it shots
+- [Source link](https://support.circleci.com/hc/en-us/articles/115014359648-Exit-code-137-Out-of-memory#:~:text=This%20is%20a%20Linux%20error,memory%2C%20your%20build%20will%20fail.)
+
+#### 139
+
+- OS: `Linux`
+- Cause: I/O issue, file inputs or node input
+- Discription: render blade error on start
+- [Source link](https://stackoverflow.com/questions/42882168/how-to-solve-exit-code-139-error-when-reading-from-file-on-unix/42882179#:~:text=3%20Answers&text=It%20means%20the%20program%20crashed,is%20successfully%20opened%20after%20fopen%20.)
+
+
+
