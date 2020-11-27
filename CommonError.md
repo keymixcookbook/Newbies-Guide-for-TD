@@ -63,6 +63,18 @@ import W_dontUseNativeMenuBar
 W_dontUseNativeMenuBar.init()
 ```
 
+### Nuke freeze when opening property panel
+
+[source](https://community.foundry.com/discuss/topic/112522/double-click-on-read-node-kills-freezes-nuke)
+
+when trying to open a node's property panel, nuke freezes. Usually happen to `Roto` and `Rotopaint` node. 
+
+*Only freeze when connected.*
+
+*Assumed cause:* Too many channels in the pipe and, maybe, too many python modules loaded
+
+
+
 ### Exit codes
 
 #### 137
