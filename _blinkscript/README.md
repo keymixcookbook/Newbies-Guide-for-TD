@@ -4,6 +4,7 @@ C++ modded with Nuke NDK
 ###### Table of Contents
 - [Start with C++](./cpp.md)
 - [Blinkscript Basics](#Blinkscript-Basics)
+- [Blinkscript vs GLSL](#Blinkscript-vs-GLSL)
 
 ### Blinkscript Basics
 for what I understand, Foundary's Blinkscript (or Blink Kernel, ["WTF is a Kernel"](https://en.wikipedia.org/wiki/Kernel_(operating_system)#/media/File:Kernel_Layout.svg)) is a mix of C++ and GLSL (or you can argue GLSL is base off C++, so Blinkscript is a child of C++)
@@ -155,3 +156,22 @@ variables pre-defined by nuke (for this, I use `src` for sources images for clea
     - `rect.grow(scalar x, scalar y)`: grow bounds by `x` and `y`
     - `rect.inside(scalar x, scalar y)`, `rect.inside(vec v)`: bool, whether `(x,y)` or `v` inside `rect`
     - `rect.width()`, `rect.height()`: `vec` or `scalar`, width and height
+- GLSL Functions that are not avaliable in Blinkscript
+    1. `mix(a,b,f)`: mixing input `a` with input `b` at rate of `f`
+    2. `step(a,b)`: comparing `a` with `b` and reutrn a `bool`
+    3. `clamp()`
+    4. `length()`
+    5. `distance()`
+
+### Blinkscript vs GLSL
+
+Although Blinkscript is very similar to GLSL, but it has differences with their syntax
+
+GLSL | Blinkscript
+---- | ----------
+`vec2` | `float2`, xy knob
+`vec3` | `float3`, xyz knob
+`vec4` | `float4`, rgba knob
+`gl_FragCoord.xy` | `int2 pos`, defined in `void process(int2 pos){}`
+`gl_FragCoord.xyz` | `int3 pos`
+`uniform vec2 u_resolution` | `float2(src.bounds.x2,src.bounds.y2)`
