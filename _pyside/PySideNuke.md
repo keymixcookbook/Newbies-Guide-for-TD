@@ -95,7 +95,7 @@ it took me a while to figure this shit out, thanks to [TurboNode5000 by Matt Roe
 for reoccering pyside widgets with a single instance and dynamic inputs
 Excecuing Seq:
 1. Initiate class: nuke launch, `__init__(self)` is defined
-2. Initiate class: inside `__init__(self)`, setting layouts and widgets with **empty input values** 
+2. Initiate class: inside `__init__(self)`, setting layouts and widgets with **empty input values**
 3. Initiate class: **`self.default()`** is run to set default values and get input values
 4. Calling instance: `instance.run()`
 5. Calling instance: `self.default()` is run to set values dynamically
@@ -110,26 +110,26 @@ import nuke
 class Panel(QtGui.QWidget):
     def __init__(self):
         super(Panel, self).__init__()
-        
+
         self.line = QtGui.QLabel()
         self.layout = QtGui.QVBoxLayout()
         self.layout.addWidget(self.line)
         self.setLayout(self.layout)
         self.resize(100,50)
-        
+
         # Reset Default value when instancing the class
         self.default()
 
     # setting defalt value when run
     def default(self):
         self.line.setText(nuke.selectedNode().name())
-    
+
     # sequence of events when relaunch
     def run(self):
         self.default()
         self.show()
-        
-            
+
+
 p = Panel()
 ```
 ### Access PyQt Widget in Script Editor
@@ -144,3 +144,29 @@ for n in YourWidget.children():
     if isinstance(n, YourWidget_child_Class):
         YourWidget_child = n
 ```
+
+### Find Widget at Mouse position
+```python
+
+from Qt import QtWidgets, QtGui
+
+app = QtWidgets.QApplication
+pos = QtGui.QCursor.pos()
+widget = app.widgetAt(pos)
+
+```
+
+### Change Nuke Viewer Window's FrameSlider Range
+```python
+# widget, is the current displayed QAction widget
+# can find via widget at mouse pos, or ToolTip: "FrameSlider Range"
+
+a = widget.actions()[0]
+a.menu().actions()[1].trigger()
+
+```
+list of actions:
+- `0` = Global
+- `1` = Input
+- `2` = In/Out
+- `3` = Visible
