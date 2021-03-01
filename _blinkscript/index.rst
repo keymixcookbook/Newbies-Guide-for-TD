@@ -12,7 +12,8 @@ Blinkscript Basics
 For what I understand, Foundary's Blinkscript (or Blink Kernel) is a mix of C++ and GLSL. 
 It is very much a language of its own with a C++ like syntax, and is very simiar to GLSL in how it works
 
-.. image:: https://en.wikipedia.org/wiki/Kernel_(operating_system)#/media/File:Kernel_Layout.svg
+.. image:: Kernel Diagram
+   :target: https://en.wikipedia.org/wiki/Kernel_(operating_system)#/media/File:Kernel_Layout.svg
 
 There are numbers of good online resources for learning Blinkscript, list below are just a few:
 
@@ -30,19 +31,19 @@ Necessary Components
 
 The necessary parts to setup Blinkscript are as follows, in order:
 
-#. Define the name of your Kernel
-#. Define a Kernel Type
-#. Define a Kernel Granularity
-#. Define inputs and output
-#. Any Declaration of global functions
-#. Define parameters and/or local variables
-#. Set User knobs, if any, and their default values
-#. Initilize functions to call when node is created *(or when compiled)*
-#. Processing to run at every pixel or every channel
+#. Define the **Name** of your Kernel
+#. Define a **Kernel Type**
+#. Define a **Kernel Granularity**
+#. Define **Inputs** and **Output**
+#. Any Declaration of **Global Functions**
+#. Define **Parameters** and/or **local** variables
+#. Set **User Knobs**, if any, and their default values
+#. **Initilize** functions to call when node is created *(or when compiled)*
+#. **Processing** to run at every pixel or every channel
 
 **In code examples**: A Simple kernel to invert input
 
-.. code:: C++
+.. code-block:: C++
    :linenos:
 
 	kernel InvertKernel : ImageComputationKernel<eComponentWise>
