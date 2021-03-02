@@ -1,0 +1,104 @@
+//---------------------------------------------------------
+// apMaxMinKernel v0.1 by Adrian Pueyo
+//
+// Calculates the maximum and minimum value of an input img,
+// through the positive values of an area.
+//
+// adrianpueyo.com, 2017
+// ---------------------------------------------------------
+
+static inline float y_convert_ccir601(const float4 in){
+  return in.x * 0.299f + in.y * 0.587f + in.z * 0.114f;
+}
+static inline float y_convert_rec709(const float4 in){
+  return in.x * 0.2125f + in.y * 0.7154f + in.z * 0.0721f;
+}
+static inline float y_convert_avg(const float4 in){
+  return (in.x + in.y + in.z)/3.0f;
+}
+static inline float y_convert_max(const float4 in){
+  return max(max(in.x,in.y),in.z);
+}
+static inline float y_convert_min(const float4 in){
+  return min(min(in.x,in.y),in.z);
+}
+
+kernel apMaxMinKernel : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom, eEdgeClamped> img;
+  Image<eRead, eAccessRandom, eEdgeClamped> area;
+  Image<eWrite> dst;
+
+  param:
+    int useArea;
+    int math; //0=Rec709,1=Ccir601,2=Avg,3=MaxMin,4=PerChannel
+
+  void process(int2 pos) {
+    float4 theMax=-1000000000.0f, theMin=1000000000.0f;
+    for(int j=img.bounds.y1; j<img.bounds.y2; j++){
+      for(int i=img.bounds.x1; i<img.bounds.x2; i++){
+        if(useArea==0 || area(i,j,0)>0.0f){
+          if(math==0){ //Rec709
+            if(pos.x==0){ //Max
+              if(y_convert_rec709(img(i,j))>y_convert_rec709(theMax)){
+                theMax = img(i,j);
+              }
+            }else{//Min
+              if(y_convert_rec709(img(i,j))<y_convert_rec709(theMin)){
+                theMin = img(i,j);
+              }
+            }
+          }else if(math==1){ //Ccir601
+            if(pos.x==0){ //Max
+              if(y_convert_ccir601(img(i,j))>y_convert_ccir601(theMax)){
+                theMax = img(i,j);
+              }
+            }else{//Min
+              if(y_convert_ccir601(img(i,j))<y_convert_ccir601(theMin)){
+                theMin = img(i,j);
+              }
+            }
+          }else if(math==2){ //Avg
+            if(pos.x==0){ //Max
+              if(y_convert_avg(img(i,j))>y_convert_avg(theMax)){
+                theMax = img(i,j);
+              }
+            }else{//Min
+              if(y_convert_avg(img(i,j))<y_convert_avg(theMin)){
+                theMin = img(i,j);
+              }
+            }
+          }else if(math==3){ //MaxMin
+            if(pos.x==0){ //Max
+              if(y_convert_max(img(i,j))>y_convert_max(theMax)){
+                theMax = img(i,j);
+              }
+            }else{//Min
+              if(y_convert_min(img(i,j))<y_convert_min(theMin)){
+                theMin = img(i,j);
+              }
+            }
+          }else if(math==4){ //PerChannel
+            if(pos.x==0){ //Max
+              for (int ch = 0; ch < dst.kComps; ch++){
+                if(img(i,j,ch)>theMax[ch])
+                  theMax[ch] = img(i,j,ch);
+              }
+            }else{//Min
+              for (int ch = 0; ch < dst.kComps; ch++){
+                if(img(i,j,ch)<theMin[ch])
+                  theMin[ch] = img(i,j,ch);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if(pos.x==0){ //Max
+      dst() = theMax;
+    }else{ //Min
+      dst() = theMin;
+    }
+  }
+};

@@ -1,0 +1,12 @@
+kernel Ls_Dot : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessPoint, eEdgeClamped> src1;
+  Image<eRead, eAccessPoint, eEdgeClamped> src2;
+  Image<eWrite> dst;
+
+  void process() {
+    dst(0) = dot(src1(), src2());
+    dst(1) = 0.0;
+    dst(2) = 0.0;
+  }
+};

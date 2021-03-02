@@ -1,0 +1,39 @@
+kernel RadialBlur : ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessRandom, eEdgeConstant> src; // the input image
+  Image<eWrite> dst; // the output image
+
+  param:
+    float4 radial_length;  // This local variable is not exposed to the user.
+    float2 center;
+    int samples;
+    float4 aspect; 
+
+  // In define(), parameters can be given labels and default values.
+  void define() {
+    defineParam(radial_length, "Radial Length", float4(0.0f, 0.0f, 0.0f, 0.0f));
+
+    defineParam(center, "Center", float2(0.0f, 0.0f));
+    defineParam(samples, "Samples", 200);
+
+    defineParam(aspect, "Aspect", float4(1.0f, 1.0f, 1.0f, 1.0f));
+  }
+
+  void process(int3 pos) {
+    float2 offset_pos((pos.x - center.x) * aspect[pos.z], pos.y - center.y);
+
+    float radius = sqrt(offset_pos.x * offset_pos.x + offset_pos.y * offset_pos.y);
+    float theta = atan2(offset_pos.y, offset_pos.x);
+
+    float theta_add = radial_length[pos.z] / samples;
+
+    float sum = 0.0f;
+
+    for (int sample=0; sample < samples; sample++) {
+      sum += bilinear(src, radius * cos(theta)/aspect[pos.z] + center.x, radius * sin(theta) + center.y);
+
+      theta += theta_add;
+    }
+    dst() = sum / samples;
+  }
+};

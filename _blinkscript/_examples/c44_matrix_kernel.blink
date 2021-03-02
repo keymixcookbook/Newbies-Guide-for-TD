@@ -1,0 +1,23 @@
+kernel C44MatrixKernel : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessPoint, eEdgeClamped> src;
+  Image<eWrite> dst;
+
+  param:
+    float4x4 m;
+    int invert;
+    int transpose;
+    int w_divide;
+
+  void process(int2 pos) {
+    SampleType(src) p = src();
+    float4 result = 1.0f;
+    float4x4 mi = m;
+    mi = invert?mi.invert():mi;
+    mi = transpose?mi.transpose():mi;
+    for(int c = 0; c<dst.kComps; c++){
+      result[c] = mi[c][0]*p.x + mi[c][1]*p.y + mi[c][2]*p.z + mi[c][3]*p.w;
+    }
+    dst() = w_divide?result/result.w:result;
+  }
+};

@@ -1,0 +1,37 @@
+kernel Ls_Vignette : ImageComputationKernel<ePixelWise> {
+  Image<eRead, eAccessPoint, eEdgeClamped> src;
+  Image<eWrite> dst;
+
+  param:
+    float2 centre;
+    float aspect, size, mixx;
+
+  void define() {
+    defineParam(centre, "Centre", float2(960.0f, 540.0f));
+    defineParam(aspect, "Aspect", 1.0f);
+    defineParam(size, "Size", 1280.0f);
+    defineParam(mixx, "Mix", 1.0f);
+  }
+
+  float mixxx(float from, float to, float factorr) {
+    return factorr * to + (1.0 - factorr) * from;
+  }
+
+  void process(int2 pos) {
+    float2 where;
+    where.x = float(pos.x);
+    where.y = float(pos.y);
+
+    float2 fromcentre = where - centre;
+    fromcentre.y *= aspect;
+    float dist = length(fromcentre);
+    float x = dist / size;
+    x = min(x, 3.1415926535f);
+    float vignette = pow(cos(x), 4.0f);
+    float mixedvignette = mixxx(1.0, vignette, mixx);
+
+    SampleType(src) s = src();
+    s *= mixedvignette;
+    dst() = s;
+  }
+};

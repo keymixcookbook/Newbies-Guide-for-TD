@@ -1,0 +1,73 @@
+// https://gist.github.com/herronelou/a8a66910da8f214274d1d1d80acd34a8
+
+inline float3 uv_to_sphere(const float2 uv, const float2 image_size)
+{
+  float2 st = (uv+float2(0.5f)) / image_size;
+  float latitude = (st.y - 0.5f) * PI;
+  float longitude = (st.x - 0.5f) * 2 * PI;
+  float radiusAtLat = cos(latitude);
+  float3 normal;
+  normal.x = radiusAtLat * cos(longitude);
+  normal.y = sin(latitude);
+  normal.z = radiusAtLat * sin(longitude);
+  return normal;
+}
+
+inline float2 sphere_to_uv(const float3 normal, const float2 image_size)
+{
+  float latitude = asin(normal.y);
+  float radiusAtLat = cos(latitude);
+  float longitude = atan2(normal.z, normal.x);
+  float2 st = float2(longitude/ (2 * PI) + 0.5f, latitude / PI + 0.5f);
+  return st*image_size-float2(0.5f);
+}
+
+
+kernel Irradiance : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom, eEdgeConstant> src;
+  Image<eWrite, eAccessPoint> dst;
+
+  param:
+    float sampleDelta;
+    float2 size;
+
+  void define() {
+    defineParam(sampleDelta, "SampleDelta", 0.25f);
+    defineParam(size, "Image Size", float2(1280.0f, 720.0f));
+  }
+
+  void process(int2 pos)
+  {
+    SampleType(src) irradiance(0);
+    float2 fpos = float2(pos.x,pos.y);
+    float3 normal = normalize(uv_to_sphere(fpos, size));
+
+
+    float3 up    = float3(0.0f, 1.0f, 0.0f);
+    float3 right = cross(up, normal);
+    up           = cross(normal, right);
+
+    int nrSamples = 0.0;
+    for(float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta)
+    {
+        for(float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta)
+        {
+            // spherical to cartesian (in tangent space)
+            float3 tangentSample = float3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));
+            // tangent space to world
+            float3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * normal;
+
+            float2 coordinates = sphere_to_uv(sampleVec, size);
+
+            irradiance += bilinear(src, coordinates.x, coordinates.y) * cos(theta) * sin(theta);
+            nrSamples++;
+        }
+    }
+    irradiance = PI * irradiance * (1.0 / float(nrSamples));
+
+    //Use a bilinear filter to get the value at that src position.
+    dst() = irradiance;
+  }
+
+};

@@ -1,0 +1,410 @@
+//
+// Copyright (c) 2014-2015 Haarm-Pieter Duiker <hpd1@duikerresearch.com>
+//
+
+//
+// A kernel that will apply 3d LUT to an image. The 3d LUT is represented as the Nuke cmsTestPattern
+//
+
+//
+// Map from a 3D LUT position to 2D pixel coordinate in the CMSTestPattern image
+//
+int2 position3dToNukePosition(int3 pos, int width, int height, int nukeBlockSize, int lutResolution) {
+    int2 position;
+
+    int pixel = (pos.z*lutResolution*lutResolution + pos.y*lutResolution + pos.x);
+
+    position.x = (pixel%(width/nukeBlockSize))*nukeBlockSize;
+    position.y = (pixel/(width/nukeBlockSize))*nukeBlockSize;
+
+    // Put the position in the middle of the nukeBlockSize x nukeBlockSize block
+    position += nukeBlockSize/2;
+
+    return position;
+}
+
+// Utility
+float4 mix(float4 a, float4 b, float f) {
+  float4 mixed;
+  mixed.x = a.x*(1.f - f) + b.x*f;
+  mixed.y = a.y*(1.f - f) + b.y*f;
+  mixed.z = a.z*(1.f - f) + b.z*f;
+  mixed.w = a.w*(1.f - f) + b.w*f;
+  return mixed;  
+}
+
+//
+// kernel
+//
+kernel LUTApplyKernel : public ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom, eEdgeClamped> src;
+  Image<eRead, eAccessRandom, eEdgeClamped> cmsPattern;
+  Image<eWrite> dst;
+
+  param:
+    int interpolation;
+
+  local:
+    int lutResolution;
+    int nukeBlockSize;
+
+  void define() {
+    // unused for now. 
+    defineParam(interpolation, "interpolation", 2);
+  }
+
+  void init() {
+    // The Nuke CMSTestPattern node generates 7x7 pixel blocks for each LUT entry
+    nukeBlockSize = 7;
+    float pixels = cmsPattern.bounds.width() * cmsPattern.bounds.height() / (nukeBlockSize * nukeBlockSize);
+    lutResolution = int(floor(pow(pixels, 0.333333333334f)));
+  }
+
+  void process(int2 pos) {
+    SampleType(cmsPattern) cmsSample;
+
+    // Sample the src image
+    SampleType(src) srcSample;
+    srcSample = src(pos.x, pos.y);
+
+    // Use the 3D LUT to find the new value
+    
+    // Nearest point
+    if( interpolation == 0 ) {
+      int3 srcLUTPosition;
+      srcLUTPosition.x = round(clamp(srcSample.x, 0.0f, 1.0f) * (lutResolution-1));
+      srcLUTPosition.y = round(clamp(srcSample.y, 0.0f, 1.0f) * (lutResolution-1));
+      srcLUTPosition.z = round(clamp(srcSample.z, 0.0f, 1.0f) * (lutResolution-1));
+
+      int2 cmsSamplePosition;
+      cmsSamplePosition = position3dToNukePosition(srcLUTPosition, 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+
+      cmsSample = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+    } // nearest
+
+    // Tri-linear interpolation 
+    else if( interpolation == 1 ) {
+      float3 srcSample3;
+      srcSample3.x = srcSample.x;
+      srcSample3.y = srcSample.y;
+      srcSample3.z = srcSample.z;
+
+      srcSample3 = clamp(srcSample3, float3(0.f), float3(1.f));
+
+      // index values interpolation factor for RGB
+      float indexRf = (srcSample3.x * (lutResolution-1));
+      int indexR    = int(floor(indexRf));
+      float interpR = indexRf - indexR;
+      float indexRfb = floor(indexRf) / (lutResolution-1);
+
+      float indexGf = (srcSample3.y * (lutResolution-1));
+      int indexG    = int(floor(indexGf));
+      float interpG = indexGf - indexG;
+      float indexGfb = floor(indexGf) / (lutResolution-1);
+
+      float indexBf = (srcSample3.z * (lutResolution-1));
+      int indexB    = int(floor(indexBf));
+      float interpB = indexBf - indexB;
+      float indexBfb = floor(indexBf) / (lutResolution-1);
+
+      SampleType(cmsPattern) cmsSamples[8];
+      int2 cmsSamplePosition;
+
+      // sample r, g, b
+      cmsSamplePosition = position3dToNukePosition(int3(indexR    , indexG    , indexB    ), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[0] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r, g, b+1
+      cmsSamplePosition = position3dToNukePosition(int3(indexR    , indexG    , indexB + 1), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[1] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r, g+1, b
+      cmsSamplePosition = position3dToNukePosition(int3(indexR    , indexG + 1, indexB    ), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[2] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r, g+1, b+1
+      cmsSamplePosition = position3dToNukePosition(int3(indexR    , indexG + 1, indexB + 1), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[3] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r+1, g, b
+      cmsSamplePosition = position3dToNukePosition(int3(indexR + 1, indexG    , indexB    ), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[4] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r+1, g, b+1
+      cmsSamplePosition = position3dToNukePosition(int3(indexR + 1, indexG    , indexB + 1), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[5] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r+1, g+1, b
+      cmsSamplePosition = position3dToNukePosition(int3(indexR + 1, indexG + 1, indexB    ), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[6] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r+1, g+1, b+1
+      cmsSamplePosition = position3dToNukePosition(int3(indexR + 1, indexG + 1, indexB + 1), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[7] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // Interpolate along the 4 lines in B
+      cmsSamples[0] = mix(cmsSamples[0], cmsSamples[1], interpB);
+      cmsSamples[2] = mix(cmsSamples[2], cmsSamples[3], interpB);
+      cmsSamples[4] = mix(cmsSamples[4], cmsSamples[5], interpB);
+      cmsSamples[6] = mix(cmsSamples[6], cmsSamples[7], interpB);
+      
+      // Interpolate along the 2 lines in G
+      cmsSamples[0] = mix(cmsSamples[0], cmsSamples[2], interpG);
+      cmsSamples[4] = mix(cmsSamples[4], cmsSamples[6], interpG);
+
+      // Interpolate along the 1 line in R
+      cmsSamples[0] = mix(cmsSamples[0], cmsSamples[4], interpR);
+
+      cmsSample = cmsSamples[0];
+    } // tri-linear
+
+    // Tetrahedral interpolation
+    else if( interpolation == 2 ) {
+      float3 srcSample3;
+      srcSample3.x = srcSample.x;
+      srcSample3.y = srcSample.y;
+      srcSample3.z = srcSample.z;
+
+      srcSample3 = clamp(srcSample3, float3(0.f), float3(1.f));
+
+      // index values interpolation factor for RGB
+      float indexRf = (srcSample3.x * (lutResolution-1));
+      int indexR    = int(floor(indexRf));
+      float interpR = indexRf - indexR;
+      float indexRfb = floor(indexRf) / (lutResolution-1);
+
+      float indexGf = (srcSample3.y * (lutResolution-1));
+      int indexG    = int(floor(indexGf));
+      float interpG = indexGf - indexG;
+      float indexGfb = floor(indexGf) / (lutResolution-1);
+
+      float indexBf = (srcSample3.z * (lutResolution-1));
+      int indexB    = int(floor(indexBf));
+      float interpB = indexBf - indexB;
+      float indexBfb = floor(indexBf) / (lutResolution-1);
+
+      SampleType(cmsPattern) cmsSamples[8];
+      int2 cmsSamplePosition;
+
+      // sample r, g, b
+      cmsSamplePosition = position3dToNukePosition(int3(indexR    , indexG    , indexB    ), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[0] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r, g, b+1
+      cmsSamplePosition = position3dToNukePosition(int3(indexR    , indexG    , indexB + 1), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[1] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r, g+1, b
+      cmsSamplePosition = position3dToNukePosition(int3(indexR    , indexG + 1, indexB    ), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[2] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r, g+1, b+1
+      cmsSamplePosition = position3dToNukePosition(int3(indexR    , indexG + 1, indexB + 1), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[3] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r+1, g, b
+      cmsSamplePosition = position3dToNukePosition(int3(indexR + 1, indexG    , indexB    ), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[4] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r+1, g, b+1
+      cmsSamplePosition = position3dToNukePosition(int3(indexR + 1, indexG    , indexB + 1), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[5] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r+1, g+1, b
+      cmsSamplePosition = position3dToNukePosition(int3(indexR + 1, indexG + 1, indexB    ), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[6] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // sample r+1, g+1, b+1
+      cmsSamplePosition = position3dToNukePosition(int3(indexR + 1, indexG + 1, indexB + 1), 
+        cmsPattern.bounds.width(), cmsPattern.bounds.height(), nukeBlockSize, lutResolution);
+      cmsSamples[7] = cmsPattern(cmsSamplePosition.x, cmsSamplePosition.y);
+
+      // Tetrahedral interoplation, as described by:
+      // http://www.filmlight.ltd.uk/pdf/whitepapers/FL-TL-TN-0057-SoftwareLib.pdf
+      // http://blogs.mathworks.com/steve/2006/11/24/tetrahedral-interpolation-for-colorspace-conversion/
+      // http://www.hpl.hp.com/techreports/98/HPL-98-95.html
+      // Reference implementation from OCIO
+      // https://github.com/imageworks/OpenColorIO/blob/master/src/core/Lut3DOp.cpp#L294
+
+      // Rebind for consistency with Truelight paper
+      float fx = interpR;
+      float fy = interpG;
+      float fz = interpB;
+
+      SampleType(cmsPattern) startPos[8];
+      startPos[0] = cmsSamples[0];
+      startPos[1] = cmsSamples[1];
+      startPos[2] = cmsSamples[2];
+      startPos[3] = cmsSamples[3];
+      startPos[4] = cmsSamples[4];
+      startPos[5] = cmsSamples[5];
+      startPos[6] = cmsSamples[6];
+      startPos[7] = cmsSamples[7];
+
+      SampleType(cmsPattern) rgbaBuffer;
+
+      // Compute index into LUT for surrounding corners
+      const int n000 = 0;
+      const int n100 = 4;
+      const int n010 = 2;
+      const int n001 = 1;
+      const int n110 = 6;
+      const int n101 = 5;
+      const int n011 = 3;
+      const int n111 = 7;
+
+      if (fx > fy) {
+          if (fy > fz) {
+             rgbaBuffer.x =
+                 (1-fx)  * startPos[n000].x +
+                 (fx-fy) * startPos[n100].x +
+                 (fy-fz) * startPos[n110].x +
+                 (fz)    * startPos[n111].x;
+
+             rgbaBuffer.y =
+                 (1-fx)  * startPos[n000].y +
+                 (fx-fy) * startPos[n100].y +
+                 (fy-fz) * startPos[n110].y +
+                 (fz)    * startPos[n111].y;
+
+             rgbaBuffer.z =
+                 (1-fx)  * startPos[n000].z +
+                 (fx-fy) * startPos[n100].z +
+                 (fy-fz) * startPos[n110].z +
+                 (fz)    * startPos[n111].z;
+          }
+          else if (fx > fz)
+          {
+              rgbaBuffer.x =
+                  (1-fx)  * startPos[n000].x +
+                  (fx-fz) * startPos[n100].x +
+                  (fz-fy) * startPos[n101].x +
+                  (fy)    * startPos[n111].x;
+
+              rgbaBuffer.y =
+                  (1-fx)  * startPos[n000].y +
+                  (fx-fz) * startPos[n100].y +
+                  (fz-fy) * startPos[n101].y +
+                  (fy)    * startPos[n111].y;
+
+              rgbaBuffer.z =
+                  (1-fx)  * startPos[n000].z +
+                  (fx-fz) * startPos[n100].z +
+                  (fz-fy) * startPos[n101].z +
+                  (fy)    * startPos[n111].z;
+          }
+          else
+          {
+              rgbaBuffer.x =
+                  (1-fz)  * startPos[n000].x +
+                  (fz-fx) * startPos[n001].x +
+                  (fx-fy) * startPos[n101].x +
+                  (fy)    * startPos[n111].x;
+
+              rgbaBuffer.y =
+                  (1-fz)  * startPos[n000].y +
+                  (fz-fx) * startPos[n001].y +
+                  (fx-fy) * startPos[n101].y +
+                  (fy)    * startPos[n111].y;
+
+              rgbaBuffer.z =
+                  (1-fz)  * startPos[n000].z +
+                  (fz-fx) * startPos[n001].z +
+                  (fx-fy) * startPos[n101].z +
+                  (fy)    * startPos[n111].z;
+          }
+      }
+      else
+      {
+          if (fz > fy)
+          {
+              rgbaBuffer.x =
+                  (1-fz)  * startPos[n000].x +
+                  (fz-fy) * startPos[n001].x +
+                  (fy-fx) * startPos[n011].x +
+                  (fx)    * startPos[n111].x;
+
+              rgbaBuffer.y =
+                  (1-fz)  * startPos[n000].y +
+                  (fz-fy) * startPos[n001].y +
+                  (fy-fx) * startPos[n011].y +
+                  (fx)    * startPos[n111].y;
+
+              rgbaBuffer.z =
+                  (1-fz)  * startPos[n000].z +
+                  (fz-fy) * startPos[n001].z +
+                  (fy-fx) * startPos[n011].z +
+                  (fx)    * startPos[n111].z;
+          }
+          else if (fz > fx)
+          {
+              rgbaBuffer.x =
+                  (1-fy)  * startPos[n000].x +
+                  (fy-fz) * startPos[n010].x +
+                  (fz-fx) * startPos[n011].x +
+                  (fx)    * startPos[n111].x;
+
+              rgbaBuffer.y =
+                  (1-fy)  * startPos[n000].y +
+                  (fy-fz) * startPos[n010].y +
+                  (fz-fx) * startPos[n011].y +
+                  (fx)    * startPos[n111].y;
+
+              rgbaBuffer.z =
+                  (1-fy)  * startPos[n000].z +
+                  (fy-fz) * startPos[n010].z +
+                  (fz-fx) * startPos[n011].z +
+                  (fx)    * startPos[n111].z;
+          }
+          else
+          {
+              rgbaBuffer.x =
+                  (1-fy)  * startPos[n000].x +
+                  (fy-fx) * startPos[n010].x +
+                  (fx-fz) * startPos[n110].x +
+                  (fz)    * startPos[n111].x;
+
+              rgbaBuffer.y =
+                  (1-fy)  * startPos[n000].y +
+                  (fy-fx) * startPos[n010].y +
+                  (fx-fz) * startPos[n110].y +
+                  (fz)    * startPos[n111].y;
+
+              rgbaBuffer.z =
+                  (1-fy)  * startPos[n000].z +
+                  (fy-fx) * startPos[n010].z +
+                  (fx-fz) * startPos[n110].z +
+                  (fz)    * startPos[n111].z;
+          }
+      }
+
+      cmsSample = rgbaBuffer;
+
+    } // tetrahedral
+
+    // Write the new value to dst
+    SampleType(dst) t;
+    t.x = cmsSample.x;
+    t.y = cmsSample.y;
+    t.z = cmsSample.z;
+
+    dst() = t;
+  }
+};

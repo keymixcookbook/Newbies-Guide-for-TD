@@ -1,0 +1,53 @@
+// https://community.foundry.com/discuss/topic/144399/dilate-erode-with-round-pattern-like-keylight
+
+float lengthSq(float2 vec)
+{
+  return dot(vec, vec);
+}
+
+kernel Erode : public ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom, eEdgeClamped> src;
+  Image<eWrite, eAccessPoint> dst;
+
+  param:
+    int size;
+    float mix;
+
+    void define() 
+  {
+    defineParam(size, "size", int(3));
+    defineParam(mix, "mix", float(1.0f));
+  }
+
+  void process(int2 pos) 
+  {
+    int s = abs(size);
+    float4 c_max;
+    float4 c_min;
+    float4 c = src(pos.x, pos.y);
+
+    for(int j = -s; j <= s; ++j)
+      for(int i = -s; i <= s; ++i)
+      {
+        float2 p_i = float2(i, j);
+        float4 c_i = src(ceil(pos.x+p_i.x), ceil(pos.y+p_i.y));
+
+        if(lengthSq(p_i) <= float(s*s)+1.0f)
+        {
+          c_max = max(c, c_i);
+          c_min = min(c, c_i);    
+          if(size >= 0)
+          {
+            c = c_max;
+          }
+          else
+          {
+            c = c_min;
+          }
+          
+        }
+      }
+    dst() = c*mix + src(pos.x, pos.y)*(1-mix);
+  }
+};

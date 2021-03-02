@@ -1,0 +1,215 @@
+// Max van leeuwen
+// maxvanleeuwen.com/pixelrepeat
+//
+// Repeats the pixels starting where matte goes over threshold. Creates stretchy lines, or mirrors/warps the image.
+
+
+
+
+kernel PixelRepeat : ImageComputationKernel<eComponentWise>{
+
+	Image<eRead, eAccessRandom, eEdgeClamped> src;
+	Image<eRead, eAccessRandom, eEdgeClamped> matte;
+	Image<eWrite, eAccessRandom> dst;
+
+
+param:
+
+	int stretchLength;
+	bool multipleStreaks;
+	int repeatCount;
+	int repeatOffset;
+	bool pingPong;
+	bool displayPong;
+	float thresholdValue;
+	bool override;
+
+
+local:
+
+	void define() {
+
+		// how long the streaks can get (0 means unlimited stretching)
+		defineParam(stretchLength, "stretchLength", 0);
+
+		// allow multiple streaks
+		defineParam(multipleStreaks, "multipleStreaks", true);
+
+		// amount of pixels to repeat
+		defineParam(repeatCount, "repeatCount", 0);
+
+		// offset for repeated pixels
+		defineParam(repeatOffset, "repeatOffset", 0);
+
+		// go back-and-forth through cycle index instead of repeating front to end
+		defineParam(pingPong, "pingPong", false);
+
+		// show pingpong matte
+		defineParam(displayPong, "displayPong", false);
+
+		// when to start stretching
+		defineParam(thresholdValue, "thresholdValue", 0.8f);
+
+		// whether the value can update mid-streak if it is higher than current
+		defineParam(override, "override", false);
+	}
+
+
+
+
+	// run over each pixel
+	void process(int3 pos) {
+
+		// empty bg val
+		float emptyVal = -1.0f;
+
+		// placeholder for out value
+		float outVal = -1.0f;
+
+		// get img width
+		int srcWidth = src.bounds.x2;
+
+		// only once per row
+		if (pos.x == 0){
+
+			// start of stretch index
+			int stretchStart = -1;
+
+			// placeholder value at start of stretch
+			float startStretchValue = -1.0f;
+
+			// current stretching counter
+			int currStretchLength = -1;
+
+			// cycle index
+			int currCyclePos = 0;
+
+			// check if forwards or backwards
+			bool pong = false;
+
+
+			// go through each pixel in row
+			for(int pixel = 0; pixel < srcWidth; pixel++){
+
+				// get current img value
+				float currVal = src(pixel, pos.y);
+
+
+				// if stretching has not started yet
+				if(currStretchLength == -1){
+
+					// value to compare from matte
+					float foundValue = matte(pixel, pos.y);
+
+					// if matte is greater than thresholdValue, start stretch
+					if(foundValue >= thresholdValue){
+					
+						// index of first stretched pixel
+						stretchStart = pixel;
+
+						// start stretch
+						currStretchLength = 0;
+						// set out to current pixel
+						outVal = (pingPong && displayPong) ? 0 : currVal;
+
+						// store this highscore value
+						startStretchValue = foundValue;
+
+					// if not, this is empty space
+					}else{
+
+						outVal = emptyVal;
+					}
+
+
+				// if stretching has started and is still going
+				}else if(currStretchLength >= 0 && (currStretchLength < stretchLength || stretchLength <= 0) ){
+
+					// get current stretch position without non-stretch part
+					int currStretchPos = pixel - stretchStart - 1;
+
+					// set index in cycle
+					currCyclePos = (currStretchPos + repeatOffset) % abs(repeatCount);
+
+					if(pingPong){
+
+						pong = int(currStretchPos/repeatCount) % 2 ? true : false;
+					}
+
+					// make index including (if enabled) pingpong
+					int cyclePingpongIndex = pong ? (abs(repeatCount) - 1) - currCyclePos : currCyclePos;
+
+					// override active
+					bool overridden = false;
+
+
+					// check if override
+					if(override){
+
+						if(currVal > startStretchValue){
+
+							overridden = true;
+
+							// first in cycle
+							currCyclePos = 0;
+
+							// reset pingpong
+							pong = false;
+
+							// first index of stretching
+							currStretchLength = 0;
+
+							// index of first stretched pixel
+							stretchStart = pixel;
+
+							// set out to current pixel
+							outVal = currVal;
+
+							// store this highscore value
+							startStretchValue = currVal;
+						}
+					}
+
+
+					// increment index
+					currStretchLength++;
+
+					if(!overridden){
+
+						if(pingPong && displayPong){
+
+							outVal = pong;
+						}else{
+
+							outVal = src(stretchStart + (cyclePingpongIndex * (repeatCount < 0 ? -1 : 1)), pos.y);
+						}
+					}
+
+
+				// if stretching has started and is over limit, end
+				}else if(currStretchLength >= stretchLength && stretchLength > 0){
+
+					// start of stretch index
+					stretchStart = -1;
+
+					// placeholder value at start of stretch
+					startStretchValue = -1;
+
+					// current stretching index back to start, or even further if should be ignored after this
+					currStretchLength = multipleStreaks ? -1 : -2;
+
+					// cycle index
+					currCyclePos = 0;
+
+					// show current pixel value
+					outVal = emptyVal;
+
+				}
+
+
+				// write
+				dst(pixel, pos.y) = outVal;
+			}
+		}
+	}
+};

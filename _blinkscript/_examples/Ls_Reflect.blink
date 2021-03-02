@@ -1,0 +1,61 @@
+// Reflect: reflect from a normals pass
+// lewis@lewissaunders.com
+// TODO:
+//  o obvs get P in here and do equiv of GLSL reflect()
+//  o fold all the space conversions and gizmo stuff from
+//    GlueP into this
+
+kernel Ls_Reflect : ImageComputationKernel<ePixelWise> {
+  Image<eRead, eAccessPoint, eEdgeClamped> normals;
+  Image<eWrite> dst;
+
+  param:
+    float3 env_rotate;
+
+  void define() {
+    defineParam(env_rotate, "rotate", float3(0.0, 0.0, 0.0));
+  }
+
+  float deg2rad(float angle) {
+    return(angle/(180.0f/PI));
+  }
+
+  // Rotates about the origin in ZXY order
+  float3 rotate(float3 p, float3 angles) {
+    float x = deg2rad(angles.x);
+    float y = deg2rad(angles.y);
+    float z = deg2rad(angles.z);
+
+    float3x3 rx, ry, rz;
+    float rxd[] = {1.0, 0.0, 0.0, 0.0, cos(x), -sin(x), 0.0, sin(x), cos(x)};
+    float ryd[] = {cos(y), 0.0, sin(y), 0.0, 1.0, 0.0, -sin(y), 0.0, cos(y)};
+    float rzd[] = {cos(z), -sin(z), 0.0, sin(z), cos(z), 0.0, 0.0, 0.0, 1.0};
+    rx.setArray(rxd);
+    ry.setArray(ryd);
+    rz.setArray(rzd);
+
+    float3x3 r = rz * rx * ry;
+    return(r * p);
+  }
+
+  void process(int2 pos) {
+    SampleType(normals) nrgba = normals();
+    float3 n = float3(nrgba.x, nrgba.y, nrgba.z);
+
+    // Optionally rotate the normal
+    n = rotate(n, env_rotate);
+
+    // Convert n to latlong spherical coordinates
+    float lat =  (asin(n.y)       / (1.0 * PI)) + 0.5;
+    float lon =  (atan2(n.z, n.x) / (2.0 * PI)) + 0.75;
+
+    lat -= floor(lat);
+    lon -= floor(lon);
+
+    SampleType(dst) d;
+    d.x = lon;
+    d.y = lat;
+    d.z = 0.0f;
+    dst() = d;
+  }
+};

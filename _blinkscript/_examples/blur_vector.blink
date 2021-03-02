@@ -1,0 +1,127 @@
+// ContourBlur by Chris Fryer
+// Blur Based on the surface normal of an input image
+
+kernel ContourBlur : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom, eEdgeClamped> src; // the input image
+  Image<eRead, eAccessRandom, eEdgeClamped> N;
+  Image<eWrite> dst; // the output image
+
+  param:
+    // This parameter is made available to the user.
+    float walk;
+    bool bidirectional;
+    float4x4 cameraMatrix;
+    float reachMult;
+    bool softFalloff;
+
+
+  local:
+    // This local variable is not exposed to the user.
+    float4 sample;    
+    float2 sample2;
+    float4 output;
+    float4 output2;
+
+    float2 sample3;    
+    float2 sample4;
+    float4 output3;
+    float4 output4;
+
+    float4 outputA;
+    float4 outputB;
+
+    float4 finalOutput;
+
+    int walkFloor;
+    int walkCeil;
+
+    
+  // In define(), parameters can be given labels and default values.
+  void define() {
+    
+  }
+
+  // The init() function is run before any calls to process().
+  // Local variables can be initialized here.
+  void init() {
+
+    walkFloor = int(walk);
+    walkCeil = ceil(walk);
+    
+  }
+
+  void process(int2 pos) {   
+
+
+    ///// IT WILL BREAK ON CPU IF YOU REMOVE THIS I DON'T KNOW WHY. IF YOU DO, PLEASE MESSAGE ME /////
+    sample = 0.0f;
+    sample2 = 0.0f;
+    output = 0.0f;
+    output2 = 0.0f;
+
+    sample = 0.0f;
+    sample2 = 0.0f;
+    output = 0.0f;
+    output2 = 0.0f;
+
+    float normaliser = 0.0f;
+    /////
+
+    
+    
+   
+    for(int i = 0; i < walkCeil; i++){
+
+      //storing previous sample
+      output3 = output;
+      output4 = output2;      
+
+      sample.x += reachMult*bilinear(N,pos.x+sample.x,pos.y+sample.y).x;
+      sample.y += reachMult*bilinear(N,pos.x+sample.x,pos.y+sample.y).y;
+    
+      output += softFalloff == 1 && walkFloor > 0 ? bilinear(src,pos.x+sample.y,pos.y+sample.x)*2.0f*(1.0f - (float(i)+1.0f)/(walkFloor+1.0f)) : bilinear(src,pos.x+sample.y,pos.y+sample.x);
+      normaliser += (1.0f - (float(i)+1.0f)/(walkCeil+1.0f));
+
+      if(bidirectional){
+
+        sample2.x -= bilinear(N,pos.x+sample2.x,pos.y+sample2.y).x;
+        sample2.y -= bilinear(N,pos.x+sample2.x,pos.y+sample2.y).y;
+    
+        output2 += softFalloff == 1 && walkFloor ? bilinear(src,pos.x+sample2.y,pos.y+sample2.x)*2.0f*(1.0f - (float(i)+1.0f)/(walkFloor+1.0f)) : bilinear(src,pos.x+sample2.y,pos.y+sample2.x);      
+      
+      }
+
+      
+
+
+    }
+
+    //output = output/(0.5f-0.25f/walkCeil);
+
+    // Write the result to the output image
+
+    if(walkCeil>0){
+
+      
+      outputB = (output+output2)/((1+bidirectional)*walkCeil);
+      outputA = walkFloor > 0 ? (output3+output4)/((1+bidirectional)*walkFloor) : src(pos.x,pos.y);
+
+      outputB = softFalloff && walkFloor >= 1 ? outputB * float(walkCeil)/float(walkFloor) : outputB;
+
+      finalOutput = walkFloor == walkCeil ? outputB : outputA + (outputB - outputA)*(walk-float(walkFloor));
+
+
+      //dst() = (output+output2)/((1+bidirectional)*walkCeil*2);   
+      dst() = finalOutput;
+
+    }else{
+
+      dst() = src(pos.x,pos.y);
+
+    }    
+    
+    
+    
+  }
+};

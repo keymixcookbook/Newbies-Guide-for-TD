@@ -1,0 +1,50 @@
+kernel Ls_Rotate : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessPoint, eEdgeClamped> src;
+  Image<eWrite> dst;
+
+  param:
+    float3 angles;
+
+  void define() {
+    defineParam(angles, "angles", float3(0.0, 0.0, 0.0));
+  }
+
+  float deg2rad(float angle) {
+    return(angle/(180.0f/PI));
+  }
+
+  // Rotates about the origin in ZXY order
+  float3 rotate(float3 p, float3 angles) {
+    float x = deg2rad(angles.x);
+    float y = deg2rad(angles.y);
+    float z = deg2rad(angles.z);
+
+    float3x3 rx, ry, rz;
+    float rxd[] = {1.0, 0.0, 0.0, 0.0, cos(x), -sin(x), 0.0, sin(x), cos(x)};
+    float ryd[] = {cos(y), 0.0, sin(y), 0.0, 1.0, 0.0, -sin(y), 0.0, cos(y)};
+    float rzd[] = {cos(z), -sin(z), 0.0, sin(z), cos(z), 0.0, 0.0, 0.0, 1.0};
+    rx.setArray(rxd);
+    ry.setArray(ryd);
+    rz.setArray(rzd);
+
+    float3x3 r = rz * rx * ry;
+    return(r * p);
+  }
+
+  void process() {
+    SampleType(src) s = src();
+    float3 s3;
+    s3.x = s.x;
+    s3.y = s.y;
+    s3.z = s.z;
+
+    float3 rotated = rotate(s3, angles);
+
+    SampleType(dst) d;
+    d.x = rotated.x;
+    d.y = rotated.y;
+    d.z = rotated.z;
+    dst() = d;
+  }
+};

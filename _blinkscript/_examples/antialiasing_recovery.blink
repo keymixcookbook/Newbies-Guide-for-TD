@@ -1,0 +1,217 @@
+// http://www.nukepedia.com/blink/filter/antialiasing-recovery
+
+float step(float valA, float valB)
+{
+  if(valA > valB) {return valA;} else {return valB;}
+}
+
+float projectDist2(float3 color, float3 vCenter, float3 vDir, float& t)
+{
+	float3 v = color - vCenter;
+	t = dot(vDir, v);
+	float3 vDist = color - (vCenter + vDir * t);
+	return dot(vDist, vDist);
+}
+
+float aliasDetectSobelArray(float3 vNeib[9])
+{
+  float3 gx, gy, h1, h2, h3, v1, v2, v3;
+
+  h1 = float3(vNeib[1].x, vNeib[1].y, vNeib[1].z) + float3(vNeib[2].x, vNeib[2].y, vNeib[2].z)*2 + float3(vNeib[3].x, vNeib[3].y, vNeib[3].z);
+  h2 = float3(vNeib[8].x, vNeib[8].y, vNeib[8].z) + float3(vNeib[0].x, vNeib[0].y, vNeib[0].z)*2 + float3(vNeib[4].x, vNeib[4].y, vNeib[4].z);
+  h3 = float3(vNeib[7].x, vNeib[7].y, vNeib[7].z) + float3(vNeib[6].x, vNeib[6].y, vNeib[6].z)*2 + float3(vNeib[5].x, vNeib[5].y, vNeib[5].z);
+
+  v1 = float3(vNeib[1].x, vNeib[1].y, vNeib[1].z) + float3(vNeib[8].x, vNeib[8].y, vNeib[8].z)*2 + float3(vNeib[7].x, vNeib[7].y, vNeib[7].z);
+  v2 = float3(vNeib[2].x, vNeib[2].y, vNeib[2].z) + float3(vNeib[0].x, vNeib[0].y, vNeib[0].z)*2 + float3(vNeib[6].x, vNeib[6].y, vNeib[6].z);
+  v3 = float3(vNeib[3].x, vNeib[3].y, vNeib[3].z) + float3(vNeib[4].x, vNeib[4].y, vNeib[4].z)*2 + float3(vNeib[5].x, vNeib[5].y, vNeib[5].z);
+
+  gx = ( fabs(h2-h1) + fabs(h3-h2) );
+  gy = ( fabs(v2-v1) + fabs(v3-v2) );
+  gx /= 8.f;
+  gy /= 8.f;
+	return dot(gx, gx) + dot(gy, gy);
+}
+
+bool selectExtrema(float3 vNeib[9], float3 vDir, float varTol, int& idmin, int& idmax)
+{
+  float tmin1 = 1.f, tmax1 = -1.f;
+  int idmin1 = 0, idmax1 = 0;
+  for(int i = 1; i < 9; ++i)
+  {
+    float3 ani = float3(vNeib[i].x, vNeib[i].y, vNeib[i].z);
+    float3 anc = float3(vNeib[0].x, vNeib[0].y, vNeib[0].z); 
+    float t;
+    float dist2 = projectDist2(ani, anc, vDir, t); 
+    if(dist2 > 9*varTol)
+      {
+        continue;
+      }
+    if( t < tmin1)
+    {
+      tmin1 = t;
+      idmin1 = i;
+    }
+    if(t > tmax1)
+    {
+      tmax1 = t;
+      idmax1 = i;
+    }
+  }
+  idmin = idmin1;
+  idmax = idmax1;
+  if(tmin1 > 0 || tmax1 < 0 || fabs(tmin1-tmax1) < 0.0001)
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+}
+
+float linearCombinability(float3 c1, float3 c2, float3 c, float varTol, float& t)
+{
+	float3 c2c1 = c2 - c1;
+	float c2c1len = length(c2c1);
+	float3 c2c1norm = c2c1 / c2c1len;
+	t = dot(c-c1, c2c1norm) / c2c1len;
+	float3 distVec = c - (t * c2c1) - c1;
+	float dist2 = dot(distVec, distVec);
+
+	if(t < 0)
+	{
+		float3 vToEndPt1 = c-c1;
+		dist2 = max(dist2, dot(vToEndPt1, vToEndPt1));
+	}
+	if(t > 1)
+	{
+		float3 vToEndPt2 = c-c2;
+		dist2 = max(dist2, dot(vToEndPt2, vToEndPt2));
+	}
+	t = max(0.f, min(t, 1.f));
+
+	float linComb = exp(-dist2 * 0.5f / varTol) ;
+	return linComb;
+}
+
+
+kernel AA_Recovery : public ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRanged2D, eEdgeClamped> filter;
+  Image<eRead, eAccessRanged2D, eEdgeClamped> orig;
+  Image<eWrite, eAccessPoint> dst;
+  
+  param:
+    float  varTol;
+    float edgeThres;
+    bool edgeDisplay;
+
+  local:
+
+  void define() 
+  {
+    defineParam(varTol, "sigma d", 0.1f);
+    defineParam(edgeThres, "edge threshold", 0.001f);
+    defineParam(edgeDisplay, "Show Edges", false);
+  }
+
+  void init()
+  {
+    orig.setRange(-1,-1, 1, 1);
+    filter.setRange(-1,-1, 1, 1);
+  }
+
+  void process(int2 pos) 
+  {
+    const int nNeib = 9;
+    const int2 NeibOffset[nNeib] = {
+      int2( 0, 0), int2(-1, 1), int2( 0, 1), 
+      int2( 1, 1), int2( 1, 0), int2( 1,-1), 
+      int2( 0,-1), int2(-1,-1), int2(-1, 0) 
+    };
+
+    float3 vNeib[nNeib], vNeibMean[nNeib], fNeib[nNeib];
+    float3 vCenter, vDir;
+
+    //Load original and filtered image into array and prepare for PCA with EM
+    for(int i = 0; i < nNeib; i++)
+    {
+      vNeib[i].x = orig(NeibOffset[i].x, NeibOffset[i].y, 0);
+      vNeib[i].y = orig(NeibOffset[i].x, NeibOffset[i].y, 1);
+      vNeib[i].z = orig(NeibOffset[i].x, NeibOffset[i].y, 2);
+      
+      fNeib[i].x = filter(NeibOffset[i].x, NeibOffset[i].y, 0);
+      fNeib[i].y = filter(NeibOffset[i].x, NeibOffset[i].y, 1);
+      fNeib[i].z = filter(NeibOffset[i].x, NeibOffset[i].y, 2);
+      
+      vCenter += float3(vNeib[i].x, vNeib[i].y, vNeib[i].z);
+    }
+    vCenter /= nNeib;
+
+    for(int i = 0; i < nNeib; i++)
+    {
+        vNeibMean[i].x = vNeib[i].x - vCenter.x;
+        vNeibMean[i].y = vNeib[i].y - vCenter.y;
+        vNeibMean[i].z = vNeib[i].z - vCenter.z;
+    }
+      
+    //EM iterations
+    const int NITER = 4;
+
+    float3 p = normalize(vCenter + 0.001);
+    for(int iter = 0; iter < NITER; ++iter)
+    {
+      float3 t = float3(0.0001,0.0001,0.0001);
+      for(int i = 0; i < nNeib; ++i)
+      {
+        float3 vnm = float3(vNeibMean[i].x, vNeibMean[i].y, vNeibMean[i].z);
+        t += vnm * dot(vnm,  p);
+      }
+      p = normalize(t);
+    }
+    vDir = p;
+
+    
+    //do kernel things
+    float3 res = 0.f;
+    int idmin, idmax;
+    float prob;
+    float t = 0.f;
+    float edge, edgeVis;
+    
+    
+    if(selectExtrema(vNeib, vDir, varTol, idmin, idmax))
+    {
+      float3 c = float3(vNeib[0].x, vNeib[0].y, vNeib[0].z), c1 = float3(vNeib[idmin].x, vNeib[idmin].y, vNeib[idmin].z), c2 = float3(vNeib[idmax].x, vNeib[idmax].y, vNeib[idmax].z);
+      prob = linearCombinability(c1,c2, c, varTol, t);
+      res = float3(fNeib[idmin].x, fNeib[idmin].y, fNeib[idmin].z) * (1-t) + float3(fNeib[idmax].x, fNeib[idmax].y, fNeib[idmax].z) * t;
+    }
+    else
+    {
+      prob = 0.f;
+    }
+    
+    //edge detection
+    edge = aliasDetectSobelArray(vNeib);
+    edge *= aliasDetectSobelArray(fNeib);
+    edgeVis = 1 - exp(-edge*edge / edgeThres);
+    
+    prob *= step(0.01f, edgeVis);
+ 
+    
+    prob *= edgeVis;
+    res = prob * res + (1-prob) * float3(fNeib[0].x, fNeib[0].y, fNeib[0].z);
+    
+    if(not edgeDisplay)
+    {
+      //dst() = float4(vDir.x, vDir.y, vDir.z, 1.f);
+      dst() = float4(res.x, res.y, res.z, orig(0, 0, 3));
+    }
+    else
+    {
+      dst() = float4(edgeVis, edgeVis, edgeVis, 1.f);
+      //dst() = float4(edge, edge, edge, 0.0f);
+    }
+
+  }
+};

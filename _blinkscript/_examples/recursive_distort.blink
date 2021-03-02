@@ -1,0 +1,28 @@
+// IIDistort by Erwan Leroy
+// Recursive IDistort, produces similar results as Substance Designer's Vector Warp/Morph.
+
+
+kernel FlowKernel : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom, eEdgeClamped> vectors; // the input image
+  Image<eWrite> dst; // the output image
+
+  param:
+    int samples;
+    float strength;
+
+  void process(int2 pos) {
+    float2 fpos = float2(pos.x, pos.y);
+    float4 disp;
+
+    for (int i=0; i<samples; i++)
+    {
+      disp = bilinear(vectors, fpos.x, fpos.y);
+      fpos += float2(disp.x, disp.y)*strength/samples;
+    }
+
+    // Write the result to the output image
+    float2 result = fpos - float2(pos.x, pos.y);
+    dst() = float4(result.x, result.y, 0.0f, 0.0f);
+  }
+};

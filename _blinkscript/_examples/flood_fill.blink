@@ -1,0 +1,105 @@
+// FloodBucket by Chris Fryer
+// based on Flood Fill algorithm
+kernel FloodBucket : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom> src; // the input image
+  Image<eRead, eAccessRandom> floodShape; // the input image
+  Image<eWrite, eAccessRandom> dst; // the output image
+
+  param:
+
+    int2 centre;
+    int cycles;
+    bool startShape;
+
+  local:
+
+    float2 resolution;
+    
+    
+
+  void define() {
+
+  }
+
+  void init() {
+
+    resolution.x = src.bounds.width();
+    resolution.y = src.bounds.height();
+
+  }
+
+  void process(int2 pos) {
+  
+   
+
+    
+
+    if(pos.x == centre.x && pos.y == centre.y){
+
+    if(startShape == 1){
+
+      for(int X = 1; X <= resolution.x; X++){
+        for(int Y = 1; Y <= resolution.y; Y++){
+
+          dst(X,Y) = floodShape(X,Y);
+        }   
+      }
+    }else{
+
+      dst(centre.x, centre.y) = 1;
+
+    }
+
+
+
+    for(int i = 0; i < cycles; i++){
+      for(int X = 1; X <= resolution.x; X++){
+        for(int Y = 1; Y <= resolution.y; Y++){
+
+          
+
+          if(dst(X,Y).x == 1 && src(X,Y).x != 1 ){
+
+            dst(X+1,Y) = 1;
+            dst(X,Y+1) = 1;
+            dst(X-1,Y) = 1;
+            dst(X,Y-1) = 1;   
+            
+            if(src(X,Y).x == 1){
+
+              dst(X,Y) == 0;
+
+            }
+
+          }
+          if(dst(resolution.x-X,resolution.y-Y).x == 1 && src(resolution.x-X,resolution.y-Y).x != 1){
+
+            dst(resolution.x-X+1,resolution.y-Y) = 1;
+            dst(resolution.x-X,resolution.y-Y+1) = 1;
+            dst(resolution.x-X-1,resolution.y-Y) = 1;
+            dst(resolution.x-X,resolution.y-Y-1) = 1;   
+            
+            if(src(resolution.x-X,resolution.y-Y).x == 1){
+
+              dst(resolution.x-X,resolution.y-Y) == 0;
+
+            }
+
+            
+          }
+
+          
+
+          
+        }
+
+        
+        }
+      }
+    }
+
+
+
+  }
+};

@@ -1,0 +1,9 @@
+kernel Ls_Normalize : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessPoint, eEdgeClamped> src;
+  Image<eWrite> dst;
+
+  void process() {
+     dst() = normalize(src());
+  }
+};

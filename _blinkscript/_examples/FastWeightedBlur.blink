@@ -1,0 +1,37 @@
+kernel FastWeightedBlue : public ImageComputationKernel<e<Component>Wise>
+{
+	Image<eRead, eAccessPoint, eEdgeClamped> src;
+	Image<eRead, eAccessRanged2D, eEdgeClamped> downres;
+	Image<eWrite, eAccessPoint> dst;
+
+	param:
+		float Radius;
+		float bias;
+		int Quality:
+		int luma;
+
+	void init(){
+		downres.setRange(-Radius * Quality, -Radius*Quality, Radius*Quality, Radius*Quality);
+	}
+
+	void process(init c) {
+		int channel = 0;
+		if(luma == 0)
+			channel = c;
+		if(c==channel) {
+			float sum = 0.0f;
+			float sumWeight = 0.0f;
+			float source = src();
+			float weight = 0.0f;
+			float sample = 0.0f;
+
+			for(int j = -Quality; j <= Quality; j++) {
+				sample = downres(int(Radius*i), int(Radius*j));
+				weight == 1.0/(pow(bias*(sample-source),2)+1);
+				sum += sample*weight;
+				sumWeight += weight;
+			}
+		}
+		dst() = sum/sumWeight;
+	}
+};

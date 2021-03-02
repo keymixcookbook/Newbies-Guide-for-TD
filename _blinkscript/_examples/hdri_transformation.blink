@@ -1,0 +1,610 @@
+//
+// A kernel that will transform between environment map / panorama formats
+//
+
+// The panorama types numbers are
+// 0 = Spherical / Lat long map
+// 1 = Angular / Angular Map 360
+// 2 = Chrome Ball / Mirror Ball
+// 3 = Fisheye / 180 degrees fisheye lens
+// 4 = Cubic (single image)
+
+#define M_PI 3.14159265358979323846f
+
+// acos workaround 
+// bug reported in email from Mads Lund, madshlund@gmail.com to nuke-users on 2014/06/16
+float acosWorkaround(float x)
+{
+  return M_PI/2.f - asin(x);
+}
+
+//
+// Functions specific to spherical panoramas
+//
+float3 spherical_tex2dir(float2 tc)
+{
+  float theta, gamma, u, v;
+  float3 dir;
+
+  u = tc.x*2.f - 1.f;
+  v = tc.y*2.f - 1.f;
+
+  theta = u*M_PI;
+  gamma = v*M_PI/2.f;
+    
+  dir.z = cos(theta)*cos(gamma);
+  dir.y = sin(gamma);
+  dir.x = sin(theta)*cos(gamma);
+
+  return dir;
+}
+
+float2 spherical_dir2tex(float3 dir)
+{
+  float2 tc;
+  float theta, gamma;
+  
+  gamma = asin(dir.y);
+  theta = atan2(dir.x, dir.z);
+
+  tc.x = (float)(theta/M_PI);
+  tc.y = (float)(gamma/(M_PI/2.f));
+
+  tc = (tc + 1.f)/2.f;
+
+  return tc;
+}
+
+float spherical_solidAngle(int y, int width, int height)
+{
+  float u = (2.f*M_PI)/width;
+  float v = sin(float(y+0.5)/height*M_PI)*(M_PI/height);
+  return u*v;  
+}
+
+//
+// Functions specific to angular panoramas
+//
+float3 angular_tex2dir(float2 tc)
+{
+  float3 dir;
+  float theta, gamma;
+  
+  tc = tc*2.f - 1.f;
+
+  if( sqrt(tc.x*tc.x + tc.y*tc.y) > 1.f )
+    return float3(0.f);
+
+  theta = M_PI*sqrt(tc.x*tc.x + tc.y*tc.y);
+  gamma = atan2(tc.y, tc.x);
+
+  dir.x = cos(gamma)*sin(theta);
+  dir.y = sin(gamma)*sin(theta);
+  dir.z = cos(theta);
+
+  return dir;
+}
+
+float2 angular_dir2tex(float3 dir)
+{
+  float2 tc;
+  float theta, gamma;
+  
+  // using workaround for acos bug
+  theta = acosWorkaround(dir.z);
+  gamma = atan2(dir.y, dir.x);
+
+  tc.x = cos(gamma)*theta/M_PI;
+  tc.y = sin(gamma)*theta/M_PI;
+
+  tc = (tc + 1.f)/2.f;
+
+  return tc;
+}
+
+//
+// Functions specific to chrome balls panoramas
+//
+float3 ball_tex2dir(float2 tc)
+{
+  float3 dir;
+  float theta, gamma;
+  
+  tc = tc*2.f - 1.f;
+
+  if( sqrt(tc.x*tc.x + tc.y*tc.y) > 1.f )
+    return float3(0.f);
+
+  theta = asin(sqrt(tc.x*tc.x + tc.y*tc.y));
+  gamma = atan2(tc.y, tc.x);
+
+  dir.x = cos(gamma)*sin(2*theta);
+  dir.y = sin(gamma)*sin(2*theta);
+  dir.z = cos(2*theta);
+
+  return dir;
+}
+
+float2 ball_dir2tex(float3 dir)
+{
+  float2 tc;
+  float theta, gamma;
+  
+  theta = 0.5f*acosWorkaround(dir.z);
+  gamma = atan2(dir.y, dir.x);
+
+  tc.x = cos(gamma)*sin(theta);
+  tc.y = sin(gamma)*sin(theta);
+
+  tc = (tc + 1.f)/2.f;
+
+  return tc;
+}
+
+
+//
+// Functions specific to Fisheye 180 panoramas
+//
+float3 fisheye_tex2dir(float2 tc)
+{
+  float3 dir;
+  float theta, gamma;
+  
+  tc = tc*2.f - 1.f;
+
+  if( sqrt(tc.x*tc.x + tc.y*tc.y) > 1.f )
+    return float3(0.f);
+
+  theta = M_PI/2.f*sqrt(tc.x*tc.x + tc.y*tc.y);
+  gamma = atan2(tc.y,tc.x);
+
+  dir.x = cos(gamma)*sin(theta);
+  dir.y = sin(gamma)*sin(theta);
+  dir.z = cos(theta);
+
+  return dir;
+}
+
+float2 fisheye_dir2tex(float3 dir)
+{
+  float2 tc;
+  float theta, gamma;
+
+  if( dir.z < 0.f )
+    return float2(0.f);
+
+  theta = acosWorkaround(dir.z);
+  gamma = atan2(dir.y, dir.x);
+
+  tc.x = cos(gamma)*theta/M_PI*2.f;
+  tc.y = sin(gamma)*theta/M_PI*2.f;
+
+  tc = (tc + 1.f)/2.f;
+
+  return tc;
+}
+
+//
+// Functions specific to cubic panoramas
+//
+float2 cubic_dir2tex(float3 dir)
+{
+  float2 tc;
+  float theta, gamma;
+  
+  theta = atan2(dir.x, -dir.z);
+  gamma = asin(dir.y);
+
+  const float quarterPi = (float)M_PI/4.f;
+
+  float rotationOffset;
+  float textureOffset;
+  float textureXScale;
+  float textureYScale;
+
+  rotationOffset = 0.f;
+  textureOffset = 0.f;
+  textureXScale = 1.f;
+  textureYScale = 1.f;
+
+  // -Z
+  if( ( theta >= -quarterPi && theta < quarterPi ) )
+  {
+    rotationOffset = 0.f;
+    textureOffset = 0.f;
+
+    textureXScale = -1.f;
+  }
+
+  // +X
+  else if( ( theta >= quarterPi && theta < 3.f*quarterPi ) ||
+           ( theta >= -7.f*quarterPi && theta < -5.f*quarterPi ) )
+  {
+    if( theta >= quarterPi && theta < 3.f*quarterPi )
+    {
+      rotationOffset = 2.f;
+      textureOffset = 4.f;
+    }
+    else
+    {
+      rotationOffset = -6.f;
+      textureOffset = 4.f;
+    }
+
+    textureXScale = -1.f;
+  }
+
+  // +Z
+  else if( ( theta >= 3.f*quarterPi && theta < 5.f*quarterPi ) ||
+           ( theta >= -5.f*quarterPi && theta < -3.f*quarterPi ) )
+  {
+    if( theta >= 3.f*quarterPi && theta < 5.f*quarterPi )
+    {
+      rotationOffset = 4.f;
+      textureOffset = 1.f;
+    }
+    else
+    {
+      rotationOffset = -4.f;
+      textureOffset = 1.f;
+    }
+
+    textureXScale = -1.f;
+  }
+
+  // -X
+  else if( ( theta >= 5.f*quarterPi && theta < 7.f*quarterPi ) ||
+           ( theta >= -3.f*quarterPi && theta < -1.f*quarterPi ) )
+  {
+    if( theta >= 5.f*quarterPi && theta < 7.f*quarterPi )
+    {
+      rotationOffset = 6.f;
+      textureOffset = 5.f;
+    }
+    else
+    {
+      rotationOffset = -2.f;
+      textureOffset = 5.f;
+    }
+
+    textureXScale = -1.f;
+  }
+
+  theta = theta - rotationOffset*quarterPi;
+      
+  float u, v, w, h;
+  h = cos(gamma);
+  u = sin(theta) * h;
+  v = sin(gamma);
+  w = cos(theta) * h;
+
+  tc.x = u/w;
+  tc.y = v/w;
+
+  // -Y
+  if( tc.y <= -1.f )
+  {
+    //float otc = tc.y;
+    theta = atan2(dir.x, -dir.y);
+    gamma = asin(+dir.z);
+
+    h = cos(gamma);
+    u = sin(theta) * h;
+    v = sin(gamma);
+    w = cos(theta) * h;
+
+    tc.x = u/w;
+    tc.y = v/w;
+
+    textureXScale = 1.f;
+    textureOffset = 2.f;
+
+    //tc.y = otc;
+    tc.y = clamp(tc.y, -0.999f, 0.999f);
+  }
+
+  // +Y
+  if( tc.y >= 1.f )
+  {
+    theta = atan2(dir.x, dir.y);
+    gamma = asin(-dir.z);
+
+    h = cos(gamma);
+    u = sin(theta) * h;
+    v = sin(gamma);
+    w = cos(theta) * h;
+
+    tc.x = u/w;
+    tc.y = v/w;
+
+    textureXScale = 1.f;
+    textureOffset = 3.f;
+
+    tc.y = clamp(tc.y, -0.999f, 0.999f);
+  }
+
+  tc.x = clamp(tc.x, -1.f, 1.f);
+  tc.y = clamp(tc.y, -1.f, 1.f);
+
+  tc.x *= textureXScale;
+  tc.y *= textureYScale;
+
+  tc = (tc + 1.f)/2.f;
+  tc = clamp(tc, float2(0.f), float2(1.f));
+  tc.y += textureOffset;
+  tc.y /= 6.f;
+
+  return tc;
+}
+
+float3 cubic_tex2dir(float2 tc)
+{
+  float3 dir;
+
+  float os = 1.f/6.f;
+
+  // -X
+  if( tc.y > (1.f-os) )
+  {
+    tc.y *= 6.f;
+    tc.y -= 5.f;
+
+    tc = clamp(tc, float2(0.f), float2(1.f));
+    tc = tc*2.f - 1.f;
+
+    float3 udir = float3(-1.f, tc.y,  tc.x);
+    dir = udir/sqrt(udir.x*udir.x + udir.y*udir.y + udir.z*udir.z);
+
+  }
+
+  // +X
+  else if( tc.y > (1.f-2*os) )
+  {
+    tc.y *= 6.f;
+    tc.y -= 4.f;
+
+    tc = clamp(tc, float2(0.f), float2(1.f));
+    tc = tc*2.f - 1.f;
+
+    float3 udir = float3( 1.f, tc.y, -tc.x);
+    dir = udir/sqrt(udir.x*udir.x + udir.y*udir.y + udir.z*udir.z);
+  }
+
+  // +Y
+  else if( tc.y > (1.f-3*os) )
+  {
+    tc.y *= 6.f;
+    tc.y -= 3.f;
+
+    tc = clamp(tc, float2(0.f), float2(1.f));
+    tc = tc*2.f - 1.f;
+
+    float3 udir = float3( tc.x, 1.f, -tc.y);
+    dir = udir/sqrt(udir.x*udir.x + udir.y*udir.y + udir.z*udir.z);
+  }
+
+  // -Y
+  else if( tc.y > (1.f-4*os) )
+  {
+    tc.y *= 6.f;
+    tc.y -= 2.f;
+
+    tc = clamp(tc, float2(0.f), float2(1.f));
+    tc = tc*2.f - 1.f;
+
+    float3 udir = float3( tc.x, -1.f, tc.y);
+    dir = udir/sqrt(udir.x*udir.x + udir.y*udir.y + udir.z*udir.z);
+  }
+
+  // +Z
+  else if( tc.y > (1.f-5*os) )
+  {
+    tc.y *= 6.f;
+    tc.y -= 1.f;
+
+    tc = clamp(tc, float2(0.f), float2(1.f));
+    tc = tc*2.f - 1.f;
+
+    float3 udir = float3( tc.x, tc.y, 1.f);
+    dir = udir/sqrt(udir.x*udir.x + udir.y*udir.y + udir.z*udir.z);
+  }
+
+  // -Z
+  else // if( tc.y < 6*os )
+  {
+    tc.y *= 6.f;
+    tc.y -= 0.f;
+
+    tc = clamp(tc, float2(0.f), float2(1.f));
+    tc = tc*2.f - 1.f;
+
+    float3 udir = float3(-tc.x, tc.y, -1.f);
+    dir = udir/sqrt(udir.x*udir.x + udir.y*udir.y + udir.z*udir.z);
+  }
+
+  return dir;
+}
+
+
+//
+// Add the same functions for other panorama types to support those types
+//
+
+//
+// kernel
+//
+kernel EnvironmentTransformKernel : public ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom, eEdgeClamped> src;
+  Image<eWrite> dst;
+
+  param:
+    int panoramaInput;
+    int panoramaOutput;
+    int sampling;
+
+  void define() {
+    defineParam(panoramaInput, "panoramaInput", 0);
+    defineParam(panoramaOutput, "panoramaOutput", 1);
+    defineParam(sampling, "sampling", 1);
+  }
+
+  void process(int2 pos) {
+    SampleType(src) valueSum(0);
+
+    SampleType(src) filterSum(0);    
+    ValueType(src) filter;
+
+    float u, v;
+
+    // Have to sample at least once
+    int os = max(1, sampling);
+
+    float filterVal = 1.f/float(os*os);
+
+    //
+    // Oversampling loop
+    //
+    // No oversampling option
+    //int osx = 0;
+    //int osy = 0;
+
+    for(int osx = 0; osx < os; osx++)
+    {
+      for(int osy = 0; osy < os; osy++)
+      {
+        //
+        // Compute the direction for the output pixel
+        //
+        float3 outputDir;
+
+        // Using the src width and height because there seems to be some
+        // issue if you choose a different output format
+        // Once those are fixed, this should use dst.bounds width and height
+        u = float(pos.x + (1.f/(2.f*os)) + (1.f/os)*osx)/(src.bounds.width());
+        v = float(pos.y + (1.f/(2.f*os)) + (1.f/os)*osy)/(src.bounds.height());
+
+        // No oversampling option
+        //u = float(pos.x + 0.5f)/(src.bounds.width());
+        //v = float(pos.y + 0.5f)/(src.bounds.height());
+
+        if( panoramaOutput == 0 )
+        {
+          outputDir = spherical_tex2dir( float2(u, v) );
+        }
+        else if( panoramaOutput == 1 )
+        {
+          outputDir = angular_tex2dir( float2(u, v) );
+        }
+        else if( panoramaOutput == 2 )
+        {
+          outputDir = ball_tex2dir( float2(u, v) );
+        }
+        else if( panoramaOutput == 3 )
+        {
+          outputDir = fisheye_tex2dir( float2(u, v) );
+        }
+        else if( panoramaOutput == 4 )
+        {
+          outputDir = cubic_tex2dir( float2(u, v) );
+        }
+        else
+        {
+          outputDir = float3(0.0, 0.0, -1.0);
+        }
+
+        // 
+        // Compute the texture coordinate for the input panorama
+        //
+        float2 inputUV;
+        if( panoramaInput == 0 )
+        {
+          inputUV = spherical_dir2tex( outputDir );
+        }
+        else if( panoramaInput == 1 )
+        {
+          inputUV = angular_dir2tex( outputDir );
+        }
+        else if( panoramaInput == 2 )
+        {
+          inputUV = ball_dir2tex( outputDir );
+        }
+        else if( panoramaInput == 3 )
+        {
+          inputUV = fisheye_dir2tex( outputDir );
+        }
+        else if( panoramaInput == 4 )
+        {
+          inputUV = cubic_dir2tex( outputDir );
+        }
+        else
+        {
+          inputUV = float2(0.0, 0.0);
+        }
+
+        int i, j;
+        i = int(floor(inputUV.x * (src.bounds.width())) );
+        j = int(floor(inputUV.y * (src.bounds.height())) );
+
+        i = min(i, int(src.bounds.width()-1));
+        j = min(j, int(src.bounds.height()-1));
+
+        valueSum += filterVal * src(i, j);
+
+        //
+        // Debugging options
+        //
+        if( sampling == -1 )
+        {
+          valueSum.x = outputDir.x;
+          valueSum.y = outputDir.y;
+          valueSum.z = outputDir.z;
+        }
+        else if( sampling == -2 )
+        {
+          valueSum.x = inputUV.x;
+          valueSum.y = inputUV.y;
+          valueSum.z = filterVal;
+        }
+        else if( sampling == -3 )
+        {
+          valueSum.x = float(pos.x);
+          valueSum.y = float(pos.y);
+          valueSum.z = 0.f;
+        }
+        else if( sampling == -4 )
+        {
+          valueSum.x = u;
+          valueSum.y = v;
+          valueSum.z = 0.f;
+        }
+        else if( sampling == -5 )
+        {
+          valueSum.x = float(i);
+          valueSum.y = float(j);
+          valueSum.z = 0.f;
+        }
+        else if( sampling == -6 )
+        {
+          valueSum.x = pos.x;
+          valueSum.y = pos.y;
+          valueSum.z = 0.f;
+        }
+        else if( sampling == -7 )
+        {
+          valueSum.x = u * src.bounds.width();
+          valueSum.y = v * src.bounds.height();
+          valueSum.z = 0.f;
+        }
+        else if( sampling == -8 )
+        {
+          valueSum.x = inputUV.x * src.bounds.width();
+          valueSum.y = inputUV.y * src.bounds.height();
+          valueSum.z = 0.f;
+        }
+      }
+    }
+
+    dst() = valueSum;
+  }
+};

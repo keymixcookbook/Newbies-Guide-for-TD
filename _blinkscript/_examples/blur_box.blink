@@ -1,0 +1,56 @@
+kernel BoxBlur2D : public ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessRanged2D, eEdgeClamped> srcA;
+  Image<eRead, eAccessRanged2D, eEdgeClamped> srcB;
+  Image<eWrite, eAccessPoint> dst;
+
+param:
+  float maxDist;  //The vertical radius of our box blur
+  int radius;  //The vertical radius of our box blur
+
+local:
+  float _maxRadialDist;
+
+  void define() {
+    defineParam(maxDist, "far", 1.0f);
+    defineParam(radius, "radius", 1);
+  }
+
+  void init() {
+    //Set the range we need to access from the source 
+    srcA.setRange(-radius, -radius, radius, radius);
+    srcB.setRange(-radius, -radius, radius, radius);
+    _maxRadialDist = sqrt(2*pow(radius,2));
+  }
+
+  void process() {
+    float occ = 0.0f;
+    if(srcA(0,0)>srcB(0,0))
+    {
+      for(int j = -radius; j <= radius; j++)
+        for(int i = -radius; i <= radius; i++)
+          if(srcB(i,j)>srcA(i,j))
+          {
+            float diff = fabs(srcB(i,j)-srcA(0,0));
+            float radialDist = sqrt(pow(i,2)+pow(j,2));
+            float radialAbsorption = 1-(radialDist/_maxRadialDist);
+            if(diff<   maxDist)
+              occ += ((1-diff)*radialAbsorption);
+          }
+    }
+    else
+    {
+      for(int j = -radius; j <= radius; j++)
+        for(int i = -radius; i <= radius; i++)
+          if(srcA(i,j)>srcB(i,j))
+          {
+            float diff = fabs(srcA(i,j)-srcB(0,0));
+            float radialDist = sqrt(pow(i,2)+pow(j,2));
+            float radialAbsorption = 1-(radialDist/_maxRadialDist);
+            if(diff<   maxDist)
+              occ += ((1-diff)*radialAbsorption);
+          }
+    }
+    dst() = 1-(occ/(pow((radius*2+1),2)));
+  }
+};

@@ -1,0 +1,37 @@
+//FrameMedian by Mads Hagbarth Lund
+//Median values among input frames
+
+kernel CleanPlater : ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessPoint, eEdgeClamped> src1; 
+  Image<eRead, eAccessPoint, eEdgeClamped> src2;
+  Image<eRead, eAccessPoint, eEdgeClamped> src3;  
+  Image<eRead, eAccessPoint, eEdgeClamped> src4;
+  Image<eRead, eAccessPoint, eEdgeClamped> src5;
+  Image<eRead, eAccessPoint, eEdgeClamped> src6;
+  Image<eRead, eAccessPoint, eEdgeClamped> src7; 
+  Image<eRead, eAccessPoint, eEdgeClamped> src8;
+  Image<eRead, eAccessPoint, eEdgeClamped> src9; 
+  Image<eRead, eAccessPoint, eEdgeClamped> src10;
+  Image<eRead, eAccessPoint, eEdgeClamped> src11; 
+  Image<eRead, eAccessPoint, eEdgeClamped> src12;
+  Image<eRead, eAccessPoint, eEdgeClamped> src13;  
+  Image<eRead, eAccessPoint, eEdgeClamped> src14;
+  Image<eRead, eAccessPoint, eEdgeClamped> src15;
+  Image<eRead, eAccessPoint, eEdgeClamped> src16;
+  Image<eRead, eAccessPoint, eEdgeClamped> src17; 
+  Image<eRead, eAccessPoint, eEdgeClamped> src18;
+  Image<eRead, eAccessPoint, eEdgeClamped> src19; 
+  Image<eRead, eAccessPoint, eEdgeClamped> src20;
+  Image<eWrite> dst;
+  param:
+    int frames;
+  void define() {
+    defineParam(frames, "Frames", 1);
+  }
+  void process() {
+    float values[] = {src1(),src2(),src3(),src4(),src5(),src6(),src7(),src8(),src9(),src10(),src11(),src12(),src13(),src14(),src15(),src16(),src17(),src18(),src19(),src20(),};
+    float outputS = median(values,  frames);
+    dst() = outputS;
+   }
+};

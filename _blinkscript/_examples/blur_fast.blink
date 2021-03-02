@@ -1,0 +1,65 @@
+kernel FastDirBlur : ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessRandom, eEdgeConstant> src; // the input image
+  Image<eWrite> dst; // the output image
+
+  param:
+    float4 radial_length;  // This local variable is not exposed to the user.
+    float4 zoom_length;
+    float4 linear_length;
+    float4 angle;
+    float2 center;
+    int samples;
+    float4 aspect; 
+    bool fade_to_center;
+    float max_dist_corner;
+
+  // In define(), parameters can be given labels and default values.
+  void define() {
+    defineParam(radial_length, "Radial Length", float4(0.0f, 0.0f, 0.0f, 0.0f));
+    defineParam(zoom_length, "Zoom Length", float4(0.0f, 0.0f, 0.0f, 0.0f));
+    defineParam(linear_length, "Linear_Length", float4(0.0f, 0.0f, 0.0f, 0.0f));
+
+    defineParam(angle, "Blur_Angle", float4(0.0f, 0.0f, 0.0f, 0.0f));
+
+    defineParam(center, "Center", float2(0.0f, 0.0f));
+    defineParam(samples, "Samples", 200);
+
+    defineParam(aspect, "Aspect", float4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    defineParam(fade_to_center, "Fade To Center", false);
+    defineParam(max_dist_corner, "Max Distance To Center", 0.0f);
+  }
+
+  void process(int3 pos) {
+    float2 offset_pos((pos.x - center.x) * aspect[pos.z], pos.y - center.y);
+
+    float radius = sqrt(offset_pos.x * offset_pos.x + offset_pos.y * offset_pos.y);
+    float theta = atan2(offset_pos.y, offset_pos.x);
+
+    float theta_add = radial_length[pos.z] / samples;
+
+    float lin_x = 0.0f;
+    float lin_y = 0.0f;
+
+    float fade_scale = fade_to_center ? radius / max_dist_corner : 1;
+
+    float radius_sub = zoom_length[pos.z] * fade_scale / samples;
+    float lin_x_add = linear_length[pos.z] * cos(angle[pos.z]) * fade_scale / samples;
+    float lin_y_add = linear_length[pos.z] * sin(angle[pos.z]) * fade_scale / samples;
+
+    float sum = 0.0f;
+
+    int sample = 0;
+    while (sample < samples && radius >= 0) {
+      sum += bilinear(src, radius * cos(theta)/aspect[pos.z] + center.x + lin_x, radius * sin(theta) + center.y + lin_y);
+
+      theta += theta_add;
+      radius -= radius_sub;
+      lin_x += lin_x_add;
+      lin_y += lin_y_add;
+      sample++;
+    }
+    dst() = sum / sample;
+  }
+};

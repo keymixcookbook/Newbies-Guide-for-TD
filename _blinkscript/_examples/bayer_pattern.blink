@@ -1,0 +1,55 @@
+// (De)bayer pattern by Martin Kenzel nuki.m4studios.at
+
+kernel bayer_pattern : public ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessPoint, eEdgeClamped> src;
+  Image<eWrite, eAccessPoint> dst;
+  
+  param:
+    // patterns are BGGR, RGGB, GBRG, GRBG
+    int pattern;
+  
+  void process(int3 pos)  {
+    int chan = pos.z;
+    int chck = (( pos.x + pos.y%2 ) %2);
+    int tl = (pos.x%2) * ((pos.y+1)%2); int tr = (pos.x%2) * (pos.y%2);
+    int bl = ((pos.x+1)%2) * ((pos.y+1)%2); int br = ((pos.x+1)%2) * (pos.y%2);
+    if( pattern == 0 ) {
+      //define BGGR
+      if( chan == 0 ) {
+        dst() = tl;
+      } else if ( chan == 1 ) {
+        dst() = 1-chck;
+      } else if ( chan == 2 ) {
+        dst() = br;
+      }
+    } else if( pattern == 1 ) {
+      //define RGGB
+      if( chan == 0 ) {
+        dst() = br;
+      } else if ( chan == 1 ) {
+        dst() = 1-chck;
+      } else if ( chan == 2 ) {
+        dst() = tl;
+      }
+    } else if( pattern == 2 ) {
+      //define GBRG
+      if( chan == 0 ) {
+        dst() = bl;
+      } else if ( chan == 1 ) {
+        dst() = chck;
+      } else if ( chan == 2 ) {
+        dst() = tr;
+      }
+    } else if( pattern == 3 ) {
+      //define GRBG
+      if( chan == 0 ) {
+        dst() = tr;
+      } else if ( chan == 1 ) {
+        dst() = chck;
+      } else if ( chan == 2 ) {
+        dst() = bl;
+      }
+    }
+  }
+};

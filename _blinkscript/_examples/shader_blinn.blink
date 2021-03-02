@@ -1,0 +1,83 @@
+// From ParticleLight by Mads Hagbarth Lund
+
+kernel blinnShader : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessPoint, eEdgeClamped> pointPos;  //the input image
+  Image<eRead, eAccessPoint, eEdgeClamped> normal;  //the input image
+  Image<eRead, eAccessRandom, eEdgeClamped> light_color;  //the input image
+  Image<eRead, eAccessRandom, eEdgeClamped> light_pos;  //the input image
+
+  Image<eWrite> dst;  //the output image
+
+  param:
+    float3 cameraPosition;
+    float diffuseMultiplier;
+    float specularPower;
+    float specularHardness;
+    bool halfLambert;
+
+  local:
+    float3 lightDir;
+    float3 viewDir;
+
+  void define() {
+    defineParam(halfLambert,"Half Lambert",bool(1));
+    defineParam(cameraPosition, "Camera Position", float3(1.0f,1.0f,1.0f));
+    defineParam(diffuseMultiplier,"Diffuse Multiplier",float(1.0f));
+    defineParam(specularPower,"Specular Power",float(10.0f));
+    defineParam(specularHardness,"Specular Hardness",float(100.0f));
+  }
+
+  void init() {
+  }
+
+  void process() {
+
+    SampleType(dst) sampleBase(0.0f);
+
+    float newVal = 0;
+    for(int j = 0; j < light_pos.bounds.y2; j++) {
+      for(int i = 0; i < light_pos.bounds.x2; i++) {
+        if (light_color(i,j).w == 1) {        
+
+        lightDir = (float3(light_pos(i,j).x,light_pos(i,j).y,light_pos(i,j).z)-float3(pointPos(0),pointPos(1),pointPos(2)));
+        float distance = length(lightDir);
+        lightDir = normalize(lightDir);
+        distance = distance * distance;
+
+        viewDir = (cameraPosition-float3(pointPos(0),pointPos(1),pointPos(2)));
+        viewDir = normalize(viewDir);
+
+
+        //Calculating Diffuse
+        float NdotL = dot(float3(normal(0),normal(1),normal(2)),lightDir);
+        if (halfLambert) {      
+           NdotL = NdotL * 0.5 + 0.5; //Added option for half lambert
+         }
+        else
+        {
+        NdotL = min(1.0f,max(0.0f,NdotL));
+        }
+
+        float diffuse = NdotL * (light_pos(i,j).w*diffuseMultiplier) / distance;
+
+
+        //Calculating Specular
+        float3 H = normalize(lightDir+viewDir);
+        float NdotH = dot(float3(normal(0),normal(1),normal(2)),H);
+        float intensity = pow(NdotH,specularHardness);
+        float specular = intensity * specularPower / distance;
+
+
+        SampleType(dst) sample(0.0f);
+        sample.x = max(0.0f,(diffuse+specular) * light_color(i,j).x);
+        sample.y =  max(0.0f,(diffuse+specular) * light_color(i,j).y);
+        sample.z =  max(0.0f, (diffuse+specular) * light_color(i,j).z);
+        sampleBase += sample;
+        }
+      }
+    }
+
+    dst() = sampleBase+float4(0,0,0,pointPos(3)); //Reaplying Alpha
+   }
+};

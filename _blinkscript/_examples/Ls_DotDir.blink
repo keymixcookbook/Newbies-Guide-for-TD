@@ -1,0 +1,18 @@
+kernel Ls_DotDir : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessPoint, eEdgeClamped> src;
+  Image<eWrite> dst;
+
+  param:
+    float2 dir;
+
+  void define() {
+    defineParam(dir, "Direction", float2(0.0, 1.0));
+  }
+
+  void process() {
+    dst(0) = dot(float2(src(0), src(1)), dir);
+    dst(1) = 0.0;
+    dst(2) = 0.0;
+  }
+};

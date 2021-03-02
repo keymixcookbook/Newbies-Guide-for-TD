@@ -1,0 +1,177 @@
+// BlinkPositionProject by Chris Fryer
+kernel BlinkPositionProject : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom, eEdgeClamped> src;
+  Image<eRead, eAccessRandom, eEdgeClamped> pos;
+  
+  Image<eWrite, eAccessRandom, eEdgeClamped> dst;
+
+  param:
+   
+    int iterations;
+    float timeOffsetSlider;
+    float shutter;
+
+    float2 resolution;
+    bool outputSTMap;  
+    bool outputDepth;  
+    int output_type;
+
+    float focal;
+    float haperture;
+    float vaperture;
+    float4x4 matrix;
+
+    float focalAnimated;
+    float hapertureAnimated;
+    float vapertureAnimated;
+    float4x4 matrixAnimated;
+
+    float focalNext;
+    float hapertureNext;
+    float vapertureNext;
+    float4x4 matrixNext;
+
+    float focalPrev;
+    float haperturePrev;
+    float vaperturePrev;
+    float4x4 matrixPrev;
+
+    float vMult;
+  
+
+  void process(int2 position) {  
+
+    float3 output;
+    float4 posDifference;
+   
+    posDifference.x = pos(position.x,position.y).x - matrix[0][3];
+    posDifference.y = pos(position.x,position.y).y - matrix[1][3];
+    posDifference.z = pos(position.x,position.y).z - matrix[2][3]; 
+    posDifference.w = pow(pow(posDifference.x,2)+pow(posDifference.y,2)+pow(posDifference.z,2),0.5f);
+
+    float xCoords = matrix[0][0]*posDifference.x + matrix[1][0]*posDifference.y + matrix[2][0]*posDifference.z;
+    float yCoords = matrix[0][1]*posDifference.x + matrix[1][1]*posDifference.y + matrix[2][1]*posDifference.z;
+    float zCoords = matrix[0][2]*posDifference.x + matrix[1][2]*posDifference.y + matrix[2][2]*posDifference.z;
+
+    float4 uv;
+    uv.x = 0.5f - (xCoords * ((focal/(haperture))/zCoords));
+    uv.y = 0.5f - (yCoords * ((focal/(vaperture*vMult))/zCoords));
+    uv.z = 1;
+
+     
+
+    float4 uvScaled;
+
+    uvScaled.x = uv.x*resolution.x;
+    uvScaled.y = uv.y*resolution.y;
+
+
+
+/////////////////////////////////////////////////////////
+
+    float4 nextPosDifference;
+   
+    nextPosDifference.x = pos(position.x,position.y).x - matrixNext[0][3];
+    nextPosDifference.y = pos(position.x,position.y).y - matrixNext[1][3];
+    nextPosDifference.z = pos(position.x,position.y).z - matrixNext[2][3]; 
+    nextPosDifference.w = pow(pow(nextPosDifference.x,2)+pow(nextPosDifference.y,2)+pow(nextPosDifference.z,2),0.5f);
+
+    float nextXCoords = matrixNext[0][0]*nextPosDifference.x + matrixNext[1][0]*nextPosDifference.y + matrixNext[2][0]*nextPosDifference.z;
+    float nextYCoords = matrixNext[0][1]*nextPosDifference.x + matrixNext[1][1]*nextPosDifference.y + matrixNext[2][1]*nextPosDifference.z;
+    float nextZCoords = matrixNext[0][2]*nextPosDifference.x + matrixNext[1][2]*nextPosDifference.y + matrixNext[2][2]*nextPosDifference.z;
+
+    float4 nextUV;
+    nextUV.x = 0.5f - (nextXCoords * ((focalNext/(hapertureNext))/nextZCoords));
+    nextUV.y = 0.5f - (nextYCoords * ((focalNext/(vapertureNext*vMult))/nextZCoords));
+    nextUV.z = 1;
+
+     
+
+    float4 nextUVScaled;
+
+    nextUVScaled.x = nextUV.x*resolution.x;
+    nextUVScaled.y = nextUV.y*resolution.y;
+    
+///////////////////////////////////////////////////
+
+    float4 prevPosDifference;
+
+    prevPosDifference.x = pos(position.x,position.y).x - matrixPrev[0][3];
+    prevPosDifference.y = pos(position.x,position.y).y - matrixPrev[1][3];
+    prevPosDifference.z = pos(position.x,position.y).z - matrixPrev[2][3]; 
+    prevPosDifference.w = pow(pow(prevPosDifference.x,2)+pow(prevPosDifference.y,2)+pow(prevPosDifference.z,2),0.5f);
+
+    float prevXCoords = matrixPrev[0][0]*prevPosDifference.x + matrixPrev[1][0]*prevPosDifference.y + matrixPrev[2][0]*prevPosDifference.z;
+    float prevYCoords = matrixPrev[0][1]*prevPosDifference.x + matrixPrev[1][1]*prevPosDifference.y + matrixPrev[2][1]*prevPosDifference.z;
+    float prevZCoords = matrixPrev[0][2]*prevPosDifference.x + matrixPrev[1][2]*prevPosDifference.y + matrixPrev[2][2]*prevPosDifference.z;
+
+    float4 prevUV;
+    prevUV.x = 0.5f - (prevXCoords * ((focalPrev/(haperturePrev))/prevZCoords));
+    prevUV.y = 0.5f - (prevYCoords * ((focalPrev/(vaperturePrev*vMult))/prevZCoords));
+    prevUV.z = 1;
+
+     
+
+    float4 prevUVScaled;
+
+    prevUVScaled.x = prevUV.x*resolution.x;
+    prevUVScaled.y = prevUV.y*resolution.y;
+
+///////////////////////////////////////////////////
+
+
+    float4 projectedOutput;
+    projectedOutput = bilinear(src,uv.x*resolution.x,uv.y*resolution.y);
+
+
+
+    if (output_type == 1) {       
+      
+    
+        dst(position.x,position.y)= uv;
+        
+
+    } else if (output_type == 2) {
+
+        dst(position.x,position.y)= posDifference.w;
+        
+    } else if (output_type == 3) {
+
+         float4 moBlurredOutput;
+         float4 currentUV;
+         float4 inverseUV;
+
+        //dst(prevUVScaled.x,prevUVScaled.y) = projectedOutput;
+        //dst(nextUVScaled.x,nextUVScaled.y) = projectedOutput;
+
+        for (float i = 0.0f; i < iterations; i++) {
+
+          
+          currentUV = prevUVScaled-(prevUVScaled-nextUVScaled)*(i/iterations);
+          inverseUV.x = (position.x)+(currentUV.x-position.x)*(shutter/2);
+          inverseUV.y = (position.y)+(currentUV.y-position.y)*(shutter/2);
+          
+          dst(inverseUV.x,inverseUV.y) += projectedOutput/iterations;
+          //moBlurredOutput+= dst(position.x,position.y);
+
+        }
+
+        dst(position.x,position.y) = moBlurredOutput;
+
+
+          
+          
+        
+
+        
+
+    } else {
+        
+        dst(position.x,position.y)= projectedOutput;
+
+    }
+  }   
+
+  
+};

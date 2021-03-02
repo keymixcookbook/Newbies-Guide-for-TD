@@ -1,0 +1,335 @@
+/* Lightning Kernel by Erwan Leroy 2020
+ *
+ * Simplex Noise based on https://github.com/Draradech/csworldgen/blob/master/simplexnoise.cpp
+ * Ported by Mads Hagbarth Lund 2014
+ *
+ * Modifications (fBm) by Erwan Leroy 2018 at Spin VFX
+ *
+ * Simplex license:
+ * Copyright (c) 2007-2012 Eliot Eshelman
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+
+int fastfloor( const float x ) { return x > 0 ? (int) x : (int) x - 1; }
+
+inline float raw_noise_4d(const float4 coord)
+{
+  int simplex[64][4] =
+  {
+    {0,1,2,3},{0,1,3,2},{0,0,0,0},{0,2,3,1},{0,0,0,0},{0,0,0,0},{0,0,0,0},{1,2,3,0},
+    {0,2,1,3},{0,0,0,0},{0,3,1,2},{0,3,2,1},{0,0,0,0},{0,0,0,0},{0,0,0,0},{1,3,2,0},
+    {0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},
+    {1,2,0,3},{0,0,0,0},{1,3,0,2},{0,0,0,0},{0,0,0,0},{0,0,0,0},{2,3,0,1},{2,3,1,0},
+    {1,0,2,3},{1,0,3,2},{0,0,0,0},{0,0,0,0},{0,0,0,0},{2,0,3,1},{0,0,0,0},{2,1,3,0},
+    {0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},
+    {2,0,1,3},{0,0,0,0},{0,0,0,0},{0,0,0,0},{3,0,1,2},{3,0,2,1},{0,0,0,0},{3,1,2,0},
+    {2,1,0,3},{0,0,0,0},{0,0,0,0},{0,0,0,0},{3,1,0,2},{0,0,0,0},{3,2,0,1},{3,2,1,0}
+  };
+
+  int perm[512] =
+  {
+    151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,
+    8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,
+    35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,
+    134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,
+    55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208, 89,
+    18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,
+    250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,
+    189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,
+    172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,
+    228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,
+    107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,
+    138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180,
+
+    151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,
+    8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,
+    35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,
+    134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,
+    55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208, 89,
+    18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,
+    250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,
+    189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,
+    172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,
+    228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,
+    107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,
+    138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
+  };
+
+  int grad4[32][4]=
+  {
+    {0,1,1,1},  {0,1,1,-1},  {0,1,-1,1},  {0,1,-1,-1},
+    {0,-1,1,1}, {0,-1,1,-1}, {0,-1,-1,1}, {0,-1,-1,-1},
+    {1,0,1,1},  {1,0,1,-1},  {1,0,-1,1},  {1,0,-1,-1},
+    {-1,0,1,1}, {-1,0,1,-1}, {-1,0,-1,1}, {-1,0,-1,-1},
+    {1,1,0,1},  {1,1,0,-1},  {1,-1,0,1},  {1,-1,0,-1},
+    {-1,1,0,1}, {-1,1,0,-1}, {-1,-1,0,1}, {-1,-1,0,-1},
+    {1,1,1,0},  {1,1,-1,0},  {1,-1,1,0},  {1,-1,-1,0},
+    {-1,1,1,0}, {-1,1,-1,0}, {-1,-1,1,0}, {-1,-1,-1,0}
+  };
+  float x = coord.x;
+  float y = coord.y;
+  float z = coord.z;
+  float w = coord.w;
+  float F4 = (sqrt(5.0f)-1.0)/4.0;
+  float G4 = (5.0-sqrt(5.0f))/20.0;
+  float n0, n1, n2, n3, n4;
+  float s = (x + y + z + w) * F4;
+  int i = fastfloor(x + s);
+  int j = fastfloor(y + s);
+  int k = fastfloor(z + s);
+  int l = fastfloor(w + s);
+  float t = (i + j + k + l) * G4;
+  float X0 = i - t;
+  float Y0 = j - t;
+  float Z0 = k - t;
+  float W0 = l - t;
+  float x0 = x - X0;
+  float y0 = y - Y0;
+  float z0 = z - Z0;
+  float w0 = w - W0;
+  int c1 = (x0 > y0) ? 32 : 0;
+  int c2 = (x0 > z0) ? 16 : 0;
+  int c3 = (y0 > z0) ? 8 : 0;
+  int c4 = (x0 > w0) ? 4 : 0;
+  int c5 = (y0 > w0) ? 2 : 0;
+  int c6 = (z0 > w0) ? 1 : 0;
+  int c = c1 + c2 + c3 + c4 + c5 + c6;
+  int i1, j1, k1, l1;
+  int i2, j2, k2, l2;
+  int i3, j3, k3, l3;
+  i1 = simplex[c][0]>=3 ? 1 : 0;
+  j1 = simplex[c][1]>=3 ? 1 : 0;
+  k1 = simplex[c][2]>=3 ? 1 : 0;
+  l1 = simplex[c][3]>=3 ? 1 : 0;
+  i2 = simplex[c][0]>=2 ? 1 : 0;
+  j2 = simplex[c][1]>=2 ? 1 : 0;
+  k2 = simplex[c][2]>=2 ? 1 : 0;
+  l2 = simplex[c][3]>=2 ? 1 : 0;
+  i3 = simplex[c][0]>=1 ? 1 : 0;
+  j3 = simplex[c][1]>=1 ? 1 : 0;
+  k3 = simplex[c][2]>=1 ? 1 : 0;
+  l3 = simplex[c][3]>=1 ? 1 : 0;
+  float x1 = x0 - i1 + G4;
+  float y1 = y0 - j1 + G4;
+  float z1 = z0 - k1 + G4;
+  float w1 = w0 - l1 + G4;
+  float x2 = x0 - i2 + 2.0*G4;
+  float y2 = y0 - j2 + 2.0*G4;
+  float z2 = z0 - k2 + 2.0*G4;
+  float w2 = w0 - l2 + 2.0*G4;
+  float x3 = x0 - i3 + 3.0*G4;
+  float y3 = y0 - j3 + 3.0*G4;
+  float z3 = z0 - k3 + 3.0*G4;
+  float w3 = w0 - l3 + 3.0*G4;
+  float x4 = x0 - 1.0 + 4.0*G4;
+  float y4 = y0 - 1.0 + 4.0*G4;
+  float z4 = z0 - 1.0 + 4.0*G4;
+  float w4 = w0 - 1.0 + 4.0*G4;
+  int ii = i & 255;
+  int jj = j & 255;
+  int kk = k & 255;
+  int ll = l & 255;
+  int gi0 = perm[ii+perm[jj+perm[kk+perm[ll]]]] % 32;
+  int gi1 = perm[ii+i1+perm[jj+j1+perm[kk+k1+perm[ll+l1]]]] % 32;
+  int gi2 = perm[ii+i2+perm[jj+j2+perm[kk+k2+perm[ll+l2]]]] % 32;
+  int gi3 = perm[ii+i3+perm[jj+j3+perm[kk+k3+perm[ll+l3]]]] % 32;
+  int gi4 = perm[ii+1+perm[jj+1+perm[kk+1+perm[ll+1]]]] % 32;
+
+  float t0 = 0.6 - x0*x0 - y0*y0 - z0*z0 - w0*w0;
+
+  if(t0<0) {
+    n0 = 0.0;
+  }
+  else
+  {
+    t0 *= t0;
+    n0 = t0 * t0 * dot(float4(grad4[gi0][0],grad4[gi0][2],grad4[gi0][3],grad4[gi0][3]), float4(x0, y0, z0, w0));
+  }
+
+  float t1 = 0.6 - x1*x1 - y1*y1 - z1*z1 - w1*w1;
+
+  if(t1<0) {
+    n1 = 0.0;
+  }
+  else {
+    t1 *= t1;
+    n1 = t1 * t1 * dot(float4(grad4[gi1][0],grad4[gi1][2],grad4[gi1][3],grad4[gi1][3]), float4(x1, y1, z1, w1));
+  }
+
+  float t2 = 0.6 - x2*x2 - y2*y2 - z2*z2 - w2*w2;
+
+  if(t2<0) {
+    n2 = 0.0;
+  }
+  else {
+    t2 *= t2;
+    n2 = t2 * t2 * dot(float4(grad4[gi2][0],grad4[gi2][2],grad4[gi2][3],grad4[gi2][3]), float4(x2, y2, z2, w2));
+  }
+
+  float t3 = 0.6 - x3*x3 - y3*y3 - z3*z3 - w3*w3;
+
+  if(t3<0) {
+    n3 = 0.0;
+  }
+  else {
+    t3 *= t3;
+    n3 = t3 * t3 * dot(float4(grad4[gi3][0],grad4[gi3][2],grad4[gi3][3],grad4[gi3][3]), float4(x3, y3, z3, w3));
+  }
+
+  float t4 = 0.6 - x4*x4 - y4*y4 - z4*z4 - w4*w4;
+
+  if(t4<0) {
+    n4 = 0.0;
+  }
+  else {
+    t4 *= t4;
+    n4 = t4 * t4 * dot(float4(grad4[gi4][0],grad4[gi4][2],grad4[gi4][3],grad4[gi4][3]), float4(x4, y4, z4, w4));
+  }
+  return 27.0 * (n0 + n1 + n2 + n3 + n4);
+}
+
+
+inline float remap(float val, float ori_min, float ori_max, float new_min, float new_max)
+{
+  float ori_range = ori_max-ori_min;
+  float new_range = new_max-new_min;
+  return (((val - ori_min) * new_range) / ori_range) + new_min;
+
+}
+
+inline float3 mix(float3 _X,float3 _Y,float _A){
+  return _X*(1.0f-_A)+_Y*_A;
+}
+inline float mix(float _X,float _Y,float _A){
+  return _X*(1.0f-_A)+_Y*_A;
+}
+
+
+// Random number generator algorithm from https://www.shadertoy.com/view/Xt23Ry
+inline float fract (float x) {return x-floor(x);}
+inline float random(float co) { return fract(sin(co*(91.3458f)) * 47453.5453f); }
+
+inline float3 randomv(float3 seed)
+{
+  float scramble = random(seed.x + seed.y * seed.z);
+  float3 rand;
+  rand.x = random(seed.x + scramble + 0.14557f + 0.47917f * seed.z)*2-1;
+  rand.y = random(seed.y * 0.214447f + scramble * 47.241f * seed.x)*2-1;
+  rand.z = random(seed.z * scramble + 3.147855f + 0.2114f * seed.y)*2-1;
+  return normalize(rand);
+}
+
+kernel PointLighning : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom> format;
+  Image<eWrite, eAccessRandom> dst;
+
+  param: //Parameters available to the user
+    int seed, relative_scale;
+    int2 WHformat;
+    float3 start, end;
+    float spread, branch_min, branch_max, scale_min, scale_max, scale_distribution;
+    float distribution, noise_frequency, noise_time;
+    float3 noise_amount;
+    int octaves;
+    float lacunarity;
+    float amplitude;
+    float gain;
+
+  void define() {
+    defineParam(WHformat, "format", int2(10,10));
+  }
+
+float fBm_4d(const float octaves, const float lacunarity, const float gain, const float4 coord, float amplitude)
+{
+  float total = 0;
+  float4 frequency = coord;
+  for( int i=0; i < octaves; i++ ) {
+    total += (float)raw_noise_4d(frequency) * amplitude;
+    frequency *= lacunarity;
+    amplitude *= gain;
+  }
+  return float(total);
+}
+
+float3 fBm_4d_3d(const float octaves, const float lacunarity, const float gain, const float4 coord, float amplitude)
+{
+  float3 sample;
+  sample.x = fBm_4d(octaves, lacunarity, gain, coord, amplitude);
+  sample.y = fBm_4d(octaves, lacunarity, gain, coord + 100.0f, amplitude);
+  sample.z = fBm_4d(octaves, lacunarity, gain, coord + 200.0f, amplitude);
+  return sample;
+}
+
+  void process(int2 pos) {
+    // this is highly inneficient, but for the algoritm to work, it needs to be single threaded.
+    if (pos.x || pos.y ) {
+      return;
+    }
+    float3 main_vector = end-start;
+    float2 random_source;
+    int2 sample_source;
+
+    float progress = 0.0f;
+    float3 branch_start;
+    float3 branch_end;
+    float branch_length;
+    float branch_progress;
+    float3 position;
+    float4 noise_source;
+    float3 noise;
+    for (int x = 0; x < WHformat.x; x++) {
+      // For the first branch, we use interpolate between the start and end, otherwise from fork to random point
+      if (x==0) {
+        branch_start = start;
+        branch_end = end;
+        branch_length = 1.0f;
+      } else {
+        // Pick from another random point
+        random_source = float2(random(seed+12.5f+x), random(seed+3.14f+x));
+        random_source.x = pow(random_source.x, 1/distribution); // Gamma the random value to change distribution
+        random_source.x = remap(random_source.x, 0, 1, 0, x);
+        random_source.y = remap(random_source.y, 0, 1, WHformat.y*branch_min, WHformat.y*branch_max) + 0.5f;
+        random_source.y = max(0.0f, min(float(WHformat.y-1), random_source.y));
+        sample_source = int2(random_source);
+        float4 sample = dst(sample_source.x, sample_source.y);
+        branch_start = float3(sample.x, sample.y, sample.z);
+        progress = sample.w;
+        if (relative_scale) {
+          branch_length = length(main_vector) * (1.0f-progress);
+        } else {
+          branch_length = length(main_vector);
+        }
+        branch_length = branch_length * remap(random(branch_length*x), 0.0f, 1.0f, scale_min, scale_max);  // randomize
+        branch_length = branch_length * mix(1.0f - float(x)/WHformat.x, 1.0f, scale_distribution);
+        branch_end = normalize(mix(normalize(main_vector), randomv(float3(x)), spread)) * branch_length + branch_start;
+      }
+        
+      // Iterate along the branch
+      for (int y = 0; y < WHformat.y; y++) {
+        branch_progress = y/(WHformat.y-1.0f);
+        position = mix(branch_start, branch_end, branch_progress);
+        noise_source = float4(position.x, position.y, position.z, 1.0f) * noise_frequency;
+        noise_source.w = x*100.0f + noise_time;
+        noise = fBm_4d_3d(octaves,lacunarity, gain, noise_source, amplitude);
+        position = position + (noise * branch_length * (1.0f - fabs(branch_progress * 2.0f - 1.0f))) * noise_amount;
+        float global_progress = remap(branch_progress, 0.0f, 1.0f, progress, 1.0f);
+        dst(x,y) = float4(position.x, position.y, position.z, global_progress); 
+      }
+    }
+  }
+};

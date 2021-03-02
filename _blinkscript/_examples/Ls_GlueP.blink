@@ -1,0 +1,215 @@
+// GlueP: project onto a position pass
+// lewis@lewissaunders.com
+// TODO:
+//  o rearrange the output selection logic, translating
+//    the return statements into setting a flag was stupid
+//  o I wonder what happens when inputs are different sizes
+
+kernel Ls_GlueP : ImageComputationKernel<ePixelWise> {
+  Image<eRead, eAccessRandom, eEdgeClamped> src;
+  Image<eRead, eAccessPoint, eEdgeClamped> position;
+  Image<eRead, eAccessPoint, eEdgeClamped> normals;
+  Image<eWrite> dst;
+
+  param:
+    bool convertp, convertn, outputp, outputn;
+    float3 worldcam_position, worldcam_rotation;
+    float3 projector_position, projector_rotation;
+    float projector_focal, projector_haperture;
+    bool frontface, backface, zclip;
+    float znear, zfar;
+    bool outputviewspace, outputclipspace, outputndc, outputuv, outputfacingratio;
+    int srcwidth, srcheight;
+
+  local:
+    float aspect, vaperture, fovy, fovx;
+
+  void define() {
+    defineParam(convertp, "ConvertPpassfromcameraspace", false);
+    defineParam(convertn, "ConvertNpassfromcameraspace", false);
+    defineParam(outputp, "OutputconvertedP", false);
+    defineParam(outputn, "OutputconvertedN", false);
+    defineParam(worldcam_position, "OriginalCGcameraposition", float3(0.0, 0.0, 0.0));
+    defineParam(worldcam_rotation, "OriginalCGcamerarotation", float3(0.0, 0.0, 0.0));
+    defineParam(projector_position, "Projectorposition", float3(0.0, 0.0, -100.0));
+    defineParam(projector_rotation, "Projectorrotation", float3(0.0, 0.0, 0.0));
+    defineParam(projector_focal, "Projectorfocallength", 50.0f);
+    defineParam(projector_haperture, "Projectorhorizontalaperture", 23.76f);
+    defineParam(zclip, "Depthclip", false);
+    defineParam(frontface, "Projectonfrontfaces", true);
+    defineParam(backface, "Projectonbackfaces", true);
+    defineParam(znear, "Depthclipnear", 0.0f);
+    defineParam(zfar, "Depthclipfar", 999999.0f);
+    defineParam(outputviewspace, "Outputviewspace", false);
+    defineParam(outputclipspace, "Outputclipspace", false);
+    defineParam(outputndc, "OutputNDCspace", false);
+    defineParam(outputuv, "OutputUVs", false);
+    defineParam(outputfacingratio, "OutputFacingRatio", false);
+    defineParam(srcwidth, "Srcwidth", 1920);
+    defineParam(srcheight, "Srcheight", 1080);
+  }
+
+  void init() {
+    aspect = max(float(srcwidth), 1.0f) / max(float(srcheight), 1.0f);
+    vaperture = projector_haperture / aspect;
+    fovy = 2.0f * atan(vaperture / (2.0f * projector_focal));
+    fovx = 2.0f * atan(projector_haperture / (2.0f * projector_focal));
+  }
+
+  float deg2rad(float angle) {
+    return(angle/(180.0f/PI));
+  }
+
+  // Rotates about the origin in ZXY order
+  float3 rotate(float3 p, float3 angles) {
+    float x = deg2rad(angles.x);
+    float y = deg2rad(angles.y);
+    float z = deg2rad(angles.z);
+
+    float3x3 rx, ry, rz;
+    float rxd[] = {1.0, 0.0, 0.0, 0.0, cos(x), -sin(x), 0.0, sin(x), cos(x)};
+    float ryd[] = {cos(y), 0.0, sin(y), 0.0, 1.0, 0.0, -sin(y), 0.0, cos(y)};
+    float rzd[] = {cos(z), -sin(z), 0.0, sin(z), cos(z), 0.0, 0.0, 0.0, 1.0};
+    rx.setArray(rxd);
+    ry.setArray(ryd);
+    rz.setArray(rzd);
+
+    float3x3 r = rz * rx * ry;
+    return(r * p);
+  }
+
+  // Un-rotates about the origin in ZXY order
+  float3 unrotate(float3 p, float3 angles) {
+    float x = deg2rad(angles.x);
+    float y = deg2rad(angles.y);
+    float z = deg2rad(angles.z);
+
+    float3x3 rx, ry, rz;
+    float rxd[] = {1.0f, 0.0f, 0.0f, 0.0f, cos(x), sin(x), 0.0f, -sin(x), cos(x)};
+    float ryd[] = {cos(y), 0.0f, -sin(y), 0.0f, 1.0f, 0.0f, sin(y), 0.0f, cos(y)};
+    float rzd[] = {cos(z), sin(z), 0.0f, -sin(z), cos(z), 0.0f, 0.0f, 0.0f, 1.0f};
+    rx.setArray(rxd);
+    ry.setArray(ryd);
+    rz.setArray(rzd);
+
+    float3x3 r = ry * rx * rz;
+    return(r * p);
+  }
+
+  void process(int2 pos) {
+    SampleType(position) prgba = position();
+    float3 p = float3(prgba.x, prgba.y, prgba.z);
+
+    SampleType(normals) nrgba = normals();
+    float3 n = float3(nrgba.x, nrgba.y, nrgba.z);
+
+    bool outputready = false;
+    float3 o;
+
+    // Optionally, convert P and N passes from camera space to world space
+    if(convertp) {
+      p.z *= -1.0f;
+      p = unrotate(p, -worldcam_rotation);
+      p += worldcam_position;
+    }
+    if(convertn) {
+      n.z *= -1.0f;
+      n = unrotate(n, -worldcam_rotation);
+    }
+    if(outputp && !outputready) {
+      o = p;
+      outputready = true;		
+    }
+    if(outputn && !outputready) {
+      o = n;
+      outputready = true;		
+    }
+
+    // Keep world space p for later, we need it for facing calc
+    float3 worldp = p;
+
+    // World space to view space
+    p -= projector_position;
+    p = rotate(p, -projector_rotation);
+    if(outputviewspace && !outputready) {
+       o = p;
+       outputready = true;
+    }
+
+    // Optional clipping
+    if(zclip) {
+      if(-p.z < znear || -p.z > zfar) {
+        o = float3(0.0f);
+        outputready = true;
+      }
+    }
+
+    // Clip behind projector
+    if(p.z > 0.0f) {
+        o = float3(0.0f);
+        outputready = true;
+    }
+
+    // Facing
+    float3 v = normalize(projector_position - worldp);
+    float facingratio = dot(n, v);
+    if(outputfacingratio && !outputready) {
+        o = float3(facingratio);
+        outputready = true;
+    }
+    if((facingratio > 0.0f && !frontface) || (facingratio < 0.0f && !backface)) {
+        o = float3(0.0f);
+        outputready = true;
+    }
+
+    // View space to clip space
+    float4x4 projection_matrix;
+    float pmd[] = {1.0f/tan(fovx/2.0f), 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f/tan(fovy/2.0f), 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f, 0.0f};
+    projection_matrix.setArray(pmd);
+    float4 p4 = float4(p.x, p.y, p.z, 0.0f);
+    p4 = projection_matrix * p4;
+    if(outputclipspace && !outputready) {
+       o.x = p4.x;
+       o.y = p4.y;
+       o.z = p4.z;
+       outputready = true;
+    }
+
+    // Clip space to NDC
+    p4 /= p4.w;
+    if(outputndc && !outputready) {
+       o.x = p4.x;
+       o.y = p4.y;
+       o.z = p4.z;
+       outputready = true;
+    }
+
+    // NDC to window
+    p4 /= -2.0f;
+    p4 += 0.5f;
+    if(outputuv && !outputready) {
+       o.x = p4.x;
+       o.y = p4.y;
+       o.z = 0.0f;
+       outputready = true;
+    }
+
+    // Sample
+    if(!outputready) {
+      SampleType(src) s = bilinear(src, p4.x*srcwidth, p4.y*srcheight);
+      o.x = s.x;
+      o.y = s.y;
+      o.z = s.z;
+    }
+
+    // Output
+    SampleType(dst) d;
+    d.x = o.x;
+    d.y = o.y;
+    d.z = o.z;
+    dst() = d;
+  }
+};

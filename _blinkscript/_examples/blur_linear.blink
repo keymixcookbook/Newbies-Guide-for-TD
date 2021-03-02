@@ -1,0 +1,40 @@
+kernel LinearBlur : ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessRandom, eEdgeConstant> src; // the input image
+  Image<eWrite> dst; // the output image
+
+  param:
+    float4 linear_length;
+    float4 angle;
+    int samples;
+    float4 aspect;
+
+  // In define(), parameters can be given labels and default values.
+  void define() {
+    defineParam(linear_length, "Linear_Length", float4(0.0f, 0.0f, 0.0f, 0.0f));
+
+    defineParam(angle, "Blur_Angle", float4(0.0f, 0.0f, 0.0f, 0.0f));
+
+    defineParam(samples, "Samples", 200);
+
+    defineParam(aspect, "Aspect", float4(1.0f, 1.0f, 1.0f, 1.0f));
+  }
+
+  void process(int3 pos) {
+    float lin_x = pos.x;
+    float lin_y = pos.y;
+
+    float lin_x_add = linear_length[pos.z] * cos(angle[pos.z]) / samples;
+    float lin_y_add = linear_length[pos.z] * sin(angle[pos.z]) / samples;
+
+    float sum = 0.0f;
+
+    for (int sample=0; sample < samples; sample++) {
+      sum += bilinear(src, lin_x, lin_y);
+
+      lin_x += lin_x_add;
+      lin_y += lin_y_add;
+    }
+    dst() = sum / samples;
+  }
+};

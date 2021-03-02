@@ -1,0 +1,122 @@
+// ChromaticBlink by Chris Fryer
+
+kernel ChromaticBlink : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom, eEdgeClamped> src;
+  Image<eRead, eAccessPoint, eEdgeClamped> stmapA;
+  Image<eRead, eAccessPoint, eEdgeClamped> stmapB;
+  
+  Image<eWrite, eAccessPoint> dst;
+
+  param:
+   
+    float2 resolution;
+    bool swapAB;
+    int iterations;    
+    float purpleAmount;
+    
+    
+
+  void process() {
+    float2 uvA;
+    float2 uvB;
+    float4 RGBA;
+    float4 RGBA_tweaked;
+
+    if (swapAB == 0){
+
+    uvA.x = stmapA().x * resolution.x - 0.5f;
+    uvA.y = stmapA().y * resolution.y - 0.5f;
+
+    uvB.x = stmapB().x * resolution.x - 0.5f;
+    uvB.y = stmapB().y * resolution.y - 0.5f;
+    }
+    
+    else {
+
+    uvB.x = stmapA().x * resolution.x - 0.5f;
+    uvB.y = stmapA().y * resolution.y - 0.5f;
+
+    uvA.x = stmapB().x * resolution.x - 0.5f;
+    uvA.y = stmapB().y * resolution.y - 0.5f;
+
+    }
+
+    float4 output;
+    float4 RGBA_temp;
+        
+    RGBA = 0.0f;
+    RGBA_tweaked = 0.0f;
+    RGBA_temp = 0.0f;
+    
+    float redMult = 0.0;
+    float greenMult = 0.0;
+    float blueMult = 0.0;
+    float iterationsFloat;
+    float adjuster = 0;    
+    
+    iterationsFloat = float(iterations);
+
+    for (int i = 0; i < iterations; i++){
+      
+      RGBA = RGBA + bilinear(src,(uvA.x+((uvB.x-uvA.x)*i)/iterations),(  uvA.y+  ((uvB.y-uvA.y)*i)/iterations));
+      RGBA_temp = bilinear(src,(uvA.x+((uvB.x-uvA.x)*i)/iterations),(  uvA.y+  ((uvB.y-uvA.y)*i)/iterations));
+
+      adjuster = (i);
+
+      if( adjuster < 1*iterations/6) {
+        redMult += (1/(iterationsFloat/6));
+        RGBA_tweaked.x += RGBA_temp.x*redMult;        
+      }
+      else if(adjuster >= 1*iterations/6 && adjuster < 2*iterations/6){
+        
+        greenMult += (1/(iterationsFloat/6));    
+
+        RGBA_tweaked.x += RGBA_temp.x*redMult   ; 
+        RGBA_tweaked.y += RGBA_temp.y*greenMult;
+      }
+
+      else if(adjuster >= 2*iterations/6 && adjuster < 3*iterations/6){
+        redMult += -(1/(iterationsFloat/6));
+        
+        RGBA_tweaked.x += RGBA_temp.x*redMult; 
+        RGBA_tweaked.y += RGBA_temp.y*greenMult;
+        
+      }
+      else if(adjuster >= 3*iterations/6 && adjuster < 4*iterations/6){
+            
+        blueMult += (1/(iterationsFloat/6));
+         
+        RGBA_tweaked.y += RGBA_temp.y*greenMult;
+        RGBA_tweaked.z += RGBA_temp.z*blueMult;
+      }
+      else if(adjuster >= 4*iterations/6 && adjuster < 5*iterations/6){
+        
+        greenMult += -(1/(iterationsFloat/6));    
+                
+        RGBA_tweaked.y += RGBA_temp.y*greenMult;
+        RGBA_tweaked.z += RGBA_temp.z*blueMult;
+      }
+      else if(adjuster >= 5*iterations/6 && adjuster < 6*iterations/6){
+        redMult += (1/(iterationsFloat/6));            
+        blueMult += -(1/(iterationsFloat/6));
+
+        RGBA_tweaked.x += RGBA_temp.x*redMult*blueMult*purpleAmount; 
+        RGBA_tweaked.z += RGBA_temp.z*blueMult;
+      }
+
+
+    }
+
+      RGBA.x = 3.0*RGBA_tweaked.x/(1+(1-0.91672)*purpleAmount);
+      RGBA.y = 3.0*(2.0/3.0)*RGBA_tweaked.y;
+      RGBA.z = 3.0*RGBA_tweaked.z;
+
+      output = (RGBA)/iterations;
+        
+    dst() = output;
+    
+  }   
+
+  
+};

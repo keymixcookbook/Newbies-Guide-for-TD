@@ -1,0 +1,71 @@
+// glow3D by Simon Moreau
+// Relight base on the position of the object
+// http://visualprocess.blogspot.com/2016/01/relighting-tool-position-passe-based.html
+
+
+kernel glow3D_Kernel: ImageComputationKernel<ePixelWise>
+{
+Image<eRead, eAccessPoint, eEdgeClamped> posDst; //target position
+Image<eRead, eAccessRandom, eEdgeClamped> posRef;  //reference position pass
+Image<eWrite> dst;  //the output image
+
+param:
+	float size; //Size of the glow
+	float decay;
+	int width;
+
+
+  //In define(), parameters can be given labels and default values.
+void define() {
+	defineParam(size, "Size", 1.0f);
+	defineParam(decay, "Decay", 1.0f);
+	defineParam(width, "Width", 1280);
+	}
+
+local:
+	int x1;
+	int x2;
+	int y1;
+	int y2;
+
+  //The init() function is run before any calls to kernel().
+void init() {
+  }
+
+float distance(float ref0,float targ0, float ref1, float targ1, float ref2, float targ2) {//calculate the distance 
+	float dist = sqrt((targ0-ref0)*(targ0-ref0) +(targ1-ref1)*(targ1-ref1) +(targ2-ref2)*(targ2-ref2) );
+	return dist;
+	}
+
+void process(int2 pos) {
+	if (posDst(3) != 0) {
+		float tempDist;
+		int denominateur = 0;
+		float somme = 0;
+		float ponderation;
+		int i = 0;
+		int x = i % width;
+		int y = i / width;
+		while (posRef(x,y,3) != 0) {
+			tempDist = distance(posRef(x,y,0), posDst(0), posRef(x,y,1), posDst(1), posRef(x,y,2), posDst(2));
+			if (tempDist<size) {
+				ponderation = 1-(tempDist/size);
+				ponderation = pow(ponderation,decay);
+				somme += (posRef(x,y,3)*ponderation);
+				denominateur++;
+				}
+			i += 1;
+			x = i % width;
+			y = i / width;
+			}
+		if (denominateur != 0) {
+			dst() = somme/denominateur;
+			}
+		else {
+			dst() = 0;
+			}
+	}
+	else {dst() = 0;}
+	
+   }
+};

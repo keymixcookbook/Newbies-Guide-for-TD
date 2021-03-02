@@ -1,0 +1,33 @@
+kernel Ls_Advect : ImageComputationKernel<ePixelWise> {
+	Image<eRead, eAccessRandom, eEdgeClamped> src;
+	Image<eRead, eAccessRandom, eEdgeClamped> map;
+	Image<eWrite> dst;
+
+	param:
+		float steplen;
+		int stepss;
+
+	local:
+		float realsteplen;
+
+	void define() {
+		defineParam(steplen, "Step length", 1.0f);
+		defineParam(stepss, "Steps", 32);
+	}
+
+	void init() {
+		realsteplen = steplen * 100.0;
+	}
+
+	void process(int2 pos) {
+		float2 where;
+		where.x = float(pos.x);
+		where.y = float(pos.y);
+		for(int i = 0; i < stepss; i++) {
+			SampleType(map) mapdir = bilinear(map, where.x, where.y);
+			where.x += mapdir.x * realsteplen;
+			where.y += mapdir.y * realsteplen;
+		}
+		dst() = bilinear(src, where.x, where.y);
+	}
+};

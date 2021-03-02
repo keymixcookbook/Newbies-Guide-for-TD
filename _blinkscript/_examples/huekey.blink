@@ -1,0 +1,237 @@
+//------- aa_HueKey, by Asier Aparicio 2018 -------//
+
+// key luminance between two points
+static float luminance_op(const float luminance, const float point_ref){
+	float ret = (1- fabs(point_ref - luminance));
+	ret = clamp(ret, 0.0f,1.0f);
+	return ret;
+}
+
+//decides if a color is close to the specified hue
+static float colorclose(float Cb_p, float Cr_p, float Cb_key,float Cr_key, float tola,float tolb) { 
+
+	float temp = sqrt(( pow((Cb_key-Cb_p),2) + pow((Cr_key-Cr_p),2) )); 
+
+	if (temp < tola){
+		return (0.0f);
+	} else if(temp < tolb) {
+		return ((temp-tola)/(tolb-tola));
+	}else{
+		return (1.0f);
+	} 
+	return temp;
+} 
+
+//grade node
+static float grade_alpha (float in, float blackpoint, float whitepoint, float lift, float gain, float multiply, float offset, float gamma){
+
+	float a, b, out;
+
+	a = multiply * (gain-lift) / (whitepoint-blackpoint);
+	b = offset + lift - a * blackpoint; 
+	out = pow( (a*in+b),(1.0f/gamma) );
+
+	return out;
+}
+
+//gamma op
+static float simple_gamma(float in, float amount){
+	return pow(in, (1/amount));
+}
+
+
+// main algorithms to get the spill
+float4 get_spill(
+	const float4 in, 
+	const float grade_mult
+	){
+
+	float r = in.x;
+	float g = in.y;
+	float b = in.z;
+	float4 spill;
+
+	spill.y = g - (max(r,b)) *grade_mult; 		// max operation
+
+	spill.x = 0.0f; 							// red channel to 0
+	spill.y = clamp (spill.y, 0.0f, 1000.0f); 	// clamp lower than 0 on green channel
+	spill.z = 0.0f; 							// blue channel to 0
+
+
+	//deal with alpha
+	spill.w = spill.y;							// spill to alpha
+
+	return spill;
+}
+
+//apply a hue rotation to an image in degrees
+static float4 hueTransform(const float4 in, const float hue_rot) {	// (rgba in, hue rotation in degrees)
+	float4 out;
+	const float cos_h = cos(hue_rot*3.14159265f/180); 				// convert degrees to radians
+	const float sin_h = sin(hue_rot*3.14159265f/180); 
+
+	//calculate the rotation matrix
+	float rot_matrix[3][3] = {{cos_h + (1.0f - cos_h) / 3.0f, 1.0f/3.0f * (1.0f - cos_h) - sqrt(1.0f/3.0f) * sin_h, 1.0f/3.0f * (1.0f - cos_h) + sqrt(1.0f/3.0f) * sin_h},
+		{1.0f/3.0f * (1.0f - cos_h) + sqrt(1.0f/3.0f) * sin_h, cos_h + 1.0f/3.0f*(1.0f - cos_h), 1.0f/3.0f * (1.0f - cos_h) - sqrt(1.0f/3.0f) * sin_h},
+		{1.0f/3.0f * (1.0f - cos_h) - sqrt(1.0f/3.0f) * sin_h, 1.0f/3.0f * (1.0f - cos_h) + sqrt(1.0f/3.0f) * sin_h, cos_h + 1.0f/3.0f * (1.0f - cos_h)}};
+
+	//Use the rotation matrix to convert the RGB 
+	out.x = in.x*rot_matrix[0][0] + in.y*rot_matrix[0][1] + in.z*rot_matrix[0][2];
+	out.y = in.x*rot_matrix[1][0] + in.y*rot_matrix[1][1] + in.z*rot_matrix[1][2];
+	out.z = in.x*rot_matrix[2][0] + in.y*rot_matrix[2][1] + in.z*rot_matrix[2][2];
+	out.w = in.w;
+
+	return out;
+}
+
+//project rgb cube (colour's 3d point) onto hsv "plane", return color's vector on the other plane
+float3 projectRGBcolour (const float3 u1){
+	float3 u2 = float3(1.0f,1.0f,1.0f); //  u2 is the normal of the hsv "plane", black to white, from 0,0,0 to 1,1,1
+	float3 ortProj;
+	ortProj =  float(dot(u1,u2)) / float(dot(u2,u2)) * u2; //orthogonal projection of u1 onto u2
+	return u1-ortProj ; //return substraction of vectors, to get the proj of the rgb point onto hsv's plane
+}
+
+// calculates angle (radians) between two 3d vectors
+float vectorAngle(const float3 v1, const float3 v2){  
+
+	float angle = acos(float(dot(v1,v2))/float(sqrt(dot(v1,v1)*dot(v2,v2)))); //returns angle between 0-180
+
+	//check if angle is really more than 180 degrees (comparing to plane's normal), if so apply sign to the angle
+	float3 cross_product = cross(v1,v2);
+	float3 plane_normal = float3(1.0f,1.0f,1.0f);
+	if (dot(plane_normal,cross_product)<0){
+		angle = -angle;
+		return angle;   //returns radians
+	}else{
+		return angle;   //returns radians
+	}
+}
+
+
+kernel aa_HueKey : ImageComputationKernel<ePixelWise>
+{
+	Image<eRead, eAccessPoint, eEdgeClamped> src;
+	Image<eRead, eAccessPoint, eEdgeClamped> src_ycbcr;
+	Image<eRead, eAccessPoint, eEdgeClamped> src_hsl;
+	Image<eRead, eAccessPoint, eEdgeClamped> pick_Lcbcr;
+	Image<eWrite> dst;
+
+	param:
+	float4 key_point;
+	int mode;
+	int chk_alpha;
+	int chk_unp;
+	//hue params
+	float op_multiplier;
+	//chroma + luma params
+	float tola, tolb;
+	float luma_acc; //blackpoint
+	//overall processing
+	float blackpoint, whitepoint, gamma;
+
+	local:
+	float lift, gain, multiply, offset;
+
+	void init(){
+		lift = 0.0f;
+		gain = 1.0f;
+		multiply = 1.0f; 
+		offset = 0.0f;
+	}
+
+	void process(){
+		// chroma+luma variables
+		float cbcr_dist;
+		float luminance_dist;
+		//hue variables
+		float angle_between;
+		float4 rot_spill;
+		float4 src_unp;
+		//overall variable
+		float alpha_result;
+
+
+		if (mode==1){	// chroma + luma
+
+			//calculate chroma distance (with some gamma) and luma distance.
+			cbcr_dist = 1- colorclose (src_ycbcr()[1], src_ycbcr()[2], pick_Lcbcr()[1], pick_Lcbcr()[2], tola, tolb );
+			cbcr_dist = simple_gamma(cbcr_dist,0.05);
+			luminance_dist = luminance_op(src_hsl()[2], pick_Lcbcr()[0]);
+
+			if (luma_acc!=0.0f){	//avoid luma grade calculation if 0.0
+				luminance_dist = grade_alpha (luminance_dist, luma_acc,  1.0f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f);
+			}
+
+			alpha_result = cbcr_dist*luminance_dist;	//chroma masked by luma
+
+			if (blackpoint == 0.0f && whitepoint == 1.0f && gamma == 1.0f){ //avoid alpha grade calculation
+				alpha_result = alpha_result;
+			}else {
+				alpha_result = grade_alpha (alpha_result, blackpoint, whitepoint, 0.0f,  1.0f,  1.0f,  0.0f, gamma );	//overall processing
+			}
+
+			alpha_result = (clamp(alpha_result, 0.0f,1.0f));	//clamp alpha 
+			if (chk_unp == 0){									//premult alpha if unchecked
+				alpha_result *= src()[3];
+			}
+
+			////-------OUTPUTS-------////
+			if (chk_alpha == 0){
+				dst() = float4(src()[0],src()[1],src()[2],alpha_result);
+			}else{
+				dst() = alpha_result;
+			}
+
+
+		}else{		// hue option
+
+			//unpremult rgb, maintain alpha
+			src_unp.x = src()[0]/src()[3];
+			src_unp.y = src()[1]/src()[3];
+			src_unp.z = src()[2]/src()[3];
+			src_unp.w = src()[3];
+
+			//calculate angle betwen picked colour and green, and huerotate the source
+			angle_between = vectorAngle(projectRGBcolour(float3(0.0f,1.0f,0.0f)),projectRGBcolour(float3(key_point.x,key_point.y,key_point.z))); //angle between green (0,1,0) on hsv and custom spill
+			angle_between = angle_between*180/3.14159265f;
+			rot_spill = hueTransform(src_unp, -angle_between);	
+
+			// huerotate spill back to normal
+			float4 rotBack_spill;
+			float4 spill = get_spill(rot_spill, op_multiplier); //get spill
+
+
+
+			if (blackpoint == 0.0f && whitepoint == 1.0f && gamma == 1.0f){ //avoid alpha grade calculation
+				spill.w  = spill.w ;
+			}else {
+				spill.w  = grade_alpha (spill.w , blackpoint, whitepoint, 0.0f,  1.0f,  1.0f,  0.0f, gamma );	//overall processing
+			}
+
+
+			spill.w = (clamp(spill.w, 0.0f,1.0f));				//clamp alpha 
+			if (chk_unp == 0){									//premult alpha
+				spill.w *= src()[3];
+			}
+
+
+			//avoid processing if custom colour has the same value in all three channels
+			if (key_point.x == key_point.y && key_point.y == key_point.z){
+				dst() = src();
+				return;
+			}
+
+
+			////-------OUTPUTS-------////
+			if (chk_alpha == 0){
+				dst() = float4(src()[0],src()[1],src()[2],spill.w);
+			}else{
+				dst() = spill.w;
+			}
+			
+		}
+
+	}
+
+};

@@ -1,0 +1,39 @@
+kernel Median : public ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessRanged2D, eEdgeClamped> imageIn; 
+  Image<eWrite, eAccessPoint> imageOut;          
+
+param:
+  int x;  //The horizontal radius of the median
+  int y;  //The vertical radius of the median
+
+local:
+  int _filterSize;
+  
+  void define() {
+    defineParam(x, "Size_X", 3); 
+    defineParam(y, "Size_Y", 3); 
+  }
+
+  void init() {
+    //Set the range we need to access from the source 
+
+    imageIn.setRange(-x, -y, x, y);
+    _filterSize = (2 * x + 1) * (2 * y + 1);
+
+  }
+  void process(int2 pos)
+  {
+    float vals[25];
+
+    for (int j = -y, index = 0; j <= y; j++) {
+      for (int i = -x; i <= x; i++, index++) {
+        vals[index] = imageIn(i, j);
+      }
+    }
+   
+    //The median function takes an array of floating-point values and an array length.
+    imageOut() = median(vals, _filterSize);
+    
+  }
+};

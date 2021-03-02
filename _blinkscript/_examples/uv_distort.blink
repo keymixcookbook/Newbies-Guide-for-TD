@@ -1,0 +1,64 @@
+// uvSticker by Marco Romeo
+
+kernel Swirlomatic : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRandom> src;
+  Image<eRead, eAccessRandom> uvs;
+  Image<eRead, eAccessPoint> mapping;
+  Image<eWrite, eAccessPoint> dst;
+
+  param:
+    int4 size;  //This parameter is made available to the user.
+    float tollerance; 
+  local:
+    float _whitePoint;  //This local variable is not exposed to the user.
+
+  //In define(), parameters can be given labels and default values.
+  void define() {
+  }
+
+  //The init() function is run before any calls to kernel().
+  void init() {
+  }
+
+  //The kernel function is run at every pixel to produce the output.
+  void process() {
+    bool found = false;
+    int foundX = 0.0;
+    int foundY = 0.0;
+
+    //if(targetUVs(0)>0.0)
+    //{
+      //dst()=1;
+      for(int y=size[1]; y<size[3]; y++)
+      {
+        for(int x=size[0]; x<size[2]; x++)
+        {
+          float uCoord = uvs(x,y,0);
+          float vCoord = uvs(x,y,1);
+          float uDiff = fabs(uCoord-mapping(0));
+          float vDiff = fabs(vCoord-mapping(1));
+          if(uCoord!=0 && vCoord!=0)
+          {
+            if(uDiff < tollerance && vDiff < tollerance)
+            {
+              found = true;
+              foundX = x;
+              foundY = y;
+            }
+          }
+          if(found)
+            break;
+        }
+        if(found)
+          break;
+      }
+      if(found)
+        dst() = src(foundX, foundY);
+      else
+        dst() = 0;
+    }
+    //else
+      //dst() = 0;
+  //}
+};

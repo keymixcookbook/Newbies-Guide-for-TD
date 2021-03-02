@@ -1,0 +1,13 @@
+kernel Ls_Cross : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessPoint, eEdgeClamped> src1;
+  Image<eRead, eAccessPoint, eEdgeClamped> src2;
+  Image<eWrite> dst;
+
+  void process() {
+    float3 s1 = float3(src1(0), src1(1), src1(2));
+    float3 s2 = float3(src2(0), src2(1), src2(2));
+    float3 c = cross(s1, s2);
+    dst() = float4(c.x, c.y, c.z, 0.0);
+  }
+};

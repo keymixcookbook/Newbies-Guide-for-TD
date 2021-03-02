@@ -1,0 +1,17 @@
+kernel PtoDepth : ImageComputationKernel<ePixelWise> {
+  Image<eRead, eAccessPoint, eEdgeClamped> src;
+  Image<eWrite> dst;
+
+  param:
+    float3 campos;
+
+  void define() {
+    defineParam(campos, "Camera position", float3(0.0, 0.0, 0.0));
+  }
+
+  void process() {    
+    SampleType(src) input = src();
+    float3 p = float3(input.x, input.y, input.z);
+    dst() = float4(length(p - campos));
+  }
+};

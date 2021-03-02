@@ -1,0 +1,98 @@
+// Voronoi.blink
+// A test implementation of libNoise's Voronoi generator using Blink
+// Ivan Busquets - August 2013
+// Modified for DasGrain by Fabian Holtz - April 2019
+
+#define X_NOISE_GEN 1619
+#define Y_NOISE_GEN 31337
+#define Z_NOISE_GEN 6971
+#define SEED_NOISE_GEN 1013
+#define SQRT_3 1.73205081
+
+inline int IntValueNoise3D (int x, int y, int z, int seed)
+{
+	// All constants are primes and must remain prime in order for this noise
+	// function to work correctly.
+	int n = (
+	X_NOISE_GEN * x
+	+ Y_NOISE_GEN * y
+	+ Z_NOISE_GEN * z
+	+ SEED_NOISE_GEN * seed)
+	& 0x7fffffff;
+	n = (n >> 13) ^ n;
+	return (n * (n * n * 60493 + 19990303) + 1376312589) & 0x7fffffff;
+}
+
+inline float ValueNoise3D (int x, int y, int z, int seed)
+{
+	return 1.0 - ((float)IntValueNoise3D (x, y, z, seed) / 1073741824.0);
+}
+
+kernel VoroNoise : ImageComputationKernel<ePixelWise>
+{
+	Image<eRead> src;
+	Image<eWrite, eAccessPoint> dst;
+
+	param:
+	float frequency;
+	int seed;
+	float aspect_ratio;
+	int width;
+	int height;
+	float randomness;
+
+
+	void define() {
+	defineParam(frequency, "Frequency", 50.0f);
+	defineParam(aspect_ratio, "aspect ratio", 1.0f);
+	defineParam(seed, "Seed", 0);
+	defineParam(randomness, "Randomness", 0.5f);
+}
+
+
+
+
+void process(int2 pos) {
+	float x = pos.x * aspect_ratio * frequency / width;
+	float y = pos.y * frequency / width;
+	int xInt = (x > 0.0) ? x : x - 1;
+	int yInt = (y > 0.0) ? y : y - 1;
+
+
+	float minDist = 2147483647.0;
+	float xCandidate = 0;
+	float yCandidate = 0;
+
+	float dist;
+
+	for (int yCur = yInt - 2; yCur <= yInt + 2; yCur++) {
+	for (int xCur = xInt - 2; xCur <= xInt + 2; xCur++) {
+
+	// Calculate the position and distance to the seed point inside of
+	// this unit cube. Limited by the randomness value
+	float xPos = xCur + (ValueNoise3D (xCur, yCur, 0, seed ) + 1 ) * randomness + (1-randomness) - 1;
+	float yPos = yCur + (ValueNoise3D (xCur, yCur, 0, seed + 1) + 1 ) * randomness + (1-randomness) - 1;
+
+	float xDist = xPos - x;
+	float yDist = yPos - y;
+
+	dist = pow(xDist, 2) + pow(yDist, 2);
+	if (dist < minDist) {
+	// This seed point is closer to any others found so far, so record
+	// this seed point.
+	minDist = dist;
+	xCandidate = xPos;
+	yCandidate = yPos;
+}
+}
+}
+
+SampleType(dst) sample(0.0f);
+
+sample.x = xCandidate / aspect_ratio / frequency;
+sample.y = yCandidate / height * width / frequency;
+sample.z = 0;
+
+dst() = sample;
+}
+};

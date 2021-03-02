@@ -1,0 +1,57 @@
+// Erode with Round edges by Erwan Lowey
+
+kernel ErodeFineRound : public ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessRanged2D, eEdgeClamped> src;
+  Image<eWrite, eAccessPoint> dst;
+
+param:
+  float size;
+
+local:
+  float s; // Absolute size
+
+  void define() {
+    defineParam(size, "Size", 1.0f);  
+  }
+
+  void init() {
+    //Set the range we need to access from the source 
+    s = fabs(size); // Absolute size
+    src.setRange(-ceil(s), -ceil(s), ceil(s), ceil(s));
+
+  }
+
+  void process() {
+    float sample_val; // Value of the current pixel being sampled
+    float val = src(0,0); // Value, initialized as the current pixel value, then updated in loop 
+    float2 v; // position vector
+    float2 s_v; // scaled position vector
+
+    // Loop
+    for(int j = -ceil(s); j <= ceil(s); j++) {
+      for(int i = -ceil(s); i <= ceil(s); i++) {
+        v = float2(float(i), float(j));
+        float len = length(v);
+        if (len <= s) {
+          sample_val = src(i, j);
+        }
+        else if (len < s + 1.0f) {
+          s_v = v/len*s;
+          sample_val = bilinear(src, s_v.x, s_v.y);
+        }
+        else {
+          continue;
+        }
+
+        if(size >= 0) {
+          val = max(sample_val, val);
+        }
+        else {
+          val = min(sample_val, val);
+        }
+      }
+    }
+    dst() = val;
+  }
+};

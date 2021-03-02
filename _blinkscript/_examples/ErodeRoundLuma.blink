@@ -1,0 +1,77 @@
+// Erode with Round edges by Erwan Lowey
+
+inline float luma(const float4 color)
+{
+  return 0.2126*color.x + 0.7152*color.y + 0.0722 * color.z;
+}
+
+kernel ErodeFineRoundLuma : public ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessRanged2D, eEdgeClamped> src;
+  Image<eWrite, eAccessPoint> dst;
+
+param:
+  float size;
+
+local:
+  float s; // Absolute size
+
+  void define() {
+    defineParam(size, "Size", 1.0f); 
+  }
+
+  void init() {
+    //Set the range we need to access from the source 
+    s = fabs(size); // Absolute size
+    src.setRange(-ceil(s), -ceil(s), ceil(s), ceil(s));
+
+  }
+
+  void process() {
+    SampleType(src) val = src(0,0); // Value, initialized as the current pixel value, then updated in loop 
+    SampleType(src) sample_val; // Value of the current pixel being sampled
+
+    float2 v; // position vector
+
+    float val_luma = luma(val);
+    float sample_luma;
+    float alpha;
+
+    // Loop
+    for(int j = -ceil(s); j <= ceil(s); j++) {
+      for(int i = -ceil(s); i <= ceil(s); i++) {
+        // Ensure we sample in a circle
+        v = float2(float(i), float(j));
+        float len = length(v);
+        if (len <= s) {
+          sample_val = src(i, j);
+        }
+        else if (len < s + 1.0f) {
+          v = v/len*s;
+          sample_val = bilinear(src, v.x, v.y);
+        }
+        else {
+          continue;
+        }
+        // Check the alpha and the luma separately
+        sample_luma = luma(sample_val);
+        if(size >= 0) {
+          alpha = max(sample_val.w, val.w);
+          if (sample_luma > val_luma){
+            val_luma = sample_luma;
+            val = sample_val;
+          }
+        }
+        else {
+          alpha = min(sample_val.w, val.w);
+          if (sample_luma < val_luma){
+            val_luma = sample_luma;
+            val = sample_val;
+          }
+        }
+        val.w = alpha;
+      }
+    }
+    dst() = val;
+  }
+};

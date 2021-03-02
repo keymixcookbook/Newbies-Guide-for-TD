@@ -1,0 +1,49 @@
+// invertJa 0.1
+
+// Blink script to allow inverting of RGB and or Alpha channels. 
+// Created by Jared Michael www.jaredmichael.net
+// No rights reserved, feel free to share, modify, etc.
+
+// Intended for use with Nuke Studio 10
+
+// INSTRUCTIONS
+// ------------------------
+// Create a new blinkscript soft effect and load this file.
+// By default RGB only is inverted. Use the checkboxes as necessary
+
+// Note: This script assumes all values are between 0 to 1. 
+// The maximum value parameter gives some control over this.
+
+
+kernel invertJa : ImageComputationKernel<ePixelWise>
+{
+Image<eRead, eAccessPoint, eEdgeClamped> src;
+Image<eWrite> dst;
+
+param:
+
+bool invertAlpha;
+bool invertRGB;
+float maxValue;
+
+void define(){
+	defineParam(invertAlpha, "Invert Alpha", false);
+	defineParam(invertRGB, "Inverts RGB", true);
+	defineParam(maxValue, "Maximum value", 1.0f);
+}
+
+void process() {
+	dst() = src(); //Input copied into output
+	if (invertRGB == true) //Inverts RGB if enabled
+	{
+		dst(0) = maxValue - src(0);
+		dst(1) = maxValue - src(1);
+		dst(2) = maxValue - src(2);
+	}
+
+	if (invertAlpha == false) //Inverts Alpha if enabled
+	{
+		dst(3) = maxValue - src(3);
+	}
+}
+};
