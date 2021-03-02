@@ -13,7 +13,7 @@ For what I understand, Foundary's Blinkscript (or Blink Kernel) is a mix of C++ 
 It is very much a language of its own with a C++ like syntax, and is very simiar to GLSL in how it works
 
 .. image:: Kernel Diagram
-   :target: ./img/kernel.png
+   :target: .._blinkscript\img\kernel.png
 
 There are numbers of good online resources for learning Blinkscript, list below are just a few:
 
