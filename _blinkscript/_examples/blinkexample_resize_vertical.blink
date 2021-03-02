@@ -1,0 +1,36 @@
+//ResizeKernel: scale the input horizontally or vertically using a bilinear filter. 
+kernel ResizeKernelV : ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessRandom, eEdgeConstant> src; //Output will be black outside the original image
+  Image<eWrite, eAccessPoint> dst;
+
+param:
+  float _externalScale;
+  bool _horizontal; 
+
+local:
+  float _scale;
+
+  void define()
+  {
+    defineParam(_externalScale, "Scale", 0.5f);
+    defineParam(_horizontal, "Horizontal", true);
+  }
+
+  void init()
+  {
+    _scale = 1.0f/_externalScale;  //invert the scale as we back-map from dst to src
+  }
+
+  void process(int2 pos)
+  {
+    //Work out the scaled src position.
+    const float xPos = (_horizontal ? (float)pos.x * _scale : (float)pos.x);
+    const float yPos = (_horizontal ? pos.y : (float)pos.y * _scale);
+
+    //Use a bilinear filter to get the value at that src position.
+    dst() = bilinear(src, xPos, yPos);    
+  }
+
+};
+

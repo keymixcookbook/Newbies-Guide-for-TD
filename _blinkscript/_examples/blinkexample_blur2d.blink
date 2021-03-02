@@ -1,0 +1,32 @@
+kernel BoxBlur2D : public ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessRanged2D, eEdgeClamped> src;
+  Image<eWrite, eAccessPoint> dst;
+
+param:
+  int xRadius;  //The horizontal radius of our box blur
+  int yRadius;  //The vertical radius of our box blur
+
+local:
+  int _filterSize;
+
+  void define() {
+    defineParam(xRadius, "RadiusX", 5); 
+    defineParam(yRadius, "RadiusY", 3); 
+  }
+
+  void init() {
+    //Set the range we need to access from the source 
+    src.setRange(-xRadius, -yRadius, xRadius, yRadius);
+
+    _filterSize = (2 * xRadius + 1) * (2 * yRadius + 1);
+  }
+
+  void process() {
+    float sum = 0.0f;
+    for(int j = -yRadius; j <= yRadius; j++)
+      for(int i = -xRadius; i <= xRadius; i++)
+        sum += src(i, j);
+    dst() = sum / (float)_filterSize;
+  }
+};

@@ -1,0 +1,22 @@
+
+kernel GainKernel: ImageComputationKernel<eComponentWise>{
+	Image<eReadWrite> dst;
+
+	param:
+		float multiply;
+
+	//In define(), parameters can be given labels and default values.
+	void define(){
+		defineParam(multiply, "Gain", 1.0f);		
+	}
+
+	//The init() function is run before any calls to process()
+	void init(){
+		
+	}
+
+	//The process function is run at every pixel to produce the output
+	void process(){
+		dst() *= multiply;
+	}
+};

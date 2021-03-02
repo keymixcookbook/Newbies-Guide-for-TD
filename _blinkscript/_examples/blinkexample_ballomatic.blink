@@ -1,0 +1,44 @@
+// Copyright (c) 2012 The Foundry Visionmongers Ltd.  All Rights Reserved.
+// Example RIP Kernel
+
+
+// BallomaticKernel: does a ball-o-matic effect. Set the power to change the effect.
+kernel Ballomatic : ImageComputationKernel<ePixelWise> {
+  Image<eRead, eAccessRandom, eEdgeClamped> src;
+  Image<eWrite, eAccessPoint> dst;
+
+param:
+  float power;
+  int size;
+  float2 centre;  
+
+local:
+  float _sizeInv2;
+
+  void define() {
+     defineParam(power, "Power", -0.2f);
+     defineParam(size, "Size", 400);
+     defineParam(centre, "Centre", float2(640.0f, 360.0f));
+  }
+
+  void init() {
+    _sizeInv2 = size <= 0 ? 0 : 1.0f/size;
+    _sizeInv2 *= _sizeInv2;
+  }
+
+  void process(int2 pos) {
+    float dx = float(pos.x) - centre.x;
+    float dy = float(pos.y) - centre.y;
+    float delta = 1.0f - ((dx*dx + dy*dy) * _sizeInv2);
+    if (delta < 0) {
+      dst() = src(pos.x, pos.y);
+    }
+    else {
+      delta = pow(delta, power);
+      float x = centre.x + dx * delta;
+      float y = centre.y + dy * delta;
+      for (int c = 0; c < dst.kComps; c++)
+        dst(c) = bilinear(src, x, y, c);	
+    }
+  }
+};

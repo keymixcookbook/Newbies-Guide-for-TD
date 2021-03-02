@@ -1,0 +1,25 @@
+kernel Median5x5Kernel : public ImageComputationKernel<eComponentWise>
+{
+  Image<eRead, eAccessRanged2D, eEdgeClamped> imageIn; 
+  Image<eWrite, eAccessPoint> imageOut;          
+
+  void init()
+  {
+    imageIn.setRange(-2, -2, 2, 2);
+  }
+
+  void process(int2 pos)
+  {
+    float vals[25];
+
+    for (int j = -2, index = 0; j <= 2; j++) {
+      for (int i = -2; i <= 2; i++, index++) {
+        vals[index] = imageIn(i, j);
+      }
+    }
+   
+    //The median function takes an array of floating-point values and an array length.
+    imageOut() = median(vals, 25);
+    
+  }
+};

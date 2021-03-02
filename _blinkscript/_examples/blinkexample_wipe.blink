@@ -25,7 +25,7 @@ kernel WipeKernel : ImageComputationKernel<eComponentWise>
 
   //The process function is run at every pixel to produce the output.
   void process(int2 pos) {
-    float2 posVec;
+    float2 posVec; 
     posVec.x = pos.x - origin.x;
     posVec.y = pos.y - origin.y;
 
@@ -39,3 +39,4 @@ kernel WipeKernel : ImageComputationKernel<eComponentWise>
     }
   }
 };
+

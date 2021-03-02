@@ -1,0 +1,43 @@
+/// Kernel demonstrating RIP knob types
+kernel KnobsKernel : ImageComputationKernel<eComponentWise>
+{
+  Image<eRead> src;
+  Image<eWrite> dst;
+
+param:
+  float single_float;
+  float2 xy;
+  float3 xyz;
+  float4 acolor;
+  float multi_float[5];
+  float3x3 array3x3;
+  float4x4 array4x4;
+  int single_int;
+  int multi_int[4];
+  bool default_true_knob;
+  bool default_false_knob;
+
+
+local:
+  void define() {
+    defineParam(single_float, "SingleFloat", 4.0f); //This knob will have a range of 0..8
+    defineParam(xy, "XY"); 
+    defineParam(xyz, "XYZ"); 
+    defineParam(acolor, "AColor"); 
+    defineParam(multi_float, "MultiFloat"); 
+    defineParam(array3x3, "Array3x3"); 
+    defineParam(array4x4, "Array4x4"); 
+    defineParam(single_int, "SingleInt", 4); 
+    defineParam(multi_int, "MultiInt"); 
+    defineParam(default_true_knob, "DefaultTrue", true); 
+    defineParam(default_false_knob, "DefaultFalse", false); 
+  }
+
+  void init() {
+  }
+
+  void process() {
+    //Just copy src to dst
+    dst() = src();
+  }
+};
