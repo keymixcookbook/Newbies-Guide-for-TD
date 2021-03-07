@@ -1,3 +1,5 @@
+import os
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -46,6 +48,7 @@ exclude_patterns = []
 #
 html_theme = 'alabaster'
 # html_theme = 'classic'
+# html_theme = 'default'
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -54,5 +57,5 @@ html_theme = 'alabaster'
 html_static_path = ['static']
 
 html_css_files = [
-	'my_theme.css',
+	'custom.css',
 	]

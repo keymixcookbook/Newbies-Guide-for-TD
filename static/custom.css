@@ -1,4 +1,14 @@
+div.document {
+    width: auto;
+    min-width: 960px;
+    max-width: 1200px;
+}
 
-.wy-nav-content {
-    max-width: 1200px !important;
-    }
+div.sphinxsidebar {
+    float: left;
+    /* width: 240px; */
+    /* margin-left: -100%; */
+    font-size: 75%;
+    word-wrap:break-word;
+    overflow-wrap : break-word;
+} 
