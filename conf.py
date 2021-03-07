@@ -19,7 +19,7 @@ import os
 
 # -- Project information -----------------------------------------------------
 
-project = 'NukeModdingGuide'
+project = 'Nuke Modding Guide'
 copyright = '2021, Tianlun Jiang'
 author = 'Tianlun Jiang'
 
@@ -47,8 +47,9 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = 'alabaster'
+# html_theme = 'master'
 # html_theme = 'classic'
-# html_theme = 'default'
+# html_theme = 'haiku'
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -56,6 +57,16 @@ html_theme = 'alabaster'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['static']
 
-html_css_files = [
-	'custom.css',
-	]
+# html_css_files = [
+# 	'custom.css',
+# 	]
+
+if html_theme == 'alabaster':
+
+	html_theme_options = {
+		# "sidebarwidth": 400,
+		# "body_min_width": 960,
+		# "body_max_width": 1200,
+		"page_width": "80%",
+		"sidebar_width": "20%",
+	}
