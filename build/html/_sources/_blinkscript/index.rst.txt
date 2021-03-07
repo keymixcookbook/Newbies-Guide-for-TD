@@ -1,0 +1,460 @@
+Blinkscript in a nutshell
+=========================
+
+Nuke NDK in a node with C++ like syntax
+
+.. contents:: Table of Contents
+
+   
+Blinkscript Basics
+------------------
+
+For what I understand, Foundary's Blinkscript (or Blink Kernel) is a mix of C++ and GLSL. 
+It is very much a language of its own with a C++ like syntax, and is very simiar to GLSL in how it works
+
+.. image:: /images/kernel.png
+
+There are numbers of good online resources for learning Blinkscript, list below are just a few:
+
+* `Foundary Blink Kernel Documentation <https://learn.foundry.com/nuke/developers/90/BlinkKernels/>`_
+* `Gabriel Roy Tuts <hhttps://sites.google.com/site/gabrielroytuts/nuke/blinkscript/intro>`_
+* `Guillem Ramisa de Soto - Blink 101 <http://www.guillemramisadesoto.com/tutorials#/blink-101/>`_
+* `Xavier Martin - X_Aton <http://www.xaviermartinvfx.com/x_aton/>`_
+
+And this guide is a consolidation of the online resources I can find
+
+`> Back to top < <#top>`_
+
+Necessary Components
+--------------------
+
+The necessary parts to setup Blinkscript are as follows, in order:
+
+#. Define the **Name** of your Kernel
+#. Define a **Kernel Type**
+#. Define a **Kernel Granularity**
+#. Define **Inputs** and **Output**
+#. Any Declaration of **Global Functions**
+#. Define **Parameters** and/or **local** variables
+#. Set **User Knobs**, if any, and their default values
+#. **Initilize** functions to call when node is created *(or when compiled)*
+#. **Processing** to run at every pixel or every channel
+
+**In code examples**: A Simple kernel to invert input
+
+.. code-block:: C++
+
+	kernel InvertKernel : ImageComputationKernel<eComponentWise>
+	{
+		// Define Inputs(src) and Output(dst)
+		Image<eRead, eAccessPpint, eEdgeClammped> src;
+		Image<eWrite> dst;
+
+		// Define parameters: veriable that are avaliable to the user
+		param:
+			float multiply;
+
+		// Define local variables, that are exposed to the user
+		local:
+			float whiteAccessPoint;
+
+		void deine(){
+			defineParam(multiply, "Multiply", 1.0f);
+		}
+
+		void init(){
+			whiteAccessPoint = 1.0f;
+		}
+
+		void process(){
+		dst() = (whiteAccessPoint - src()) * multiply;
+	}
+
+
+`> Back to top < <#top>`_
+
+Kernel Types
+------------
+
+There are 3 types of Kernel you can define, which the most common one is ``ImageComputationKernel``
+
+.. list-table::
+	:widths: 25 50 25
+
+	* - **Type**
+	  - **Description**
+	  - **Access Order**
+	* - ``ImageComputationKernel``
+	  - takes zero or more images as input and ouput one image
+	  - radom
+	* - ``ImageRollingKernel``
+	  - Where there is a data dependency between the output at different points in the output space
+	  - either hrizontally or vertically
+	* - ``ImageReductionKernel``
+	  - Reduce an image down to a value/set of values
+	  - N/A
+
+.. note:: Most of the Blinkscripts are ``ImageComputationKernel``
+
+`> Back to top < <#top>`_
+
+
+Kernel Granularity
+------------------
+
+A Kernel Granularity defines how big the size of prociess is.
+
+There are 2 types of Granularity in Blinkscript:
+
+.. list-table::
+	:widths: 1 2
+
+	* - ``<eComponentWise>``
+	  - One **channel component** at a time 
+	* - ``<ePixelWise>``
+	  - One **pixel** at a time, which includes all components
+
+.. note::
+	
+	**Granularity (Parallel computing):**
+
+	In parallel computing, granularity (or grain size) of a task is a measure of the amount of work (or computation) which is performed by that task
+
+
+.... warning:: No Multi-Channels
+
+	Blinkscript can only input and process ``rgba`` channels, where each of the **component** is red, green, blue and alpha
+
+
+`> Back to top < <#top>`_
+
+
+Image Specfication
+------------------
+
+Image Specification defines how the input and output is accessed.
+
+It includes 3 main classes:
+
+* **ReadSpec**
+* **AccessPattern**
+* **EdgeMethod**
+
++---------------+---------------------+-------------------------------------------------------------------------+
+|**States**     |**Options**          |**Description**                                                          |
++---------------+---------------------+-------------------------------------------------------------------------+
+|ReadSpec       |``eRead``            |Reading access                                                           |
+|               +---------------------+-------------------------------------------------------------------------+
+|               |``eWrite``           |Writing access                                                           |
++---------------+---------------------+-------------------------------------------------------------------------+
+|AccessPattern  |``eAccessPoint``     |Access only the current position                                         |
+|               +---------------------+-------------------------------------------------------------------------+
+|               |``eAccessRanged1D``  |Access a one-dimensional range of positions relative to current position |
+|               +---------------------+-------------------------------------------------------------------------+
+|               |``eAccessRanged2D``  |Access a two-dimensional range of positions relative to current position |
+|               +---------------------+-------------------------------------------------------------------------+
+|               |``eAccessRandom``    |Access any pixel                                                         |
++---------------+---------------------+-------------------------------------------------------------------------+
+|EdgeMethod     |``eEdgeClamped``     |Edge values is repeated outside the image bounds/format                  |
+|               +---------------------+-------------------------------------------------------------------------+
+|               |``eEdgeConstant``    |Zero values will be returned outside the image bounds/format             |
+|               +---------------------+-------------------------------------------------------------------------+
+|               |``eEdgeNone``        |(Default) Values are undefined outside bounds, no bounds check hence     |
++---------------+---------------------+-------------------------------------------------------------------------+
+
+A Image Specfication can be defined as such:
+
+.. code-block:: c++
+
+	// Image<[ReadSpec], [AccessPattern], [EdgeMethod]> src;
+	Image<eRead, eAccessRandom, eEdgeClammped> src;
+
+`> Back to top < <#top>`_
+
+Variables
+---------
+
+You can deine variables in 2 ways, both or either one:
+
+* ``param``: parameter variable that are user **accessible**
+* ``local``: script variable that are user **not accessible**
+
+Datatypes
+^^^^^^^^^
+
+There are 2 types of data: 
+
+* **Scalars**: single data (bool, int, float...)
+* **Vectors**: array of data (float2, float3, vec2, vec3...)
+
+Blinkscript datatype are very similar to GLSL with some keywards differences:
+
+.. list-table::
+	:widths: 1 1 4
+
+	* - **Datatype**
+	  - **GLSL Equivalent**
+	  - **Description**
+	* - ``bool``
+	  - ``bool``
+	  - gool ol' friend true/false
+	* - ``int``
+	  - ``int``
+	  - single intiger value
+	* - ``int2``
+	  - ``ivec2``
+	  - 2-dimensional integer, can define upto *4 dimensions*
+	* - ``float``
+	  - ``float``
+	  - single float point value
+	* - ``float2``
+	  - ``vec2``
+	  - 2-dimensional float, can define upto *4 dimensions* also can be ``rgba`` knobs
+	* - ``<t> multi[n]``
+	  - ``<t> multi[n]``
+	  - n-dimensional array, where ``<t>`` is ``int`` or ``float``
+	* - ``<t> multi[n]``
+	  - ``<t> multi[n]``
+	  - n dimensional array, where <t> is ``int`` or ``float``
+	* - ``float3x3``
+	  - ``mat3``
+	  - 3x3 floating matrix, can also define 4x4 the same way
+	* - ``recti``, ``rectf``
+	  - n/a
+	  - integer and floating rectangle object
+
+.. warning:: The Tailing ``f``
+
+	Sometimes you would see a tailing ``f`` after a ``float`` (ie. ``float data=1.0f``)
+
+	it's specific to Blinkscript. Sometimes you need it sometimes you don't. No idea why the ``f``
+
+	my guess is if a function or datatype is blinkscript specific, it will need a ``f``, but rule of thumb: just add it, it doesn't hurt
+
+Special Datatypes
+^^^^^^^^^^^^^^^^^
+
+There are datatypes you can get the datatype from a vairable.
+Because Blinkscript or C++ is not dynmacially typed, those datatypes can be extremly handy!
+
+.. list-table::
+	:widths: 1 3
+
+	* - **Datatype**
+	  - **Description**
+	* - ``SampleType(var)``
+	  - Gets the ``<ePixelWise>`` data type of variable ``var``
+	* - ``ValueType(var)``
+	  - Gets the ``<eComponentWise>`` data type of Image components ``var`` per item
+
+.. note::
+	if ``ValueType(image)`` is ``float`` and there are **3 components** in your image, ``SampleType(image)`` will be ``float3``.
+
+You can use those special datatypes as such:
+
+.. code-block:: c++
+
+	SampleType(dst) sample(0.0f);
+
+Reserved Variables
+^^^^^^^^^^^^^^^^^^
+
+There are few local variables avaliable when kernel is created or ``init()`` is called
+
+.. list-table::
+	:widths: 1 2
+
+	* - **Variable**
+	  - **Return**
+	* - ``src.kMin``
+	  - min value for any component of image data
+	* - ``src.kMax``
+	  - max value for any component of image data
+	* - ``src.kWhitePoint``
+	  - min value for any component to be white
+	* - ``src.kComps``
+	  - number of components/channels
+	* - ``src.kClamps``
+	  - wether the image data should be clamped
+	* - ``src.bounds``
+	  - bounds of an image, attributes: ``x1``, ``x2``, ``y1``, ``y2``
+
+``src`` is the input defined by ``Image<[ImageSpecs]> src;``
+
+`> Back to top < <#top>`_
+
+Methods
+-------
+
+I categorize the methods in 3 parts (unofficial categorization):
+
+* **Iterate Space Methods**: nesscary to run the kernel in different stages
+* **Specical Methods** Methods: accessing image properties
+* **Computation Methods**: function to compute datastreams
+
+Iterate Space Methods
+^^^^^^^^^^^^^^^^^^^^^
+
+Those methods are called per interate space in following order:
+
+#. ``define()``: Called once per compile
+#. ``init()``: Called once per image
+#. ``process()``: Called once per pixel
+
+There are 3 sets of arguments you can pass in to ``process()`` to access image data
+
+.. list-table::
+	:widths: 12 10 15 30
+
+	* - **args**
+	  - **Granularity**
+	  - **Representation**
+	  - **Description**
+	* - ``process()``
+	  - ``ePixelWise``, ``eComponentWise``
+	  - n/a
+	  - regardless of interation space
+	* - ``process(int2 pos)``
+	  - ``ePixelWise``
+	  - ``pos.x``, ``pos.y``
+	  - access pixel at ``(x,y)``
+	* - ``process(int3 pos)``
+	  - ``ePixelWise``, ``eComponentWise``
+	  - ``pos.x``, ``pos.y``, ``pos.z``
+	  - access pixel at ``(x,y)`` and component `z`
+
+Special Methods
+^^^^^^^^^^^^^^^
+
+Some methods need to run within one of those **Iterate Space Methods**
+
+.. list-table::
+	:widths: 1 2 1 3
+
+	* - **Iterate Space**
+	  - **Methods**
+	  - **Acecess**
+	  - **Description**
+	* - ``define()``
+	  - ``defineParam(name,label,value)``
+	  - all
+	  - Define parameters avaliable to user
+	* - ``init()``
+	  - ``img.setAxis(Axis)``
+	  - ``eAccessRanged1D``
+	  - sets axis for ``img``, ``eX`` or ``eY``
+	* - ``init()``
+	  - ``img.setRange(int min, int max)``
+	  - ``eAccessRanged1D``, ``eAccessRanged2D``
+	  - sets range for ``x`` and ``y`` axis
+	* - ``init()``
+	  - ``img.setRange(int xMin, int yMin, int xMax, int yMax)``
+	  - ``eAccessRanged2D``
+	  - sets bounds from ``xMin`` to ``yMax``
+	* - ``init()``, ``process()``
+	  - ``img()``
+	  - ``eAccessPoint``
+	  - only the current postion, not relative to other coord
+	* - ``init()``, ``process()``
+	  - ``img(int c)``
+	  - ``eAccessPoint``
+	  - only the current postion at component ``int c``
+	* - ``init()``, ``process()``
+	  - ``img(int offset)``
+	  - ``eAccessRanged1D``
+	  - img value at set axis at ``int offset`` coord
+	* - ``init()``, ``process()``
+	  - ``img(int xOffset, int yOffset)``
+	  - ``eAccessRanged2D``
+	  - img value at ``(xOffset, int yOffset)`` coord
+	* - ``init()``, ``process()``
+	  - ``img(int x, int y)``
+	  - ``eAccessRandom``
+	  - img value at ``(x, y)`` coord
+
+All methods can have an optional method ie ``int c`` for component access
+
+Computation Methods
+^^^^^^^^^^^^^^^^^^^
+
+Functions to compute data streams. Some functions are shared with GLSL (``scalar``, ``vec``, ``type`` are placeholders)
+
+.. list-table::
+	:widths: 20 2 2 20
+
+	* - **Function**
+	  - **Blink**
+	  - **GLSL**
+	  - **Description**
+	* - ``scalar dot(vec a, vec b)``
+	  - x
+	  - x
+	  - Dot product
+	* - ``vec3 cross(vec3 a, vec3 b)``
+	  - x
+	  - x
+	  - cross product, limit to 3-component vec
+	* - ``scalar length(vec a)``
+	  - x
+	  - x
+	  - magnitute or the square root of the sum of the squared components
+	* - ``vec normalize(vec a)``
+	  - x
+	  - x
+	  - dividing vec *a* by its length, result in length of ``1.0`` 
+	* - ``SampleType(img) bilinear(image img, float x, float y, int c)``
+	  - x
+	  - 
+	  - bilinear transformation, with optional component ``int c``
+	* - ``type mix(type a, type b, type f)``
+	  - 
+	  - x
+	  - mix ``a`` with ``b`` with factor of ``f``
+	* - ``type smoothstep(type a, type b, type f)``
+	  - 
+	  - x
+	  - smoothstep interpolation from ``a`` to ``b``
+	* - ``type step(type a, type b)``
+	  - 
+	  - x
+	  - ``0.0`` if ``b`` is smaller than ``a`` else ``1.0``
+	* - ``float distance(type a, type b)``
+	  - 
+	  - x
+	  - Distance between ``a`` and ``b``
+	* - ``scalar median(scalar data[], int size)``
+	  - x
+	  - 
+	  - Finds the median value in an array of data of length size
+
+Blinkscript also has a set of functions called **Rectangle Functions** to construct a rectangle type: ``recti`` or ``rectf``
+
+.. list-table::
+	:widths: 10 2 8
+
+	* - **Function**
+	  - **Reutrn**
+	  - **Description**
+	* - ``rect(scalar x1, scalar y1, scalar x2, scalar y2)``
+	  - ``rect``
+	  - Construct a rectangle that goes from (x1, y1) to (x2, y2)
+	* - ``rect.grow(scalar x, scalar y)``
+	  - ``rect``
+	  - grow bounds by x, y
+	* - ``rect.inside(scalar x, scalar y)``
+	  - ``bool``
+	  - whether ``(scalar x, scalar y)`` or ``vec xy`` inside ``rect``
+	* - ``rect.width()``
+	  - ``scalar``
+	  - width of ``rect``
+	* - ``rect.height()``
+	  - ``scalar``
+	  - height of ``rect``
+	* - ``vec rect.height()``
+	  - ``vec2`` ``(width, height)``
+	  - width and height of ``rect``
+
+* `Full list Blinkscript <https://learn.foundry.com/nuke/developers/90/BlinkKernels/Blink.html#functions>`_ 
+* `Full list GLSL <https://www.shaderific.com/glsl-functions>`_ 
+
+`> Back to top < <#top>`_

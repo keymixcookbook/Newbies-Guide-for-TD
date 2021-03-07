@@ -1,0 +1,689 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blinkscript in a nutshell &#8212; NukeModdingGuide  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/my_theme.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Nuke Modding Guide" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="blinkscript-in-a-nutshell">
+<h1><a class="toc-backref" href="#id7">Blinkscript in a nutshell</a><a class="headerlink" href="#blinkscript-in-a-nutshell" title="Permalink to this headline">¶</a></h1>
+<p>Nuke NDK in a node with C++ like syntax</p>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title">Table of Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#blinkscript-in-a-nutshell" id="id7">Blinkscript in a nutshell</a></p>
+<ul>
+<li><p><a class="reference internal" href="#blinkscript-basics" id="id8">Blinkscript Basics</a></p></li>
+<li><p><a class="reference internal" href="#necessary-components" id="id9">Necessary Components</a></p></li>
+<li><p><a class="reference internal" href="#kernel-types" id="id10">Kernel Types</a></p></li>
+<li><p><a class="reference internal" href="#kernel-granularity" id="id11">Kernel Granularity</a></p></li>
+<li><p><a class="reference internal" href="#image-specfication" id="id12">Image Specfication</a></p></li>
+<li><p><a class="reference internal" href="#variables" id="id13">Variables</a></p>
+<ul>
+<li><p><a class="reference internal" href="#datatypes" id="id14">Datatypes</a></p></li>
+<li><p><a class="reference internal" href="#special-datatypes" id="id15">Special Datatypes</a></p></li>
+<li><p><a class="reference internal" href="#reserved-variables" id="id16">Reserved Variables</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#methods" id="id17">Methods</a></p>
+<ul>
+<li><p><a class="reference internal" href="#iterate-space-methods" id="id18">Iterate Space Methods</a></p></li>
+<li><p><a class="reference internal" href="#special-methods" id="id19">Special Methods</a></p></li>
+<li><p><a class="reference internal" href="#computation-methods" id="id20">Computation Methods</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="blinkscript-basics">
+<h2><a class="toc-backref" href="#id8">Blinkscript Basics</a><a class="headerlink" href="#blinkscript-basics" title="Permalink to this headline">¶</a></h2>
+<p>For what I understand, Foundary’s Blinkscript (or Blink Kernel) is a mix of C++ and GLSL.
+It is very much a language of its own with a C++ like syntax, and is very simiar to GLSL in how it works</p>
+<img alt="../_images/kernel.png" src="../_images/kernel.png" />
+<p>There are numbers of good online resources for learning Blinkscript, list below are just a few:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://learn.foundry.com/nuke/developers/90/BlinkKernels/">Foundary Blink Kernel Documentation</a></p></li>
+<li><p><a class="reference external" href="hhttps://sites.google.com/site/gabrielroytuts/nuke/blinkscript/intro">Gabriel Roy Tuts</a></p></li>
+<li><p><a class="reference external" href="http://www.guillemramisadesoto.com/tutorials#/blink-101/">Guillem Ramisa de Soto - Blink 101</a></p></li>
+<li><p><a class="reference external" href="http://www.xaviermartinvfx.com/x_aton/">Xavier Martin - X_Aton</a></p></li>
+</ul>
+<p>And this guide is a consolidation of the online resources I can find</p>
+<p><a class="reference external" href="#top">&gt; Back to top &lt;</a></p>
+</div>
+<div class="section" id="necessary-components">
+<h2><a class="toc-backref" href="#id9">Necessary Components</a><a class="headerlink" href="#necessary-components" title="Permalink to this headline">¶</a></h2>
+<p>The necessary parts to setup Blinkscript are as follows, in order:</p>
+<ol class="arabic simple">
+<li><p>Define the <strong>Name</strong> of your Kernel</p></li>
+<li><p>Define a <strong>Kernel Type</strong></p></li>
+<li><p>Define a <strong>Kernel Granularity</strong></p></li>
+<li><p>Define <strong>Inputs</strong> and <strong>Output</strong></p></li>
+<li><p>Any Declaration of <strong>Global Functions</strong></p></li>
+<li><p>Define <strong>Parameters</strong> and/or <strong>local</strong> variables</p></li>
+<li><p>Set <strong>User Knobs</strong>, if any, and their default values</p></li>
+<li><p><strong>Initilize</strong> functions to call when node is created <em>(or when compiled)</em></p></li>
+<li><p><strong>Processing</strong> to run at every pixel or every channel</p></li>
+</ol>
+<p><strong>In code examples</strong>: A Simple kernel to invert input</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">kernel</span> <span class="nl">InvertKernel</span> <span class="p">:</span> <span class="n">ImageComputationKernel</span><span class="o">&lt;</span><span class="n">eComponentWise</span><span class="o">&gt;</span>
+<span class="p">{</span>
+        <span class="c1">// Define Inputs(src) and Output(dst)</span>
+        <span class="n">Image</span><span class="o">&lt;</span><span class="n">eRead</span><span class="p">,</span> <span class="n">eAccessPpint</span><span class="p">,</span> <span class="n">eEdgeClammped</span><span class="o">&gt;</span> <span class="n">src</span><span class="p">;</span>
+        <span class="n">Image</span><span class="o">&lt;</span><span class="n">eWrite</span><span class="o">&gt;</span> <span class="n">dst</span><span class="p">;</span>
+
+        <span class="c1">// Define parameters: veriable that are avaliable to the user</span>
+        <span class="nl">param</span><span class="p">:</span>
+                <span class="kt">float</span> <span class="n">multiply</span><span class="p">;</span>
+
+        <span class="c1">// Define local variables, that are exposed to the user</span>
+        <span class="nl">local</span><span class="p">:</span>
+                <span class="kt">float</span> <span class="n">whiteAccessPoint</span><span class="p">;</span>
+
+        <span class="kt">void</span> <span class="nf">deine</span><span class="p">(){</span>
+                <span class="n">defineParam</span><span class="p">(</span><span class="n">multiply</span><span class="p">,</span> <span class="s">&quot;Multiply&quot;</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="kt">void</span> <span class="nf">init</span><span class="p">(){</span>
+                <span class="n">whiteAccessPoint</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kt">void</span> <span class="nf">process</span><span class="p">(){</span>
+        <span class="n">dst</span><span class="p">()</span> <span class="o">=</span> <span class="p">(</span><span class="n">whiteAccessPoint</span> <span class="o">-</span> <span class="n">src</span><span class="p">())</span> <span class="o">*</span> <span class="n">multiply</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="#top">&gt; Back to top &lt;</a></p>
+</div>
+<div class="section" id="kernel-types">
+<h2><a class="toc-backref" href="#id10">Kernel Types</a><a class="headerlink" href="#kernel-types" title="Permalink to this headline">¶</a></h2>
+<p>There are 3 types of Kernel you can define, which the most common one is <code class="docutils literal notranslate"><span class="pre">ImageComputationKernel</span></code></p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 50%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Type</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Access Order</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ImageComputationKernel</span></code></p></td>
+<td><p>takes zero or more images as input and ouput one image</p></td>
+<td><p>radom</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ImageRollingKernel</span></code></p></td>
+<td><p>Where there is a data dependency between the output at different points in the output space</p></td>
+<td><p>either hrizontally or vertically</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ImageReductionKernel</span></code></p></td>
+<td><p>Reduce an image down to a value/set of values</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Most of the Blinkscripts are <code class="docutils literal notranslate"><span class="pre">ImageComputationKernel</span></code></p>
+</div>
+<p><a class="reference external" href="#top">&gt; Back to top &lt;</a></p>
+</div>
+<div class="section" id="kernel-granularity">
+<h2><a class="toc-backref" href="#id11">Kernel Granularity</a><a class="headerlink" href="#kernel-granularity" title="Permalink to this headline">¶</a></h2>
+<p>A Kernel Granularity defines how big the size of prociess is.</p>
+<p>There are 2 types of Granularity in Blinkscript:</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 67%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;eComponentWise&gt;</span></code></p></td>
+<td><p>One <strong>channel component</strong> at a time</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;ePixelWise&gt;</span></code></p></td>
+<td><p>One <strong>pixel</strong> at a time, which includes all components</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Granularity (Parallel computing):</strong></p>
+<p>In parallel computing, granularity (or grain size) of a task is a measure of the amount of work (or computation) which is performed by that task</p>
+</div>
+<p>…. warning:: No Multi-Channels</p>
+<blockquote>
+<div><p>Blinkscript can only input and process <code class="docutils literal notranslate"><span class="pre">rgba</span></code> channels, where each of the <strong>component</strong> is red, green, blue and alpha</p>
+</div></blockquote>
+<p><a class="reference external" href="#top">&gt; Back to top &lt;</a></p>
+</div>
+<div class="section" id="image-specfication">
+<h2><a class="toc-backref" href="#id12">Image Specfication</a><a class="headerlink" href="#image-specfication" title="Permalink to this headline">¶</a></h2>
+<p>Image Specification defines how the input and output is accessed.</p>
+<p>It includes 3 main classes:</p>
+<ul class="simple">
+<li><p><strong>ReadSpec</strong></p></li>
+<li><p><strong>AccessPattern</strong></p></li>
+<li><p><strong>EdgeMethod</strong></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 19%" />
+<col style="width: 67%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>States</strong></p></td>
+<td><p><strong>Options</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>ReadSpec</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eRead</span></code></p></td>
+<td><p>Reading access</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">eWrite</span></code></p></td>
+<td><p>Writing access</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><p>AccessPattern</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eAccessPoint</span></code></p></td>
+<td><p>Access only the current position</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">eAccessRanged1D</span></code></p></td>
+<td><p>Access a one-dimensional range of positions relative to current position</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">eAccessRanged2D</span></code></p></td>
+<td><p>Access a two-dimensional range of positions relative to current position</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">eAccessRandom</span></code></p></td>
+<td><p>Access any pixel</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><p>EdgeMethod</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eEdgeClamped</span></code></p></td>
+<td><p>Edge values is repeated outside the image bounds/format</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">eEdgeConstant</span></code></p></td>
+<td><p>Zero values will be returned outside the image bounds/format</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">eEdgeNone</span></code></p></td>
+<td><p>(Default) Values are undefined outside bounds, no bounds check hence</p></td>
+</tr>
+</tbody>
+</table>
+<p>A Image Specfication can be defined as such:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">// Image&lt;[ReadSpec], [AccessPattern], [EdgeMethod]&gt; src;</span>
+<span class="n">Image</span><span class="o">&lt;</span><span class="n">eRead</span><span class="p">,</span> <span class="n">eAccessRandom</span><span class="p">,</span> <span class="n">eEdgeClammped</span><span class="o">&gt;</span> <span class="n">src</span><span class="p">;</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="#top">&gt; Back to top &lt;</a></p>
+</div>
+<div class="section" id="variables">
+<h2><a class="toc-backref" href="#id13">Variables</a><a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
+<p>You can deine variables in 2 ways, both or either one:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">param</span></code>: parameter variable that are user <strong>accessible</strong></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">local</span></code>: script variable that are user <strong>not accessible</strong></p></li>
+</ul>
+<div class="section" id="datatypes">
+<h3><a class="toc-backref" href="#id14">Datatypes</a><a class="headerlink" href="#datatypes" title="Permalink to this headline">¶</a></h3>
+<p>There are 2 types of data:</p>
+<ul class="simple">
+<li><p><strong>Scalars</strong>: single data (bool, int, float…)</p></li>
+<li><p><strong>Vectors</strong>: array of data (float2, float3, vec2, vec3…)</p></li>
+</ul>
+<p>Blinkscript datatype are very similar to GLSL with some keywards differences:</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 67%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Datatype</strong></p></td>
+<td><p><strong>GLSL Equivalent</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p>gool ol’ friend true/false</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>single intiger value</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">int2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ivec2</span></code></p></td>
+<td><p>2-dimensional integer, can define upto <em>4 dimensions</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p></td>
+<td><p>single float point value</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">float2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">vec2</span></code></p></td>
+<td><p>2-dimensional float, can define upto <em>4 dimensions</em> also can be <code class="docutils literal notranslate"><span class="pre">rgba</span></code> knobs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;t&gt;</span> <span class="pre">multi[n]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;t&gt;</span> <span class="pre">multi[n]</span></code></p></td>
+<td><p>n-dimensional array, where <code class="docutils literal notranslate"><span class="pre">&lt;t&gt;</span></code> is <code class="docutils literal notranslate"><span class="pre">int</span></code> or <code class="docutils literal notranslate"><span class="pre">float</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;t&gt;</span> <span class="pre">multi[n]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;t&gt;</span> <span class="pre">multi[n]</span></code></p></td>
+<td><p>n dimensional array, where &lt;t&gt; is <code class="docutils literal notranslate"><span class="pre">int</span></code> or <code class="docutils literal notranslate"><span class="pre">float</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">float3x3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mat3</span></code></p></td>
+<td><p>3x3 floating matrix, can also define 4x4 the same way</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">recti</span></code>, <code class="docutils literal notranslate"><span class="pre">rectf</span></code></p></td>
+<td><p>n/a</p></td>
+<td><p>integer and floating rectangle object</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The Tailing <code class="docutils literal notranslate"><span class="pre">f</span></code></p>
+<p>Sometimes you would see a tailing <code class="docutils literal notranslate"><span class="pre">f</span></code> after a <code class="docutils literal notranslate"><span class="pre">float</span></code> (ie. <code class="docutils literal notranslate"><span class="pre">float</span> <span class="pre">data=1.0f</span></code>)</p>
+<p>it’s specific to Blinkscript. Sometimes you need it sometimes you don’t. No idea why the <code class="docutils literal notranslate"><span class="pre">f</span></code></p>
+<p>my guess is if a function or datatype is blinkscript specific, it will need a <code class="docutils literal notranslate"><span class="pre">f</span></code>, but rule of thumb: just add it, it doesn’t hurt</p>
+</div>
+</div>
+<div class="section" id="special-datatypes">
+<h3><a class="toc-backref" href="#id15">Special Datatypes</a><a class="headerlink" href="#special-datatypes" title="Permalink to this headline">¶</a></h3>
+<p>There are datatypes you can get the datatype from a vairable.
+Because Blinkscript or C++ is not dynmacially typed, those datatypes can be extremly handy!</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 75%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Datatype</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SampleType(var)</span></code></p></td>
+<td><p>Gets the <code class="docutils literal notranslate"><span class="pre">&lt;ePixelWise&gt;</span></code> data type of variable <code class="docutils literal notranslate"><span class="pre">var</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ValueType(var)</span></code></p></td>
+<td><p>Gets the <code class="docutils literal notranslate"><span class="pre">&lt;eComponentWise&gt;</span></code> data type of Image components <code class="docutils literal notranslate"><span class="pre">var</span></code> per item</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>if <code class="docutils literal notranslate"><span class="pre">ValueType(image)</span></code> is <code class="docutils literal notranslate"><span class="pre">float</span></code> and there are <strong>3 components</strong> in your image, <code class="docutils literal notranslate"><span class="pre">SampleType(image)</span></code> will be <code class="docutils literal notranslate"><span class="pre">float3</span></code>.</p>
+</div>
+<p>You can use those special datatypes as such:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">SampleType</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span> <span class="n">sample</span><span class="p">(</span><span class="mf">0.0f</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reserved-variables">
+<h3><a class="toc-backref" href="#id16">Reserved Variables</a><a class="headerlink" href="#reserved-variables" title="Permalink to this headline">¶</a></h3>
+<p>There are few local variables avaliable when kernel is created or <code class="docutils literal notranslate"><span class="pre">init()</span></code> is called</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 67%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Variable</strong></p></td>
+<td><p><strong>Return</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">src.kMin</span></code></p></td>
+<td><p>min value for any component of image data</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">src.kMax</span></code></p></td>
+<td><p>max value for any component of image data</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">src.kWhitePoint</span></code></p></td>
+<td><p>min value for any component to be white</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">src.kComps</span></code></p></td>
+<td><p>number of components/channels</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">src.kClamps</span></code></p></td>
+<td><p>wether the image data should be clamped</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">src.bounds</span></code></p></td>
+<td><p>bounds of an image, attributes: <code class="docutils literal notranslate"><span class="pre">x1</span></code>, <code class="docutils literal notranslate"><span class="pre">x2</span></code>, <code class="docutils literal notranslate"><span class="pre">y1</span></code>, <code class="docutils literal notranslate"><span class="pre">y2</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">src</span></code> is the input defined by <code class="docutils literal notranslate"><span class="pre">Image&lt;[ImageSpecs]&gt;</span> <span class="pre">src;</span></code></p>
+<p><a class="reference external" href="#top">&gt; Back to top &lt;</a></p>
+</div>
+</div>
+<div class="section" id="methods">
+<h2><a class="toc-backref" href="#id17">Methods</a><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<p>I categorize the methods in 3 parts (unofficial categorization):</p>
+<ul class="simple">
+<li><p><strong>Iterate Space Methods</strong>: nesscary to run the kernel in different stages</p></li>
+<li><p><strong>Specical Methods</strong> Methods: accessing image properties</p></li>
+<li><p><strong>Computation Methods</strong>: function to compute datastreams</p></li>
+</ul>
+<div class="section" id="iterate-space-methods">
+<h3><a class="toc-backref" href="#id18">Iterate Space Methods</a><a class="headerlink" href="#iterate-space-methods" title="Permalink to this headline">¶</a></h3>
+<p>Those methods are called per interate space in following order:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">define()</span></code>: Called once per compile</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">init()</span></code>: Called once per image</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">process()</span></code>: Called once per pixel</p></li>
+</ol>
+<p>There are 3 sets of arguments you can pass in to <code class="docutils literal notranslate"><span class="pre">process()</span></code> to access image data</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 15%" />
+<col style="width: 22%" />
+<col style="width: 45%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>args</strong></p></td>
+<td><p><strong>Granularity</strong></p></td>
+<td><p><strong>Representation</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">process()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ePixelWise</span></code>, <code class="docutils literal notranslate"><span class="pre">eComponentWise</span></code></p></td>
+<td><p>n/a</p></td>
+<td><p>regardless of interation space</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">process(int2</span> <span class="pre">pos)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ePixelWise</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pos.x</span></code>, <code class="docutils literal notranslate"><span class="pre">pos.y</span></code></p></td>
+<td><p>access pixel at <code class="docutils literal notranslate"><span class="pre">(x,y)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">process(int3</span> <span class="pre">pos)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ePixelWise</span></code>, <code class="docutils literal notranslate"><span class="pre">eComponentWise</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pos.x</span></code>, <code class="docutils literal notranslate"><span class="pre">pos.y</span></code>, <code class="docutils literal notranslate"><span class="pre">pos.z</span></code></p></td>
+<td><p>access pixel at <code class="docutils literal notranslate"><span class="pre">(x,y)</span></code> and component <cite>z</cite></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="special-methods">
+<h3><a class="toc-backref" href="#id19">Special Methods</a><a class="headerlink" href="#special-methods" title="Permalink to this headline">¶</a></h3>
+<p>Some methods need to run within one of those <strong>Iterate Space Methods</strong></p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 29%" />
+<col style="width: 14%" />
+<col style="width: 43%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Iterate Space</strong></p></td>
+<td><p><strong>Methods</strong></p></td>
+<td><p><strong>Acecess</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">define()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">defineParam(name,label,value)</span></code></p></td>
+<td><p>all</p></td>
+<td><p>Define parameters avaliable to user</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">init()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">img.setAxis(Axis)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eAccessRanged1D</span></code></p></td>
+<td><p>sets axis for <code class="docutils literal notranslate"><span class="pre">img</span></code>, <code class="docutils literal notranslate"><span class="pre">eX</span></code> or <code class="docutils literal notranslate"><span class="pre">eY</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">init()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">img.setRange(int</span> <span class="pre">min,</span> <span class="pre">int</span> <span class="pre">max)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eAccessRanged1D</span></code>, <code class="docutils literal notranslate"><span class="pre">eAccessRanged2D</span></code></p></td>
+<td><p>sets range for <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> axis</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">init()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">img.setRange(int</span> <span class="pre">xMin,</span> <span class="pre">int</span> <span class="pre">yMin,</span> <span class="pre">int</span> <span class="pre">xMax,</span> <span class="pre">int</span> <span class="pre">yMax)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eAccessRanged2D</span></code></p></td>
+<td><p>sets bounds from <code class="docutils literal notranslate"><span class="pre">xMin</span></code> to <code class="docutils literal notranslate"><span class="pre">yMax</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">init()</span></code>, <code class="docutils literal notranslate"><span class="pre">process()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">img()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eAccessPoint</span></code></p></td>
+<td><p>only the current postion, not relative to other coord</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">init()</span></code>, <code class="docutils literal notranslate"><span class="pre">process()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">img(int</span> <span class="pre">c)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eAccessPoint</span></code></p></td>
+<td><p>only the current postion at component <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">c</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">init()</span></code>, <code class="docutils literal notranslate"><span class="pre">process()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">img(int</span> <span class="pre">offset)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eAccessRanged1D</span></code></p></td>
+<td><p>img value at set axis at <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">offset</span></code> coord</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">init()</span></code>, <code class="docutils literal notranslate"><span class="pre">process()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">img(int</span> <span class="pre">xOffset,</span> <span class="pre">int</span> <span class="pre">yOffset)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eAccessRanged2D</span></code></p></td>
+<td><p>img value at <code class="docutils literal notranslate"><span class="pre">(xOffset,</span> <span class="pre">int</span> <span class="pre">yOffset)</span></code> coord</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">init()</span></code>, <code class="docutils literal notranslate"><span class="pre">process()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">img(int</span> <span class="pre">x,</span> <span class="pre">int</span> <span class="pre">y)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eAccessRandom</span></code></p></td>
+<td><p>img value at <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> coord</p></td>
+</tr>
+</tbody>
+</table>
+<p>All methods can have an optional method ie <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">c</span></code> for component access</p>
+</div>
+<div class="section" id="computation-methods">
+<h3><a class="toc-backref" href="#id20">Computation Methods</a><a class="headerlink" href="#computation-methods" title="Permalink to this headline">¶</a></h3>
+<p>Functions to compute data streams. Some functions are shared with GLSL (<code class="docutils literal notranslate"><span class="pre">scalar</span></code>, <code class="docutils literal notranslate"><span class="pre">vec</span></code>, <code class="docutils literal notranslate"><span class="pre">type</span></code> are placeholders)</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 45%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Function</strong></p></td>
+<td><p><strong>Blink</strong></p></td>
+<td><p><strong>GLSL</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">scalar</span> <span class="pre">dot(vec</span> <span class="pre">a,</span> <span class="pre">vec</span> <span class="pre">b)</span></code></p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>Dot product</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vec3</span> <span class="pre">cross(vec3</span> <span class="pre">a,</span> <span class="pre">vec3</span> <span class="pre">b)</span></code></p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>cross product, limit to 3-component vec</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">scalar</span> <span class="pre">length(vec</span> <span class="pre">a)</span></code></p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>magnitute or the square root of the sum of the squared components</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vec</span> <span class="pre">normalize(vec</span> <span class="pre">a)</span></code></p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>dividing vec <em>a</em> by its length, result in length of <code class="docutils literal notranslate"><span class="pre">1.0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SampleType(img)</span> <span class="pre">bilinear(image</span> <span class="pre">img,</span> <span class="pre">float</span> <span class="pre">x,</span> <span class="pre">float</span> <span class="pre">y,</span> <span class="pre">int</span> <span class="pre">c)</span></code></p></td>
+<td><p>x</p></td>
+<td></td>
+<td><p>bilinear transformation, with optional component <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">c</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">type</span> <span class="pre">mix(type</span> <span class="pre">a,</span> <span class="pre">type</span> <span class="pre">b,</span> <span class="pre">type</span> <span class="pre">f)</span></code></p></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>mix <code class="docutils literal notranslate"><span class="pre">a</span></code> with <code class="docutils literal notranslate"><span class="pre">b</span></code> with factor of <code class="docutils literal notranslate"><span class="pre">f</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">type</span> <span class="pre">smoothstep(type</span> <span class="pre">a,</span> <span class="pre">type</span> <span class="pre">b,</span> <span class="pre">type</span> <span class="pre">f)</span></code></p></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>smoothstep interpolation from <code class="docutils literal notranslate"><span class="pre">a</span></code> to <code class="docutils literal notranslate"><span class="pre">b</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">type</span> <span class="pre">step(type</span> <span class="pre">a,</span> <span class="pre">type</span> <span class="pre">b)</span></code></p></td>
+<td></td>
+<td><p>x</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code> if <code class="docutils literal notranslate"><span class="pre">b</span></code> is smaller than <code class="docutils literal notranslate"><span class="pre">a</span></code> else <code class="docutils literal notranslate"><span class="pre">1.0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">float</span> <span class="pre">distance(type</span> <span class="pre">a,</span> <span class="pre">type</span> <span class="pre">b)</span></code></p></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>Distance between <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">scalar</span> <span class="pre">median(scalar</span> <span class="pre">data[],</span> <span class="pre">int</span> <span class="pre">size)</span></code></p></td>
+<td><p>x</p></td>
+<td></td>
+<td><p>Finds the median value in an array of data of length size</p></td>
+</tr>
+</tbody>
+</table>
+<p>Blinkscript also has a set of functions called <strong>Rectangle Functions</strong> to construct a rectangle type: <code class="docutils literal notranslate"><span class="pre">recti</span></code> or <code class="docutils literal notranslate"><span class="pre">rectf</span></code></p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 10%" />
+<col style="width: 40%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Function</strong></p></td>
+<td><p><strong>Reutrn</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rect(scalar</span> <span class="pre">x1,</span> <span class="pre">scalar</span> <span class="pre">y1,</span> <span class="pre">scalar</span> <span class="pre">x2,</span> <span class="pre">scalar</span> <span class="pre">y2)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rect</span></code></p></td>
+<td><p>Construct a rectangle that goes from (x1, y1) to (x2, y2)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rect.grow(scalar</span> <span class="pre">x,</span> <span class="pre">scalar</span> <span class="pre">y)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rect</span></code></p></td>
+<td><p>grow bounds by x, y</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rect.inside(scalar</span> <span class="pre">x,</span> <span class="pre">scalar</span> <span class="pre">y)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p>whether <code class="docutils literal notranslate"><span class="pre">(scalar</span> <span class="pre">x,</span> <span class="pre">scalar</span> <span class="pre">y)</span></code> or <code class="docutils literal notranslate"><span class="pre">vec</span> <span class="pre">xy</span></code> inside <code class="docutils literal notranslate"><span class="pre">rect</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rect.width()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">scalar</span></code></p></td>
+<td><p>width of <code class="docutils literal notranslate"><span class="pre">rect</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rect.height()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">scalar</span></code></p></td>
+<td><p>height of <code class="docutils literal notranslate"><span class="pre">rect</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vec</span> <span class="pre">rect.height()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">vec2</span></code> <code class="docutils literal notranslate"><span class="pre">(width,</span> <span class="pre">height)</span></code></p></td>
+<td><p>width and height of <code class="docutils literal notranslate"><span class="pre">rect</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><a class="reference external" href="https://learn.foundry.com/nuke/developers/90/BlinkKernels/Blink.html#functions">Full list Blinkscript</a></p></li>
+<li><p><a class="reference external" href="https://www.shaderific.com/glsl-functions">Full list GLSL</a></p></li>
+</ul>
+<p><a class="reference external" href="#top">&gt; Back to top &lt;</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NukeModdingGuide</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Blinkscript in a nutshell</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#blinkscript-basics">Blinkscript Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#necessary-components">Necessary Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kernel-types">Kernel Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kernel-granularity">Kernel Granularity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#image-specfication">Image Specfication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#variables">Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Nuke Modding Guide</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Tianlun Jiang.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/_blinkscript/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
